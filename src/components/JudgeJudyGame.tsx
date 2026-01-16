@@ -689,7 +689,11 @@ const handleResponseSubmit = async () => {
     }
 
     // Check if follow-up is needed (max 1 per party per round)
-    if (clarificationCount < 1) {
+    // Only check if: not already clarifying AND haven't used follow-up yet
+    const canAskFollowUp = !isClarifying && clarificationCount === 0;
+    console.log('[FollowUp] Check - isClarifying:', isClarifying, 'count:', clarificationCount, 'canAsk:', canAskFollowUp);
+
+    if (canAskFollowUp) {
       try {
         setLoadingState('followUp');
         const followUp = await generateAIFollowUp(
@@ -697,9 +701,10 @@ const handleResponseSubmit = async () => {
         );
 
         if (followUp.needsClarification && followUp.question) {
+          console.log('[FollowUp] Asking follow-up question');
           setCurrentResponse('');
           setCurrentQuestion(followUp.question);
-          setClarificationCount(clarificationCount + 1);
+          setClarificationCount(1); // Set to exactly 1, not increment
           setIsClarifying(true);
           setCanObjectToQuestion(true);
           setObjectionWindow({ type: 'question', content: followUp.question, targetParty: examTarget });
@@ -711,10 +716,13 @@ const handleResponseSubmit = async () => {
           setIsLoading(false);
           return;
         }
+        console.log('[FollowUp] No follow-up needed, proceeding');
       } catch (error) {
         console.error('Follow-up check failed:', error);
         // Continue without follow-up
       }
+    } else {
+      console.log('[FollowUp] Skipping - already used or is clarification answer');
     }
     let nextTarget = examTarget;
     let nextRound = examRound;
