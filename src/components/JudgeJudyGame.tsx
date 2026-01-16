@@ -54,6 +54,8 @@ export default function JudgeJudyGame({ initialRoomCode }: { initialRoomCode?: s
   const [myRole, setMyRole] = useState<string | null>(null);
   const [joinCode, setJoinCode] = useState('');
   const [joinError, setJoinError] = useState('');
+  const [joinPreview, setJoinPreview] = useState<{ title: string; partyA: string; partyB: string; stakes: string } | null>(null);
+  const [isLoadingPreview, setIsLoadingPreview] = useState(false);
   const [isMultiplayer, setIsMultiplayer] = useState(false);
   const [otherPlayerJoined, setOtherPlayerJoined] = useState(false);
   const [isOtherTyping, setIsOtherTyping] = useState(false);
@@ -229,6 +231,49 @@ useEffect(() => {
     }
   }
 }, [initialRoomCode]);
+
+// Fetch case preview when join code is complete
+useEffect(() => {
+  const fetchPreview = async () => {
+    if (joinCode.length !== 6) {
+      setJoinPreview(null);
+      setJoinError('');
+      return;
+    }
+
+    setIsLoadingPreview(true);
+    setJoinError('');
+
+    const { data: caseRecord, error } = await supabase
+      .from('cases')
+      .select('title, party_a_name, party_b_name, stakes, party_b_session')
+      .eq('room_code', joinCode)
+      .single();
+
+    setIsLoadingPreview(false);
+
+    if (error || !caseRecord) {
+      setJoinPreview(null);
+      setJoinError('Case not found. Check the room code.');
+      return;
+    }
+
+    if (caseRecord.party_b_session) {
+      setJoinPreview(null);
+      setJoinError('This case already has two parties.');
+      return;
+    }
+
+    setJoinPreview({
+      title: caseRecord.title,
+      partyA: caseRecord.party_a_name,
+      partyB: caseRecord.party_b_name,
+      stakes: caseRecord.stakes
+    });
+  };
+
+  fetchPreview();
+}, [joinCode]);
 
   // Cleanup subscription on unmount
   useEffect(() => {
@@ -1193,13 +1238,13 @@ const handleResponseSubmit = async () => {
         <div className="max-w-md w-full">
           <button onClick={() => setPhase('home')} className="text-slate-400 hover:text-white mb-6">← Back</button>
 
-          <div className="text-center mb-8">
+          <div className="text-center mb-6">
             <div className="text-5xl mb-4">🔗</div>
             <h2 className="text-2xl font-bold text-white mb-2">Join a Case</h2>
             <p className="text-slate-400">Enter the room code shared by the other party</p>
           </div>
 
-          <div className="mb-6">
+          <div className="mb-4">
             <label className="block text-slate-300 mb-2 text-center">Room Code</label>
             <input
               type="text"
@@ -1211,6 +1256,32 @@ const handleResponseSubmit = async () => {
             />
           </div>
 
+          {/* Loading preview */}
+          {isLoadingPreview && (
+            <div className="bg-slate-800/50 rounded-lg p-4 mb-4 text-center">
+              <div className="text-slate-400 text-sm">Looking up case...</div>
+            </div>
+          )}
+
+          {/* Case preview */}
+          {joinPreview && !isLoadingPreview && (
+            <div className="bg-slate-800 rounded-lg p-4 mb-4 border border-green-500/30">
+              <div className="text-green-400 text-xs font-medium mb-2 text-center">✓ CASE FOUND</div>
+              <div className="text-center">
+                <div className="text-amber-400 text-xs mb-1">⚖️ DISPUTE</div>
+                <div className="text-white font-bold text-lg mb-2">{joinPreview.title}</div>
+                <div className="text-slate-400 text-sm">
+                  <span className="text-blue-400">{joinPreview.partyA}</span>
+                  <span className="text-slate-500 mx-2">vs</span>
+                  <span className="text-red-400">{joinPreview.partyB}</span>
+                </div>
+                {joinPreview.stakes && (
+                  <div className="text-amber-300 text-xs mt-2">🏆 {joinPreview.stakes}</div>
+                )}
+              </div>
+            </div>
+          )}
+
           {joinError && (
             <div className="bg-red-500/20 border border-red-500 rounded-lg p-3 mb-4 text-center text-red-400">
               {joinError}
@@ -1219,10 +1290,10 @@ const handleResponseSubmit = async () => {
 
           <button
             onClick={handleJoinCase}
-            disabled={joinCode.length !== 6 || isLoading}
+            disabled={joinCode.length !== 6 || isLoading || !joinPreview}
             className="w-full bg-amber-500 hover:bg-amber-400 disabled:bg-slate-700 disabled:text-slate-500 text-black font-bold py-4 rounded-lg text-lg"
           >
-            {isLoading ? 'Joining...' : 'Join Case →'}
+            {isLoading ? 'Joining...' : joinPreview ? `Join as ${joinPreview.partyB} →` : 'Join Case →'}
           </button>
         </div>
       </div>
