@@ -396,6 +396,17 @@ useEffect(() => {
     setExamTarget(newTarget);
 
     // Handle question updates
+    console.log('[CaseUpdate] Question check:', {
+      isGenerating: isGeneratingQuestion.current,
+      newQuestion: !!newQuestion,
+      newPhase,
+      myRole,
+      newTarget,
+      myRoleMatchesTarget: myRole === newTarget,
+      questionTargetRef: questionTargetRef.current,
+      newQuestionKey
+    });
+
     if (isGeneratingQuestion.current) {
       console.log('[CaseUpdate] Skip - currently generating');
     } else if (newQuestion) {
@@ -406,18 +417,29 @@ useEffect(() => {
       lastQuestionGenTime.current = Date.now();
       setCanObjectToQuestion(true);
       setObjectionWindow({ type: 'question', content: newQuestion, targetParty: newTarget });
-    } else if (newPhase === 'crossExam' && myRole === newTarget && !isGeneratingQuestion.current) {
+    } else if (newPhase === 'crossExam' && myRole === newTarget) {
       // No question, it's crossExam, and it's OUR turn to generate
       // Check if we already generated for this slot
-      if (questionTargetRef.current !== newQuestionKey) {
+      if (questionTargetRef.current !== newQuestionKey && !isGeneratingQuestion.current) {
         console.log('[CaseUpdate] Our turn to generate question for', newQuestionKey);
         // Small delay to let state settle before generating
         setTimeout(() => {
+          console.log('[CaseUpdate] Timeout fired, checking again:', {
+            isGenerating: isGeneratingQuestion.current,
+            questionTargetRef: questionTargetRef.current,
+            newQuestionKey
+          });
           if (!isGeneratingQuestion.current && questionTargetRef.current !== newQuestionKey) {
             generateNewQuestion(newTarget, newRound);
+          } else {
+            console.log('[CaseUpdate] Skipped generation in timeout');
           }
         }, 100);
+      } else {
+        console.log('[CaseUpdate] Already generated for this slot or currently generating');
       }
+    } else {
+      console.log('[CaseUpdate] Not our turn or not crossExam phase');
     }
 
     setObjectionsUsed({
