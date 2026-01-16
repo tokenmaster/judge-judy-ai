@@ -17,6 +17,7 @@ import {
   generateAIVerdict
 } from '@/lib/ai';
 import {
+  ProgressIndicator,
   StakesBadge,
   CredibilityBar,
   Transcript,
@@ -1237,6 +1238,7 @@ const handleResponseSubmit = async () => {
       return (
         <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4">
           <div className="max-w-md w-full text-center">
+            <ProgressIndicator currentPhase="statements" />
             <div className="bg-slate-800 rounded-lg p-4 mb-6">
               <div className="text-amber-500 text-sm font-medium">OPENING STATEMENTS</div>
               <div className="text-white font-bold text-lg">{caseData.title}</div>
@@ -1274,6 +1276,7 @@ const handleResponseSubmit = async () => {
     return (
       <div className="min-h-screen bg-slate-900 p-4">
         <div className="max-w-lg mx-auto">
+          <ProgressIndicator currentPhase="statements" />
           <div className="bg-slate-800 rounded-lg p-4 mb-6">
             <div className="text-amber-500 text-sm font-medium">OPENING STATEMENTS</div>
             <div className="text-white font-bold text-lg">{caseData.title}</div>
@@ -1330,6 +1333,7 @@ if (isMultiplayer && !isMyTurn && !isLoading) {
       return (
         <div className="min-h-screen bg-slate-900 p-4">
           <div className="max-w-lg mx-auto">
+            <ProgressIndicator currentPhase="crossExam" />
             <div className="bg-slate-800 rounded-lg p-4 mb-4">
               <div className="text-amber-500 text-sm font-medium">{isClarifying ? '🔄 FOLLOW-UP' : `⚖️ ROUND ${examRound + 1} OF 3`}</div>
               <div className="text-white font-bold text-lg">{caseData.title}</div>
@@ -1381,6 +1385,7 @@ if (isMultiplayer && !isMyTurn && !isLoading) {
     return (
       <div className="min-h-screen bg-slate-900 p-4">
         <div className="max-w-lg mx-auto">
+          <ProgressIndicator currentPhase="crossExam" />
           <div className="bg-slate-800 rounded-lg p-4 mb-4">
             <div className="text-amber-500 text-sm font-medium">{isClarifying ? '🔄 FOLLOW-UP' : `⚖️ ROUND ${examRound + 1} OF 3`}</div>
             <div className="text-white font-bold text-lg">{caseData.title}</div>
@@ -1468,8 +1473,11 @@ if (isMultiplayer && !isMyTurn && !isLoading) {
   if (phase === 'verdict') {
     if (isLoading || !verdict) {
       return (
-        <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4">
-          <div className="text-center">
+        <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center p-4">
+          <div className="w-full max-w-lg">
+            <ProgressIndicator currentPhase="verdict" />
+          </div>
+          <div className="text-center mt-8">
             <div className="flex justify-center gap-2 mb-4">
               {['📚', '⚖️', '🤝', '📜', '🔨'].map((e, i) => (
                 <span key={i} className="text-3xl animate-pulse" style={{ animationDelay: `${i * 0.2}s` }}>{e}</span>
@@ -1485,6 +1493,7 @@ if (isMultiplayer && !isMyTurn && !isLoading) {
     return (
       <div className="min-h-screen bg-slate-900 p-4">
         <div className="max-w-lg mx-auto">
+          <ProgressIndicator currentPhase="verdict" />
           <div className="text-center mb-6">
             <div className="text-5xl mb-4">⚖️</div>
             <h2 className="text-2xl font-bold text-white mb-2">THE VERDICT</h2>

@@ -3,6 +3,50 @@
 import React from 'react';
 import { getCredibilityLabel, getCredibilityColor, OBJECTION_TYPES } from '@/lib/constants';
 
+// Progress Indicator Component
+export function ProgressIndicator({ currentPhase }: { currentPhase: 'statements' | 'crossExam' | 'verdict' }) {
+  const steps = [
+    { id: 'statements', label: 'Statements', icon: '📝' },
+    { id: 'crossExam', label: 'Cross-Exam', icon: '⚖️' },
+    { id: 'verdict', label: 'Verdict', icon: '🔨' }
+  ];
+
+  const currentIndex = steps.findIndex(s => s.id === currentPhase);
+
+  return (
+    <div className="flex items-center justify-center gap-2 mb-4">
+      {steps.map((step, index) => {
+        const isCompleted = index < currentIndex;
+        const isCurrent = index === currentIndex;
+        const isPending = index > currentIndex;
+
+        return (
+          <React.Fragment key={step.id}>
+            {/* Step */}
+            <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm transition-all ${
+              isCurrent
+                ? 'bg-amber-500/20 border border-amber-500 text-amber-400'
+                : isCompleted
+                  ? 'bg-green-500/10 border border-green-500/30 text-green-400'
+                  : 'bg-slate-800 border border-slate-700 text-slate-500'
+            }`}>
+              <span>{isCompleted ? '✓' : step.icon}</span>
+              <span className="font-medium">{step.label}</span>
+            </div>
+
+            {/* Connector line */}
+            {index < steps.length - 1 && (
+              <div className={`w-8 h-0.5 ${
+                index < currentIndex ? 'bg-green-500/50' : 'bg-slate-700'
+              }`} />
+            )}
+          </React.Fragment>
+        );
+      })}
+    </div>
+  );
+}
+
 // Stakes Badge Component
 export function StakesBadge({ stakes }: { stakes: string }) {
   if (!stakes) return null;
