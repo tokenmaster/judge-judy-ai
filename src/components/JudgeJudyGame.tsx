@@ -941,15 +941,13 @@ export default function JudgeJudyGame() {
           <StakesBadge stakes={caseData.stakes} />
           <CredibilityBar partyA={caseData.partyA} partyB={caseData.partyB} credibilityA={credibilityA} credibilityB={credibilityB} history={credibilityHistory} />
 
-          {/* Transcript ABOVE the question/response area - with max height */}
-          <div className="max-h-48 overflow-y-auto">
-            <Transcript caseData={caseData} responses={responses} objections={objections} isOpen={transcriptOpen} onToggle={() => setTranscriptOpen(!transcriptOpen)} />
-          </div>
-
           {isLoading ? (
             <LoadingOverlay emoji={loadingEmoji} message={loadingMessage} />
           ) : currentQuestion ? (
             <div className="space-y-4 mt-4">
+              {/* Transcript above question */}
+               <Transcript caseData={caseData} responses={responses} objections={objections} isOpen={transcriptOpen} onToggle={() => setTranscriptOpen(!transcriptOpen)} />
+              
               <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-4">
                 <div className="text-amber-500 text-sm font-medium mb-1">
                   {JUDGE_PERSONALITIES[caseData.judge as keyof typeof JUDGE_PERSONALITIES]?.name || 'Judge'}:
