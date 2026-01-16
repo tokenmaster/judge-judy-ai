@@ -512,6 +512,7 @@ const handleResponseSubmit = async () => {
     }
 
     // FIXED: Strict check for follow-up limit (max 3 per party per round)
+  /*
     const currentClarifications = clarificationCount;
     if (currentClarifications < 2) {
       setLoadingState('followUp');
@@ -533,7 +534,7 @@ const handleResponseSubmit = async () => {
         return;
       }
     }
-
+*/
     let nextTarget = examTarget;
     let nextRound = examRound;
     let nextPhase = 'crossExam';
