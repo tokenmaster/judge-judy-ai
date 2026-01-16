@@ -44,8 +44,8 @@ export async function generateMainQuestion(
   const otherStatement = examTarget === 'A' ? caseData.statementB : caseData.statementA;
   
   const previousResponses = responses
-    .filter(r => r.party === examTarget)
-    .map(r => `Q: ${r.question}\nA: ${r.answer}`)
+    .filter((r: any) => r.party === examTarget)
+    .map((r: any) => `Q: ${r.question}\nA: ${r.answer}`)
     .join('\n\n');
 
   const prompt = `${judge.style}
@@ -129,8 +129,8 @@ export async function evaluateCredibility(
   const otherStatement = party === 'A' ? caseData.statementB : caseData.statementA;
   
   const previousAnswers = responses
-    .filter(r => r.party === party)
-    .map(r => r.answer)
+    .filter((r: any) => r.party === party)
+    .map((r: any) => r.answer)
     .join('\n');
 
   const prompt = `Evaluate the credibility of this testimony.
@@ -180,7 +180,7 @@ FLAG: [major issue if any, or "none"]`;
     newCredibility,
     change: totalChange,
     analysis: analysisMatch?.[1] || 'Response evaluated.',
-    flagged: flagged || null
+    flagged: flagged
   };
 }
 
@@ -288,7 +288,7 @@ export async function generateAIVerdict(
   const judge = JUDGE_PERSONALITIES[judgeId as keyof typeof JUDGE_PERSONALITIES];
   
   const allTestimony = responses
-    .map(r => `${r.party === 'A' ? caseData.partyA : caseData.partyB}: "${r.answer}"`)
+    .map((r: any) => `${r.party === 'A' ? caseData.partyA : caseData.partyB}: "${r.answer}"`)
     .join('\n');
 
   const prompt = `${judge.style}
@@ -320,7 +320,7 @@ CREDIBILITY_IMPACT: [How credibility affected your decision]`;
   
   const winnerMatch = result.match(/WINNER:\s*(.+)/i);
   const summaryMatch = result.match(/SUMMARY:\s*(.+)/i);
-  const reasoningMatch = result.match(/REASONING:\s*(.+?)(?=QUOTE1:|$)/is);
+  const reasoningMatch = result.match(/REASONING:\s*([^]*?)(?=QUOTE1:|$)/i);
   const quote1Match = result.match(/QUOTE1:\s*(.+)/i);
   const quote2Match = result.match(/QUOTE2:\s*(.+)/i);
   const credImpactMatch = result.match(/CREDIBILITY_IMPACT:\s*(.+)/i);
@@ -329,13 +329,17 @@ CREDIBILITY_IMPACT: [How credibility affected your decision]`;
   const winner = winnerName === caseData.partyA ? 'A' : 'B';
   const loserName = winner === 'A' ? caseData.partyB : caseData.partyA;
   
+  const quotes: string[] = [];
+  if (quote1Match?.[1]) quotes.push(quote1Match[1]);
+  if (quote2Match?.[1]) quotes.push(quote2Match[1]);
+  
   return {
     winner,
     winnerName,
     loserName,
     summary: summaryMatch?.[1]?.trim() || `${winnerName} wins this case!`,
     reasoning: reasoningMatch?.[1]?.trim() || 'Based on the evidence presented.',
-    quotes: [quote1Match?.[1], quote2Match?.[1]].filter(Boolean) as string[],
+    quotes,
     credibilityImpact: credImpactMatch?.[1]?.trim() || 'Credibility was a factor.'
   };
 }
