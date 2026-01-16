@@ -358,14 +358,16 @@ useEffect(() => {
       setCredibilityB(updatedCase.credibility_b);
     }
   }
-    setExamRound(updatedCase.exam_round || 0);
-    setExamTarget(updatedCase.exam_target || 'A');
+    const newRound = updatedCase.exam_round || 0;
+    const newTarget = updatedCase.exam_target || 'A';
+    setExamRound(newRound);
+    setExamTarget(newTarget);
 
-    // Update current question and track which target it's for
+    // Update current question and track which round-target it's for
     const newQuestion = updatedCase.current_question || '';
     setCurrentQuestion(newQuestion);
     if (newQuestion) {
-      questionTargetRef.current = updatedCase.exam_target || 'A';
+      questionTargetRef.current = `${newRound}-${newTarget}`;
     } else {
       questionTargetRef.current = null;
     }
@@ -496,15 +498,17 @@ useEffect(() => {
   };
 
   // Generate question when entering cross-exam
+  // Only depends on phase, examRound, examTarget - NOT isLoading or currentQuestion
+  // This prevents re-triggering when loading state changes
   useEffect(() => {
     // Skip if not in cross-exam phase
     if (phase !== 'crossExam') return;
 
-    // Skip if already loading or clarifying
-    if (isLoading || isClarifying) return;
+    // Skip if clarifying (follow-up questions)
+    if (isClarifying) return;
 
-    // Skip if we already have a question for the current target
-    if (currentQuestion && questionTargetRef.current === examTarget) return;
+    // Skip if we already have a question for this exact target in this round
+    if (questionTargetRef.current === `${examRound}-${examTarget}`) return;
 
     // Skip if already generating a question
     if (isGeneratingQuestion.current) return;
@@ -518,16 +522,18 @@ useEffect(() => {
     setIsLoading(true);
     setLoadingState('question');
     setCanObjectToQuestion(false);
+    setCurrentQuestion(''); // Clear old question first
 
-    // Capture current examTarget to avoid stale closure issues
+    // Capture current state to avoid stale closure issues
     const targetForQuestion = examTarget;
+    const roundForQuestion = examRound;
 
-    generateMainQuestion(caseData.judge, caseData, responses, examRound, targetForQuestion, objections)
+    generateMainQuestion(caseData.judge, caseData, responses, roundForQuestion, targetForQuestion, objections)
       .then(async (question) => {
-        // Only update if we're still targeting the same party
-        if (examTarget === targetForQuestion) {
+        // Only update if we're still targeting the same party in the same round
+        if (examTarget === targetForQuestion && examRound === roundForQuestion) {
           const finalQuestion = question || `${targetForQuestion === 'A' ? caseData.partyA : caseData.partyB}, can you explain your side of what happened?`;
-          questionTargetRef.current = targetForQuestion;
+          questionTargetRef.current = `${roundForQuestion}-${targetForQuestion}`;
           setCurrentQuestion(finalQuestion);
           setClarificationCount(0);
           setCanObjectToQuestion(true);
@@ -542,7 +548,7 @@ useEffect(() => {
         console.error('Failed to generate question:', error);
         // Provide a fallback question so the game can continue
         const fallbackQuestion = `${targetForQuestion === 'A' ? caseData.partyA : caseData.partyB}, please explain your version of events.`;
-        questionTargetRef.current = targetForQuestion;
+        questionTargetRef.current = `${roundForQuestion}-${targetForQuestion}`;
         setCurrentQuestion(fallbackQuestion);
         setCanObjectToQuestion(true);
       })
@@ -550,7 +556,7 @@ useEffect(() => {
         isGeneratingQuestion.current = false;
         setIsLoading(false);
       });
-  }, [phase, examRound, examTarget, isClarifying, myRole, isLoading, currentQuestion]);
+  }, [phase, examRound, examTarget, isClarifying, myRole, isMultiplayer]);
 
   // Generate verdict
   useEffect(() => {
