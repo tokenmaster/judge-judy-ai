@@ -464,7 +464,12 @@ useEffect(() => {
       setCurrentParty(updatedCase.current_turn);
     }
 
-    if (updatedCase.verdict) {
+    // Handle snap judgment from other player
+    if (updatedCase.verdict?.isSnapJudgment && !showSnapJudgment) {
+      console.log('[CaseUpdate] Received snap judgment from other player');
+      setSnapJudgment(updatedCase.verdict);
+      setShowSnapJudgment(true);
+    } else if (updatedCase.verdict && !updatedCase.verdict.isSnapJudgment) {
       setVerdict(updatedCase.verdict);
     }
   };
@@ -760,11 +765,22 @@ const handleResponseSubmit = async () => {
       );
 
       if (snapCheck?.triggered) {
+        console.log('[ResponseSubmit] Snap judgment triggered!', snapCheck);
         setSnapJudgment(snapCheck);
         setShowSnapJudgment(true);
         setIsLoading(false);
         isProcessingResponse.current = false;
-        console.log('[ResponseSubmit] Snap judgment triggered, cleared processing flag');
+
+        // Save snap judgment to database so other player sees it
+        if (isMultiplayer) {
+          await updateCase({
+            phase: 'snapJudgment',
+            verdict: {
+              isSnapJudgment: true,
+              ...snapCheck
+            }
+          });
+        }
         return;
       }
     } catch (error) {
@@ -918,9 +934,31 @@ const handleResponseSubmit = async () => {
     return (
       <SnapJudgmentDisplay
         judgment={snapJudgment}
-        onContinue={() => {
+        onContinue={async () => {
           setShowSnapJudgment(false);
+
+          // Create verdict from snap judgment
+          const snapVerdict = {
+            winner: snapJudgment.winner === caseData.partyA ? 'A' : 'B',
+            winnerName: snapJudgment.winner,
+            loserName: snapJudgment.winner === caseData.partyA ? caseData.partyB : caseData.partyA,
+            summary: snapJudgment.reason || 'Case decided by snap judgment.',
+            reasoning: `Snap judgment: ${snapJudgment.reason}`,
+            quotes: [],
+            credibilityImpact: 'Credibility difference led to early judgment.',
+            isSnapJudgment: true
+          };
+
+          setVerdict(snapVerdict);
           setPhase('verdict');
+
+          // Update database in multiplayer
+          if (isMultiplayer) {
+            await updateCase({
+              phase: 'verdict',
+              verdict: snapVerdict
+            });
+          }
         }}
       />
     );
@@ -1314,10 +1352,6 @@ if (isMultiplayer && !isMyTurn && !isLoading) {
                 <div className="text-white">{currentQuestion}</div>
               </div>
 
-              {/* Debug objection button visibility */}
-              <div className="text-xs text-slate-500 mb-2">
-                Debug: canObject={String(canObjectToQuestion)}, used={String(objectionsUsed[examTarget as 'A' | 'B'])}
-              </div>
               {canObjectToQuestion && !objectionsUsed[examTarget as 'A' | 'B'] && (
                 <button
                   onClick={() => {
