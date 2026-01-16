@@ -941,8 +941,10 @@ export default function JudgeJudyGame() {
           <StakesBadge stakes={caseData.stakes} />
           <CredibilityBar partyA={caseData.partyA} partyB={caseData.partyB} credibilityA={credibilityA} credibilityB={credibilityB} history={credibilityHistory} />
 
-          {/* Transcript ABOVE the question/response area */}
-          <Transcript caseData={caseData} responses={responses} objections={objections} isOpen={transcriptOpen} onToggle={() => setTranscriptOpen(!transcriptOpen)} />
+          {/* Transcript ABOVE the question/response area - with max height */}
+          <div className="max-h-48 overflow-y-auto">
+            <Transcript caseData={caseData} responses={responses} objections={objections} isOpen={transcriptOpen} onToggle={() => setTranscriptOpen(!transcriptOpen)} />
+          </div>
 
           {isLoading ? (
             <LoadingOverlay emoji={loadingEmoji} message={loadingMessage} />
