@@ -1423,18 +1423,33 @@ const handleResponseSubmit = async () => {
             </div>
           </div>
 
+          {/* Guidance box */}
+          <div className="bg-slate-800/50 rounded-lg p-4 mb-4">
+            <div className="text-amber-400 text-sm font-medium mb-2">💡 What to write:</div>
+            <ul className="text-slate-400 text-sm space-y-1">
+              <li>• <span className="text-slate-300">What happened?</span> Describe the situation from your perspective</li>
+              <li>• <span className="text-slate-300">Why are you right?</span> Explain why you deserve to win</li>
+              <li>• <span className="text-slate-300">Be specific!</span> Include details, dates, or evidence</li>
+            </ul>
+          </div>
+
           <div className={`rounded-lg border-2 p-4 mb-4 ${isPartyA ? 'border-blue-500/50 bg-blue-500/5' : 'border-red-500/50 bg-red-500/5'}`}>
-            <div className="flex items-center gap-2 mb-3">
+            <div className="flex items-center gap-2 mb-2">
               <span className={`font-bold text-lg ${isPartyA ? 'text-blue-400' : 'text-red-400'}`}>{currentName}</span>
-              <span className="text-slate-400 text-sm">— tell your side</span>
+              <span className="text-slate-400 text-sm">— your opening statement</span>
             </div>
+            <div className="text-slate-500 text-xs mb-3">The judge will read this and question you about it</div>
             <textarea
-              placeholder={`${currentName}, what happened? Tell the judge your version of events...`}
+              placeholder={`Example: "On Tuesday, ${isPartyA ? caseData.partyB || 'they' : caseData.partyA || 'they'} did [X] and I believe I'm right because [Y]. I have [evidence/witnesses] that prove..."`}
               value={currentStatement}
               onChange={(e) => handleStatementChange(e.target.value)}
               rows={6}
               className={`w-full bg-slate-800 border rounded-lg px-4 py-3 text-white placeholder-slate-500 resize-none ${isPartyA ? 'border-blue-500/30 focus:border-blue-500' : 'border-red-500/30 focus:border-red-500'}`}
             />
+            <div className="flex justify-between mt-2 text-xs text-slate-500">
+              <span>{currentStatement.length} characters</span>
+              <span>{currentStatement.length < 50 ? '📝 Add more detail for a stronger case' : currentStatement.length > 500 ? '✂️ Consider being more concise' : '✓ Good length'}</span>
+            </div>
           </div>
 
           <button onClick={handleStatementSubmit} disabled={!currentStatement} className="w-full bg-amber-500 hover:bg-amber-400 disabled:bg-slate-700 disabled:text-slate-500 text-black font-bold py-4 rounded-lg">
