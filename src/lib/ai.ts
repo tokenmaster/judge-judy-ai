@@ -173,13 +173,14 @@ FLAG: [major issue if any, or "none"]`;
     (parseInt(specificityMatch?.[1] || '0'));
   
   const newCredibility = Math.max(5, Math.min(95, currentCredibility + totalChange));
-  const flagged = flagMatch?.[1]?.toLowerCase() !== 'none' ? flagMatch?.[1] : null;
+  const flaggedText = flagMatch?.[1];
+  const flagged = (flaggedText && flaggedText.toLowerCase() !== 'none') ? flaggedText : null;
   
   return {
     newCredibility,
     change: totalChange,
     analysis: analysisMatch?.[1] || 'Response evaluated.',
-    flagged
+    flagged: flagged || null
   };
 }
 
