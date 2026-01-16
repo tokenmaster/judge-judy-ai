@@ -342,17 +342,140 @@ export function SnapJudgmentDisplay({
 }
 
 // Loading Overlay
-export function LoadingOverlay({ 
-  emoji, 
-  message 
-}: { 
-  emoji: string; 
+export function LoadingOverlay({
+  emoji,
+  message
+}: {
+  emoji: string;
   message: string;
 }) {
   return (
     <div className="bg-slate-800/50 rounded-lg p-6 text-center">
       <ThinkingEmoji emoji={emoji} />
       <div className="text-slate-400 mt-2">{message}</div>
+    </div>
+  );
+}
+
+// Chat-style Transcript for cross-examination
+export function ChatTranscript({
+  caseData,
+  responses,
+  currentQuestion,
+  judgeName,
+  isLoading,
+  loadingMessage,
+  loadingEmoji
+}: {
+  caseData: any;
+  responses: any[];
+  currentQuestion?: string;
+  judgeName: string;
+  isLoading?: boolean;
+  loadingMessage?: string;
+  loadingEmoji?: string;
+}) {
+  const chatEndRef = React.useRef<HTMLDivElement>(null);
+
+  // Auto-scroll to bottom when new messages arrive
+  React.useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [responses, currentQuestion, isLoading]);
+
+  return (
+    <div className="bg-slate-800/30 rounded-xl border border-slate-700/50 flex flex-col" style={{ height: '400px' }}>
+      {/* Chat header */}
+      <div className="bg-slate-800 px-4 py-3 rounded-t-xl border-b border-slate-700/50">
+        <div className="text-slate-400 text-sm font-medium">📜 Case Transcript</div>
+      </div>
+
+      {/* Chat messages area */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        {/* Opening statements section */}
+        <div className="text-center">
+          <span className="bg-slate-700/50 text-slate-400 text-xs px-3 py-1 rounded-full">
+            OPENING STATEMENTS
+          </span>
+        </div>
+
+        {/* Party A statement */}
+        <div className="flex flex-col items-start">
+          <span className="text-blue-400 text-xs font-medium mb-1 ml-1">{caseData.partyA}</span>
+          <div className="bg-blue-500/20 border border-blue-500/30 rounded-2xl rounded-tl-sm px-4 py-2 max-w-[85%]">
+            <span className="text-slate-200 text-sm">{caseData.statementA}</span>
+          </div>
+        </div>
+
+        {/* Party B statement */}
+        <div className="flex flex-col items-end">
+          <span className="text-red-400 text-xs font-medium mb-1 mr-1">{caseData.partyB}</span>
+          <div className="bg-red-500/20 border border-red-500/30 rounded-2xl rounded-tr-sm px-4 py-2 max-w-[85%]">
+            <span className="text-slate-200 text-sm">{caseData.statementB}</span>
+          </div>
+        </div>
+
+        {/* Cross-examination divider */}
+        {(responses.length > 0 || currentQuestion) && (
+          <div className="text-center py-2">
+            <span className="bg-amber-500/20 text-amber-400 text-xs px-3 py-1 rounded-full">
+              ⚖️ CROSS-EXAMINATION
+            </span>
+          </div>
+        )}
+
+        {/* Previous Q&A */}
+        {responses.map((r, i) => (
+          <React.Fragment key={i}>
+            {/* Judge question */}
+            <div className="flex flex-col items-start">
+              <span className="text-amber-400 text-xs font-medium mb-1 ml-1">⚖️ {judgeName}</span>
+              <div className="bg-amber-500/20 border border-amber-500/30 rounded-2xl rounded-tl-sm px-4 py-2 max-w-[85%]">
+                <span className="text-white text-sm">{r.question}</span>
+              </div>
+            </div>
+
+            {/* Party response */}
+            <div className={`flex flex-col ${r.party === 'A' ? 'items-start' : 'items-end'}`}>
+              <span className={`text-xs font-medium mb-1 ${r.party === 'A' ? 'text-blue-400 ml-1' : 'text-red-400 mr-1'}`}>
+                {r.party === 'A' ? caseData.partyA : caseData.partyB}
+              </span>
+              <div className={`rounded-2xl px-4 py-2 max-w-[85%] ${
+                r.party === 'A'
+                  ? 'bg-blue-500/20 border border-blue-500/30 rounded-tl-sm'
+                  : 'bg-red-500/20 border border-red-500/30 rounded-tr-sm'
+              }`}>
+                <span className="text-slate-200 text-sm">{r.answer}</span>
+              </div>
+            </div>
+          </React.Fragment>
+        ))}
+
+        {/* Current question */}
+        {currentQuestion && !isLoading && (
+          <div className="flex flex-col items-start">
+            <span className="text-amber-400 text-xs font-medium mb-1 ml-1">⚖️ {judgeName}</span>
+            <div className="bg-amber-500/20 border border-amber-500/30 rounded-2xl rounded-tl-sm px-4 py-2 max-w-[85%]">
+              <span className="text-white text-sm">{currentQuestion}</span>
+            </div>
+          </div>
+        )}
+
+        {/* Loading indicator */}
+        {isLoading && (
+          <div className="flex flex-col items-start">
+            <span className="text-amber-400 text-xs font-medium mb-1 ml-1">⚖️ {judgeName}</span>
+            <div className="bg-amber-500/10 border border-amber-500/20 rounded-2xl rounded-tl-sm px-4 py-3">
+              <div className="flex items-center gap-2">
+                <span className="text-lg animate-bounce">{loadingEmoji || '🤔'}</span>
+                <span className="text-slate-400 text-sm">{loadingMessage || 'Thinking...'}</span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Scroll anchor */}
+        <div ref={chatEndRef} />
+      </div>
     </div>
   );
 }
