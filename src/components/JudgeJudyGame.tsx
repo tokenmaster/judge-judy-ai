@@ -111,11 +111,122 @@ useEffect(() => {
   myRoleRef.current = myRole;
 }, [myRole]);
 
-// Auto-join if room code is in URL
+// Save session to sessionStorage when case changes
+const saveSession = (caseIdToSave: string, role: string) => {
+  if (typeof window !== 'undefined') {
+    sessionStorage.setItem('judge_judy_case', JSON.stringify({ caseId: caseIdToSave, myRole: role }));
+  }
+};
+
+const clearSession = () => {
+  if (typeof window !== 'undefined') {
+    sessionStorage.removeItem('judge_judy_case');
+  }
+};
+
+// Restore session on mount (handles page refresh)
+useEffect(() => {
+  const restoreSession = async () => {
+    if (typeof window === 'undefined') return;
+
+    const savedSession = sessionStorage.getItem('judge_judy_case');
+    if (!savedSession) return;
+
+    try {
+      const { caseId: savedCaseId, myRole: savedRole } = JSON.parse(savedSession);
+      if (!savedCaseId || !savedRole) return;
+
+      // Fetch the case from database
+      const { data: caseRecord, error } = await supabase
+        .from('cases')
+        .select('*')
+        .eq('id', savedCaseId)
+        .single();
+
+      if (error || !caseRecord) {
+        // Case no longer exists, clear session
+        clearSession();
+        return;
+      }
+
+      // Verify this session is still part of this case
+      const isPartyA = caseRecord.party_a_session === sessionId;
+      const isPartyB = caseRecord.party_b_session === sessionId;
+
+      if (!isPartyA && !isPartyB) {
+        // Session is no longer valid for this case
+        clearSession();
+        return;
+      }
+
+      // Fetch existing responses
+      const { data: existingResponses } = await supabase
+        .from('responses')
+        .select('*')
+        .eq('case_id', savedCaseId)
+        .order('created_at', { ascending: true });
+
+      if (existingResponses) {
+        setResponses(existingResponses);
+        existingResponses.forEach((r: any) => processedResponseIds.current.add(r.id));
+      }
+
+      // Restore all state from the case
+      setCaseId(savedCaseId);
+      setRoomCode(caseRecord.room_code);
+      setMyRole(isPartyA ? 'A' : 'B');
+      setIsMultiplayer(true);
+      setCaseData({
+        title: caseRecord.title,
+        category: caseRecord.category,
+        judge: caseRecord.judge,
+        stakes: caseRecord.stakes,
+        partyA: caseRecord.party_a_name,
+        partyB: caseRecord.party_b_name,
+        statementA: caseRecord.statement_a || '',
+        statementB: caseRecord.statement_b || ''
+      });
+      setCredibilityA(caseRecord.credibility_a || 50);
+      setCredibilityB(caseRecord.credibility_b || 50);
+      setExamRound(caseRecord.exam_round || 0);
+      setExamTarget(caseRecord.exam_target || 'A');
+      setCurrentQuestion(caseRecord.current_question || '');
+      setObjectionsUsed({
+        A: caseRecord.objections_used_a || false,
+        B: caseRecord.objections_used_b || false
+      });
+      setOtherPlayerJoined(!!caseRecord.party_b_session);
+
+      // Set phase based on case state
+      if (caseRecord.verdict) {
+        setVerdict(caseRecord.verdict);
+        setPhase('verdict');
+      } else if (caseRecord.phase) {
+        setPhase(caseRecord.phase);
+      }
+
+      // Subscribe to updates
+      subscribeToCase(savedCaseId);
+
+      console.log('[Session] Restored session for case', savedCaseId, 'as', isPartyA ? 'A' : 'B');
+    } catch (e) {
+      console.error('[Session] Failed to restore session:', e);
+      clearSession();
+    }
+  };
+
+  restoreSession();
+}, []);
+
+// Auto-join if room code is in URL (but not if we have a saved session)
 useEffect(() => {
   if (initialRoomCode && !isMultiplayer && phase === 'home') {
-    setJoinCode(initialRoomCode);
-    setPhase('join');
+    // Check if we already have a session being restored
+    const savedSession = typeof window !== 'undefined' ? sessionStorage.getItem('judge_judy_case') : null;
+    if (!savedSession) {
+      setJoinCode(initialRoomCode);
+      setPhase('join');
+    }
   }
 }, [initialRoomCode]);
 
@@ -262,6 +373,7 @@ useEffect(() => {
     setIsLoading(false);
 
     subscribeToCase(caseRecord.id);
+    saveSession(caseRecord.id, 'B');
   };
 
   const handleCreateCase = async () => {
@@ -275,6 +387,7 @@ useEffect(() => {
       setIsMultiplayer(true);
       setPhase('waiting-room');
       subscribeToCase(newCase.id);
+      saveSession(newCase.id, 'A');
     }
 
     setIsLoading(false);
@@ -892,6 +1005,7 @@ const handleResponseSubmit = async () => {
   };
 
   const resetCase = () => {
+    clearSession();
     setPhase('home');
     setCaseData({ title: '', category: '', judge: 'judy', partyA: '', partyB: '', statementA: '', statementB: '', stakes: '' });
     setCurrentParty('A');
