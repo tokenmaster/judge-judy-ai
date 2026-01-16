@@ -447,15 +447,18 @@ useEffect(() => {
     }
   }, [phase]);
 
-  const handleResponseSubmit = async () => {
-    const newResponse = {
-      round: examRound,
-      party: examTarget,
-      party_name: examTarget === 'A' ? caseData.partyA : caseData.partyB,
-      question: currentQuestion,
-      answer: currentResponse,
-      is_clarification: isClarifying
-    };
+const handleResponseSubmit = async () => {
+  const savedResponse = currentResponse; // Save it before clearing
+  setCurrentResponse(''); // Clear immediately
+  
+  const newResponse = {
+    round: examRound,
+    party: examTarget,
+    party_name: examTarget === 'A' ? caseData.partyA : caseData.partyB,
+    question: currentQuestion,
+    answer: savedResponse,
+    is_clarification: isClarifying
+  };
     
     // Add to local state first
     const updatedResponses = [...responses, newResponse];
@@ -474,7 +477,7 @@ useEffect(() => {
 
     const currentCred = examTarget === 'A' ? credibilityA : credibilityB;
     const credEval = await evaluateCredibility(
-      caseData, responses, examTarget, currentResponse, currentQuestion, currentCred
+      caseData, responses, examTarget, savedResponse, currentQuestion, currentCred
     );
 
     const newCredA = examTarget === 'A' ? credEval.newCredibility : credibilityA;
