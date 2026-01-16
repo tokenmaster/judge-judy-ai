@@ -27,7 +27,7 @@ import {
   ThinkingEmoji
 } from './ui';
 
-export default function JudgeJudyGame() {
+export default function JudgeJudyGame({ initialRoomCode }: { initialRoomCode?: string | null }) {
   // Core state
   const [phase, setPhase] = useState('home');
   const [caseData, setCaseData] = useState({
@@ -82,6 +82,14 @@ export default function JudgeJudyGame() {
   const processedResponseIds = useRef<Set<string>>(new Set());
 
   const MAX_CLARIFICATIONS = 3;
+
+// Auto-join if room code is in URL
+useEffect(() => {
+  if (initialRoomCode && !isMultiplayer && phase === 'home') {
+    setJoinCode(initialRoomCode);
+    setPhase('join');
+  }
+}, [initialRoomCode]);
 
   const setLoadingState = (type: 'question' | 'credibility' | 'snapJudgment' | 'followUp' | 'verdict' | 'objection') => {
     const state = getRandomLoadingState(type);
@@ -764,12 +772,27 @@ export default function JudgeJudyGame() {
           <div className="bg-slate-800 rounded-lg p-6 mb-6">
             <div className="text-slate-400 text-sm mb-2">ROOM CODE</div>
             <div className="text-5xl font-bold text-amber-400 tracking-widest mb-4">{roomCode}</div>
-            <button
-              onClick={() => navigator.clipboard.writeText(roomCode)}
-              className="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg text-sm"
-            >
-              📋 Copy Code
-            </button>
+            <div className="space-y-3">
+              <button
+                onClick={() => navigator.clipboard.writeText(roomCode)}
+                className="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg text-sm w-full"
+              >
+                📋 Copy Code
+              </button>
+              <button
+                onClick={() => {
+                  const shareUrl = `${window.location.origin}?room=${roomCode}`;
+                  navigator.clipboard.writeText(shareUrl);
+                }}
+                className="bg-amber-500 hover:bg-amber-400 text-black px-4 py-2 rounded-lg text-sm font-bold w-full"
+              >
+                🔗 Copy Share Link
+              </button>
+            </div>
+            
+            <div className="mt-4 text-slate-500 text-xs break-all">
+              {typeof window !== 'undefined' && `${window.location.origin}?room=${roomCode}`}
+            </div>
           </div>
 
           <div className="bg-slate-800/50 rounded-lg p-4 mb-6">
