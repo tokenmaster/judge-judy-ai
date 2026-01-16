@@ -1314,9 +1314,14 @@ if (isMultiplayer && !isMyTurn && !isLoading) {
                 <div className="text-white">{currentQuestion}</div>
               </div>
 
+              {/* Debug objection button visibility */}
+              <div className="text-xs text-slate-500 mb-2">
+                Debug: canObject={String(canObjectToQuestion)}, used={String(objectionsUsed[examTarget as 'A' | 'B'])}
+              </div>
               {canObjectToQuestion && !objectionsUsed[examTarget as 'A' | 'B'] && (
                 <button
                   onClick={() => {
+                    console.log('[Objection] Button clicked');
                     setObjectionWindow({ type: 'question', content: currentQuestion });
                     setShowObjectionModal(true);
                   }}
