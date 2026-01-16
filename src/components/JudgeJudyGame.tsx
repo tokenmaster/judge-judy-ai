@@ -1140,28 +1140,8 @@ if (isMultiplayer && !isMyTurn && !isLoading) {
               <div className="text-slate-500 text-xs mt-1">Room: {roomCode}</div>
             </div>
 
-            <div className="text-center py-4">
-              {isOtherTyping ? (
-                <>
-                  <div className="text-5xl mb-4">✍️</div>
-                  <h2 className="text-xl font-bold text-white mb-2">{targetName} is typing...</h2>
-                  <div className="flex justify-center gap-1 mb-2">
-                    <span className="w-2 h-2 bg-amber-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
-                    <span className="w-2 h-2 bg-amber-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
-                    <span className="w-2 h-2 bg-amber-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div className="text-5xl mb-4">⏳</div>
-                  <h2 className="text-xl font-bold text-white mb-2">{targetName} is on the stand</h2>
-                  <p className="text-slate-400 mb-2">Waiting for them to answer...</p>
-                </>
-              )}
-            </div>
-
             <CredibilityBar partyA={caseData.partyA} partyB={caseData.partyB} credibilityA={credibilityA} credibilityB={credibilityB} history={credibilityHistory} />
-            
+
             <Transcript caseData={caseData} responses={responses} objections={objections} isOpen={transcriptOpen} onToggle={() => setTranscriptOpen(!transcriptOpen)} />
 
             {currentQuestion && (
@@ -1170,6 +1150,26 @@ if (isMultiplayer && !isMyTurn && !isLoading) {
                 <div className="text-white">{currentQuestion}</div>
               </div>
             )}
+
+            {/* Typing indicator below the question */}
+            <div className="bg-slate-800/50 rounded-lg p-4 mb-4">
+              {isOtherTyping ? (
+                <div className="flex items-center justify-center gap-2">
+                  <span className="text-lg">✍️</span>
+                  <span className="text-white font-medium">{targetName} is typing</span>
+                  <div className="flex gap-1">
+                    <span className="w-1.5 h-1.5 bg-amber-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                    <span className="w-1.5 h-1.5 bg-amber-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
+                    <span className="w-1.5 h-1.5 bg-amber-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-center justify-center gap-2">
+                  <span className="text-lg">⏳</span>
+                  <span className="text-slate-400">Waiting for {targetName} to answer...</span>
+                </div>
+              )}
+            </div>
 
             <div className="bg-slate-800/50 rounded-lg p-4">
               <div className="text-slate-400 text-sm text-center">
