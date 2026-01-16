@@ -223,12 +223,20 @@ export async function checkForSnapJudgment(
   objections: any[]
 ): Promise<{ triggered: boolean; winner?: string; reason?: string }> {
   const judge = JUDGE_PERSONALITIES[judgeId as keyof typeof JUDGE_PERSONALITIES];
-  
-  // Only check after at least 2 responses
-  if (responses.length < 2) {
+
+  // Only check after at least 4 responses (2 per party) to give fair chance
+  if (responses.length < 4) {
+    console.log('[SnapJudgment] Skipping - only', responses.length, 'responses');
     return { triggered: false };
   }
-  
+
+  // Only trigger if credibility difference is significant (30+ points)
+  const credDiff = Math.abs(credibilityA - credibilityB);
+  if (credDiff < 30) {
+    console.log('[SnapJudgment] Skipping - credibility diff only', credDiff);
+    return { triggered: false };
+  }
+
   const prompt = `${judge.style}
 
 Case: "${caseData.title}"
@@ -237,23 +245,29 @@ ${caseData.partyB} credibility: ${credibilityB}%
 
 Recent response from ${lastParty === 'A' ? caseData.partyA : caseData.partyB}: "${lastResponse}"
 
-Should you issue a SNAP JUDGMENT and end the case early? Only do this if:
-- One party has clearly won/lost
-- Someone made a devastating admission
-- The evidence is overwhelming
-- Continuing would be pointless
+Should you issue a SNAP JUDGMENT and end the case early? This is RARE - only do this if:
+- One party's credibility is devastatingly low (under 20%)
+- Someone made a clear, undeniable admission of guilt
+- The case is completely one-sided with no reasonable defense
+- DO NOT trigger for minor issues or normal responses
+
+Default to "no" unless the situation is truly extreme.
 
 Respond in this exact format:
 SNAP_JUDGMENT: yes or no
-WINNER: [name if yes]
-REASON: [dramatic one-liner if yes]`;
+WINNER: [name if yes, otherwise "none"]
+REASON: [dramatic one-liner if yes, otherwise "Case continues"]`;
 
   const result = await callClaude(prompt, 150);
-  
+
+  console.log('[SnapJudgment] AI response:', result);
+
   const triggered = result.toLowerCase().includes('snap_judgment: yes');
   const winnerMatch = result.match(/WINNER:\s*(.+)/i);
   const reasonMatch = result.match(/REASON:\s*(.+)/i);
-  
+
+  console.log('[SnapJudgment] Triggered:', triggered);
+
   return {
     triggered,
     winner: winnerMatch?.[1]?.trim(),
