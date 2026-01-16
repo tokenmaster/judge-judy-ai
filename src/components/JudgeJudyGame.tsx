@@ -368,8 +368,12 @@ useEffect(() => {
     setCurrentQuestion(newQuestion);
     if (newQuestion) {
       questionTargetRef.current = `${newRound}-${newTarget}`;
+      // Enable objection button when a new question arrives
+      setCanObjectToQuestion(true);
+      setObjectionWindow({ type: 'question', content: newQuestion, targetParty: newTarget });
     } else {
       questionTargetRef.current = null;
+      setCanObjectToQuestion(false);
     }
     setObjectionsUsed({
       A: updatedCase.objections_used_a || false,
