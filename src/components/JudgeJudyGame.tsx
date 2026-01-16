@@ -606,7 +606,7 @@ useEffect(() => {
 const handleResponseSubmit = async () => {
   const savedResponse = currentResponse; // Save it before clearing
   setCurrentResponse(''); // Clear immediately
-  
+
   const newResponse = {
     round: examRound,
     party: examTarget,
@@ -615,7 +615,7 @@ const handleResponseSubmit = async () => {
     answer: savedResponse,
     is_clarification: isClarifying
   };
-    
+
     // Add to local state first
     const updatedResponses = [...responses, newResponse];
     setResponses(updatedResponses);
@@ -631,40 +631,57 @@ const handleResponseSubmit = async () => {
     setIsLoading(true);
     setLoadingState('credibility');
 
-    const currentCred = examTarget === 'A' ? credibilityA : credibilityB;
-    const credEval = await evaluateCredibility(
-      caseData, updatedResponses, examTarget, savedResponse, currentQuestion, currentCred
-    );
+    // Wrap AI calls in try-catch to ensure we always progress
+    let newCredA = credibilityA;
+    let newCredB = credibilityB;
 
-    const newCredA = examTarget === 'A' ? credEval.newCredibility : credibilityA;
-    const newCredB = examTarget === 'B' ? credEval.newCredibility : credibilityB;
+    try {
+      const currentCred = examTarget === 'A' ? credibilityA : credibilityB;
+      const credEval = await evaluateCredibility(
+        caseData, updatedResponses, examTarget, savedResponse, currentQuestion, currentCred
+      );
 
-    if (examTarget === 'A') {
-      setCredibilityA(credEval.newCredibility);
-    } else {
-      setCredibilityB(credEval.newCredibility);
+      // Use fallback values if credEval is malformed
+      const credChange = credEval?.newCredibility ?? currentCred;
+      newCredA = examTarget === 'A' ? credChange : credibilityA;
+      newCredB = examTarget === 'B' ? credChange : credibilityB;
+
+      if (examTarget === 'A') {
+        setCredibilityA(credChange);
+      } else {
+        setCredibilityB(credChange);
+      }
+
+      setCredibilityHistory(prev => [...prev, {
+        party: examTarget,
+        name: newResponse.party_name,
+        response: savedResponse.substring(0, 50) + '...',
+        change: credEval?.change ?? 0,
+        newScore: credChange,
+        analysis: credEval?.analysis ?? 'Response recorded.',
+        flagged: credEval?.flagged ?? null
+      }]);
+    } catch (error) {
+      console.error('Credibility evaluation failed:', error);
+      // Continue with unchanged credibility
     }
 
-    setCredibilityHistory(prev => [...prev, {
-      party: examTarget,
-      name: newResponse.party_name,
-      response: savedResponse.substring(0, 50) + '...',
-      change: credEval.change,
-      newScore: credEval.newCredibility,
-      analysis: credEval.analysis,
-      flagged: credEval.flagged
-    }]);
+    // Check for snap judgment but don't let it block progression
+    try {
+      setLoadingState('snapJudgment');
+      const snapCheck = await checkForSnapJudgment(
+        caseData.judge, caseData, updatedResponses, examTarget, savedResponse, newCredA, newCredB, objections
+      );
 
-    setLoadingState('snapJudgment');
-    const snapCheck = await checkForSnapJudgment(
-      caseData.judge, caseData, updatedResponses, examTarget, savedResponse, newCredA, newCredB, objections
-    );
-
-    if (snapCheck.triggered) {
-      setSnapJudgment(snapCheck);
-      setShowSnapJudgment(true);
-      setIsLoading(false);
-      return;
+      if (snapCheck?.triggered) {
+        setSnapJudgment(snapCheck);
+        setShowSnapJudgment(true);
+        setIsLoading(false);
+        return;
+      }
+    } catch (error) {
+      console.error('Snap judgment check failed:', error);
+      // Continue without snap judgment
     }
 
     // FIXED: Strict check for follow-up limit (max 3 per party per round)
