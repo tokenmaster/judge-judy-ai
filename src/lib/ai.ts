@@ -224,15 +224,15 @@ export async function checkForSnapJudgment(
 ): Promise<{ triggered: boolean; winner?: string; reason?: string }> {
   const judge = JUDGE_PERSONALITIES[judgeId as keyof typeof JUDGE_PERSONALITIES];
 
-  // Only check after at least 4 responses (2 per party) to give fair chance
-  if (responses.length < 4) {
+  // Check after at least 2 responses (1 per party)
+  if (responses.length < 2) {
     console.log('[SnapJudgment] Skipping - only', responses.length, 'responses');
     return { triggered: false };
   }
 
-  // Only trigger if credibility difference is significant (30+ points)
+  // Check if credibility difference is notable (15+ points)
   const credDiff = Math.abs(credibilityA - credibilityB);
-  if (credDiff < 30) {
+  if (credDiff < 15) {
     console.log('[SnapJudgment] Skipping - credibility diff only', credDiff);
     return { triggered: false };
   }
@@ -245,13 +245,11 @@ ${caseData.partyB} credibility: ${credibilityB}%
 
 Recent response from ${lastParty === 'A' ? caseData.partyA : caseData.partyB}: "${lastResponse}"
 
-Should you issue a SNAP JUDGMENT and end the case early? This is RARE - only do this if:
-- One party's credibility is devastatingly low (under 20%)
-- Someone made a clear, undeniable admission of guilt
-- The case is completely one-sided with no reasonable defense
-- DO NOT trigger for minor issues or normal responses
-
-Default to "no" unless the situation is truly extreme.
+Should you issue a SNAP JUDGMENT and end the case early? Consider this if:
+- One party is clearly losing credibility
+- Someone made a damaging admission
+- The evidence strongly favors one side
+- A response was evasive, contradictory, or unconvincing
 
 Respond in this exact format:
 SNAP_JUDGMENT: yes or no
