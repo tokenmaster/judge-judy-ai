@@ -4,7 +4,6 @@ import dynamic from 'next/dynamic';
 import { useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
 
-// Load the game component client-side only (it uses browser APIs)
 const JudgeJudyGame = dynamic(() => import('@/components/JudgeJudyGame'), {
   ssr: false,
   loading: () => (
@@ -21,7 +20,7 @@ function GameWithParams() {
   const searchParams = useSearchParams();
   const roomCode = searchParams.get('room');
   
-  return <JudgeJudyGame initialRoomCode={roomCode} />;
+  return <JudgeJudyGame initialRoomCode={roomCode || undefined} />;
 }
 
 export default function Home() {
