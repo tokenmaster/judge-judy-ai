@@ -1174,9 +1174,20 @@ const handleResponseSubmit = async () => {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4">
         <div className="max-w-md w-full text-center">
-          <div className="text-5xl mb-4">🔗</div>
-          <h2 className="text-2xl font-bold text-white mb-2">Share This Code</h2>
-          <p className="text-slate-400 mb-6">Send this code to {caseData.partyB} so they can join</p>
+          {/* Case Title - Prominent */}
+          <div className="bg-slate-800 rounded-lg p-4 mb-6">
+            <div className="text-amber-500 text-xs font-medium mb-1">⚖️ DISPUTE</div>
+            <div className="text-white font-bold text-xl">{caseData.title}</div>
+            <div className="text-slate-400 text-sm mt-2">
+              <span className="text-blue-400">{caseData.partyA}</span>
+              <span className="text-slate-500 mx-2">vs</span>
+              <span className="text-red-400">{caseData.partyB}</span>
+            </div>
+          </div>
+
+          <div className="text-4xl mb-3">🔗</div>
+          <h2 className="text-xl font-bold text-white mb-2">Share This Room</h2>
+          <p className="text-slate-400 mb-4 text-sm">Send this code to {caseData.partyB} so they can join</p>
 
           <div className="bg-slate-800 rounded-lg p-6 mb-6">
             <div className="text-slate-400 text-sm mb-2">ROOM CODE</div>
@@ -1198,7 +1209,7 @@ const handleResponseSubmit = async () => {
                 🔗 Copy Share Link
               </button>
             </div>
-            
+
             <div className="mt-4 text-slate-500 text-xs break-all">
               {typeof window !== 'undefined' && `${window.location.origin}?room=${roomCode}`}
             </div>
@@ -1211,12 +1222,7 @@ const handleResponseSubmit = async () => {
             </div>
           </div>
 
-          <div className="text-slate-500 text-sm">
-            Case: "{caseData.title}"<br/>
-            You are: <span className="text-blue-400">{caseData.partyA}</span> (Party A)
-          </div>
-
-          <button onClick={resetCase} className="mt-6 text-slate-500 hover:text-slate-300 text-sm">Cancel</button>
+          <button onClick={resetCase} className="text-slate-500 hover:text-slate-300 text-sm">Cancel</button>
         </div>
       </div>
     );
