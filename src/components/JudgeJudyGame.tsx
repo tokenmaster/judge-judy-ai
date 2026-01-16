@@ -92,8 +92,14 @@ export default function JudgeJudyGame({ initialRoomCode }: { initialRoomCode?: s
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const broadcastChannelRef = useRef<any>(null);
   const lastTypingBroadcast = useRef<number>(0);
+  // Timestamp of last question generation to prevent rapid re-triggers
+  const lastQuestionGenTime = useRef<number>(0);
+  // Minimum time (ms) between question generations
+  const QUESTION_GEN_COOLDOWN = 3000;
+  // Track if we're in the middle of processing a response submission
+  const isProcessingResponse = useRef(false);
 
-  const MAX_CLARIFICATIONS = 3;
+  const MAX_CLARIFICATIONS = 1;
 
 // Auto-join if room code is in URL
 useEffect(() => {
@@ -343,21 +349,31 @@ useEffect(() => {
   const handleCaseUpdate = (updatedCase: any) => {
     if (!updatedCase) return;
 
+    console.log('[CaseUpdate] Received update:', {
+      exam_round: updatedCase.exam_round,
+      exam_target: updatedCase.exam_target,
+      current_question: updatedCase.current_question ? updatedCase.current_question.substring(0, 30) + '...' : 'none',
+      phase: updatedCase.phase,
+      isGenerating: isGeneratingQuestion.current,
+      questionTargetRef: questionTargetRef.current
+    });
+
     setCaseData(prev => ({
       ...prev,
       statementA: updatedCase.statement_a || prev.statementA,
       statementB: updatedCase.statement_b || prev.statementB
     }));
 
-  // Only update credibility from database if we're NOT the one who just changed it
-  if (myRole !== examTarget) {
-    if (updatedCase.credibility_a !== undefined && updatedCase.credibility_a !== null) {
-      setCredibilityA(updatedCase.credibility_a);
+    // Only update credibility from database if we're NOT the one who just changed it
+    if (myRole !== examTarget) {
+      if (updatedCase.credibility_a !== undefined && updatedCase.credibility_a !== null) {
+        setCredibilityA(updatedCase.credibility_a);
+      }
+      if (updatedCase.credibility_b !== undefined && updatedCase.credibility_b !== null) {
+        setCredibilityB(updatedCase.credibility_b);
+      }
     }
-    if (updatedCase.credibility_b !== undefined && updatedCase.credibility_b !== null) {
-      setCredibilityB(updatedCase.credibility_b);
-    }
-  }
+
     const newRound = updatedCase.exam_round || 0;
     const newTarget = updatedCase.exam_target || 'A';
     setExamRound(newRound);
@@ -365,16 +381,25 @@ useEffect(() => {
 
     // Update current question from database
     const newQuestion = updatedCase.current_question || '';
+    const newQuestionKey = `${newRound}-${newTarget}`;
 
-    // Only update question if it's different from what we have
-    if (newQuestion && newQuestion !== currentQuestion) {
-      console.log('[CaseUpdate] New question received:', newQuestion.substring(0, 50) + '...');
+    // If we're currently generating a question, don't override state
+    if (isGeneratingQuestion.current) {
+      console.log('[CaseUpdate] Skip question update - currently generating');
+    } else if (newQuestion && newQuestion !== currentQuestion) {
+      // Only update if we have a new question and it's different
+      console.log('[CaseUpdate] Updating question from DB:', newQuestion.substring(0, 50) + '...');
       setCurrentQuestion(newQuestion);
-      questionTargetRef.current = `${newRound}-${newTarget}`;
+      questionTargetRef.current = newQuestionKey;
+      lastQuestionGenTime.current = Date.now(); // Prevent immediate re-generation
       setCanObjectToQuestion(true);
       setObjectionWindow({ type: 'question', content: newQuestion, targetParty: newTarget });
+    } else if (!newQuestion && questionTargetRef.current !== newQuestionKey) {
+      // Question was cleared and we need a new one for a different slot
+      // Don't clear questionTargetRef here - let the useEffect handle generation
+      console.log('[CaseUpdate] Question cleared, will need new generation for', newQuestionKey);
     }
-    // Don't clear questionTargetRef when question is empty - let the useEffect handle new question generation
+
     setObjectionsUsed({
       A: updatedCase.objections_used_a || false,
       B: updatedCase.objections_used_b || false
@@ -389,6 +414,7 @@ useEffect(() => {
     }
 
     if (updatedCase.phase && updatedCase.phase !== phase && updatedCase.phase !== 'waiting') {
+      console.log('[CaseUpdate] Phase change from', phase, 'to', updatedCase.phase);
       setPhase(updatedCase.phase);
     }
 
@@ -501,19 +527,9 @@ useEffect(() => {
     }
   };
 
-  // Generate question when entering cross-exam
-  useEffect(() => {
-    // Skip if not in cross-exam phase
-    if (phase !== 'crossExam') return;
-
-    // Skip if clarifying (follow-up questions handle their own questions)
-    if (isClarifying) return;
-
-    // Skip if we already have a question displayed
-    if (currentQuestion) {
-      console.log('[QuestionGen] Already have question, skipping');
-      return;
-    }
+  // Function to generate a new question - called explicitly, not via useEffect
+  const generateNewQuestion = async (targetParty: string, round: number) => {
+    const now = Date.now();
 
     // Skip if already generating
     if (isGeneratingQuestion.current) {
@@ -521,64 +537,131 @@ useEffect(() => {
       return;
     }
 
-    // In multiplayer, only the target player generates questions
-    if (isMultiplayer && myRole !== examTarget) {
-      console.log('[QuestionGen] Not my turn to generate (myRole:', myRole, 'examTarget:', examTarget, ')');
+    // Skip if within cooldown period (prevents rapid re-triggers from subscriptions)
+    if (now - lastQuestionGenTime.current < QUESTION_GEN_COOLDOWN) {
+      console.log('[QuestionGen] Within cooldown period, skipping. Time since last:', now - lastQuestionGenTime.current, 'ms');
       return;
     }
 
-    // Build unique key for this question slot
-    const questionKey = `${examRound}-${examTarget}`;
+    const questionKey = `${round}-${targetParty}`;
 
     // Skip if we already generated for this slot
     if (questionTargetRef.current === questionKey) {
-      console.log('[QuestionGen] Already generated for', questionKey);
+      console.log('[QuestionGen] Already generated for', questionKey, 'skipping');
       return;
     }
 
-    console.log('[QuestionGen] Generating question for', questionKey);
+    console.log('[QuestionGen] Starting generation for', questionKey);
 
-    // Mark as generating immediately
+    // Set all locks BEFORE any async operation
     isGeneratingQuestion.current = true;
-
-    // Capture values for async operation
-    const targetForQuestion = examTarget;
-    const roundForQuestion = examRound;
-    const currentResponses = [...responses]; // Copy to avoid stale closure
+    lastQuestionGenTime.current = now;
+    questionTargetRef.current = questionKey; // Set this early to prevent race conditions
 
     setIsLoading(true);
     setLoadingState('question');
     setCanObjectToQuestion(false);
 
-    generateMainQuestion(caseData.judge, caseData, currentResponses, roundForQuestion, targetForQuestion, objections)
-      .then(async (question) => {
-        const finalQuestion = question || `${targetForQuestion === 'A' ? caseData.partyA : caseData.partyB}, can you explain your side of what happened?`;
+    try {
+      console.log('[QuestionGen] Calling AI...');
+      const question = await generateMainQuestion(
+        caseData.judge, caseData, responses, round, targetParty, objections
+      );
 
-        console.log('[QuestionGen] Generated:', finalQuestion.substring(0, 50) + '...');
+      // After AI returns, check if we're still the active generation
+      if (questionTargetRef.current !== questionKey) {
+        console.log('[QuestionGen] Generation superseded, discarding result');
+        return;
+      }
 
-        // Mark this slot as done
-        questionTargetRef.current = `${roundForQuestion}-${targetForQuestion}`;
-        setCurrentQuestion(finalQuestion);
-        setClarificationCount(0);
-        setCanObjectToQuestion(true);
-        setObjectionWindow({ type: 'question', content: finalQuestion, targetParty: targetForQuestion });
+      const finalQuestion = question || `${targetParty === 'A' ? caseData.partyA : caseData.partyB}, can you explain your side of what happened?`;
 
-        if (isMultiplayer) {
-          await updateCase({ current_question: finalQuestion });
-        }
-      })
-      .catch((error) => {
-        console.error('[QuestionGen] Failed:', error);
-        const fallbackQuestion = `${targetForQuestion === 'A' ? caseData.partyA : caseData.partyB}, please explain your version of events.`;
-        questionTargetRef.current = `${roundForQuestion}-${targetForQuestion}`;
-        setCurrentQuestion(fallbackQuestion);
-        setCanObjectToQuestion(true);
-      })
-      .finally(() => {
-        isGeneratingQuestion.current = false;
-        setIsLoading(false);
-      });
-  }, [phase, examRound, examTarget, isClarifying, myRole, isMultiplayer, currentQuestion]);
+      console.log('[QuestionGen] Generated:', finalQuestion.substring(0, 50) + '...');
+
+      setCurrentQuestion(finalQuestion);
+      setClarificationCount(0);
+      setCanObjectToQuestion(true);
+      setObjectionWindow({ type: 'question', content: finalQuestion, targetParty });
+
+      if (isMultiplayer) {
+        console.log('[QuestionGen] Saving to database...');
+        await updateCase({ current_question: finalQuestion });
+        console.log('[QuestionGen] Saved to database');
+      }
+    } catch (error) {
+      console.error('[QuestionGen] Failed:', error);
+      const fallbackQuestion = `${targetParty === 'A' ? caseData.partyA : caseData.partyB}, please explain your version of events.`;
+      setCurrentQuestion(fallbackQuestion);
+      setCanObjectToQuestion(true);
+    } finally {
+      isGeneratingQuestion.current = false;
+      setIsLoading(false);
+      console.log('[QuestionGen] Complete for', questionKey);
+    }
+  };
+
+  // Trigger question generation when entering cross-exam phase
+  useEffect(() => {
+    const questionKey = `${examRound}-${examTarget}`;
+
+    console.log('[useEffect QuestionGen] Checking...', {
+      phase,
+      examRound,
+      examTarget,
+      questionKey,
+      currentQuestion: currentQuestion ? currentQuestion.substring(0, 30) + '...' : 'none',
+      isClarifying,
+      isGenerating: isGeneratingQuestion.current,
+      isProcessingResponse: isProcessingResponse.current,
+      questionTargetRef: questionTargetRef.current,
+      myRole,
+      isMultiplayer,
+      timeSinceLastGen: Date.now() - lastQuestionGenTime.current
+    });
+
+    if (phase !== 'crossExam') {
+      console.log('[useEffect QuestionGen] Skip: not crossExam phase');
+      return;
+    }
+    if (isClarifying) {
+      console.log('[useEffect QuestionGen] Skip: is clarifying');
+      return;
+    }
+    if (currentQuestion) {
+      console.log('[useEffect QuestionGen] Skip: already have question');
+      return;
+    }
+    if (isGeneratingQuestion.current) {
+      console.log('[useEffect QuestionGen] Skip: already generating');
+      return;
+    }
+    if (isProcessingResponse.current) {
+      console.log('[useEffect QuestionGen] Skip: processing response');
+      return;
+    }
+
+    // In multiplayer, only the target player generates
+    if (isMultiplayer && myRole !== examTarget) {
+      console.log('[useEffect QuestionGen] Skip: not my turn to generate (multiplayer)');
+      return;
+    }
+
+    // Check if we already generated for this slot
+    if (questionTargetRef.current === questionKey) {
+      console.log('[useEffect QuestionGen] Skip: already generated for this slot');
+      return;
+    }
+
+    // Check cooldown
+    const timeSinceLastGen = Date.now() - lastQuestionGenTime.current;
+    if (timeSinceLastGen < QUESTION_GEN_COOLDOWN && lastQuestionGenTime.current > 0) {
+      console.log('[useEffect QuestionGen] Skip: within cooldown', timeSinceLastGen, 'ms');
+      return;
+    }
+
+    console.log('[useEffect QuestionGen] All checks passed, generating question');
+    generateNewQuestion(examTarget, examRound);
+  }, [phase, examRound, examTarget, isClarifying, currentQuestion, myRole, isMultiplayer]);
 
   // Generate verdict
   useEffect(() => {
@@ -614,6 +697,10 @@ useEffect(() => {
   }, [phase]);
 
 const handleResponseSubmit = async () => {
+  // Set processing flag to prevent useEffect from triggering during transition
+  isProcessingResponse.current = true;
+  console.log('[ResponseSubmit] Started processing');
+
   const savedResponse = currentResponse; // Save it before clearing
   setCurrentResponse(''); // Clear immediately
 
@@ -687,6 +774,8 @@ const handleResponseSubmit = async () => {
         setSnapJudgment(snapCheck);
         setShowSnapJudgment(true);
         setIsLoading(false);
+        isProcessingResponse.current = false;
+        console.log('[ResponseSubmit] Snap judgment triggered, cleared processing flag');
         return;
       }
     } catch (error) {
@@ -694,42 +783,8 @@ const handleResponseSubmit = async () => {
       // Continue without snap judgment
     }
 
-    // Check if follow-up is needed (max 1 per party per round)
-    // Only check if: not already clarifying AND haven't used follow-up yet
-    const canAskFollowUp = !isClarifying && clarificationCount === 0;
-    console.log('[FollowUp] Check - isClarifying:', isClarifying, 'count:', clarificationCount, 'canAsk:', canAskFollowUp);
-
-    if (canAskFollowUp) {
-      try {
-        setLoadingState('followUp');
-        const followUp = await generateAIFollowUp(
-          caseData.judge, caseData, updatedResponses, examTarget, savedResponse, clarificationCount, objections
-        );
-
-        if (followUp.needsClarification && followUp.question) {
-          console.log('[FollowUp] Asking follow-up question');
-          setCurrentResponse('');
-          setCurrentQuestion(followUp.question);
-          setClarificationCount(1); // Set to exactly 1, not increment
-          setIsClarifying(true);
-          setCanObjectToQuestion(true);
-          setObjectionWindow({ type: 'question', content: followUp.question, targetParty: examTarget });
-
-          if (isMultiplayer) {
-            await updateCase({ current_question: followUp.question });
-          }
-
-          setIsLoading(false);
-          return;
-        }
-        console.log('[FollowUp] No follow-up needed, proceeding');
-      } catch (error) {
-        console.error('Follow-up check failed:', error);
-        // Continue without follow-up
-      }
-    } else {
-      console.log('[FollowUp] Skipping - already used or is clarification answer');
-    }
+    // Follow-up questions disabled
+    // const canAskFollowUp = !isClarifying && clarificationCount === 0;
     let nextTarget = examTarget;
     let nextRound = examRound;
     let nextPhase = 'crossExam';
@@ -774,6 +829,12 @@ const handleResponseSubmit = async () => {
       console.log('[ResponseSubmit] Moving to verdict phase');
       setPhase('verdict');
     }
+
+    // Clear processing flag after a small delay to let state settle
+    setTimeout(() => {
+      isProcessingResponse.current = false;
+      console.log('[ResponseSubmit] Finished processing, cleared flag');
+    }, 500);
   };
 
   const handleStatementSubmit = async () => {
@@ -834,6 +895,8 @@ const handleResponseSubmit = async () => {
     isGeneratingQuestion.current = false;
     questionTargetRef.current = null;
     lastTypingBroadcast.current = 0;
+    lastQuestionGenTime.current = 0;
+    isProcessingResponse.current = false;
     // Clean up subscription
     if (subscriptionCleanup.current) {
       subscriptionCleanup.current();

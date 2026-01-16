@@ -82,7 +82,7 @@ Just output the question, nothing else.`;
   return question || `${targetName}, can you explain your side of what happened?`;
 }
 
-// Generate follow-up question
+// Generate follow-up question - DISABLED
 export async function generateAIFollowUp(
   judgeId: string,
   caseData: any,
@@ -92,45 +92,8 @@ export async function generateAIFollowUp(
   clarificationCount: number,
   objections: any[]
 ): Promise<{ needsClarification: boolean; question: string | null }> {
-
-  // STRICT LIMIT: Only 1 follow-up per party per round
-  if (clarificationCount >= 1) {
-    console.log('[FollowUp] Limit reached:', clarificationCount);
-    return { needsClarification: false, question: null };
-  }
-
-  const judge = JUDGE_PERSONALITIES[judgeId as keyof typeof JUDGE_PERSONALITIES];
-  const targetName = examTarget === 'A' ? caseData.partyA : caseData.partyB;
-
-  const prompt = `${judge.style}
-
-The witness ${targetName} just answered: "${lastResponse}"
-
-Was this answer UNCLEAR? You can ask ONE follow-up question if:
-- They completely dodged or ignored the question
-- Their answer was confusing or contradictory
-- Their answer was too vague (just a few words, no real substance)
-- They gave an evasive non-answer
-
-If their answer made sense (even if you disagree), say no.
-
-Respond ONLY in this exact format:
-NEEDS_FOLLOWUP: yes or no
-QUESTION: your follow-up question (only if yes)`;
-
-  const result = await callClaude(prompt, 200);
-
-  console.log('[FollowUp] AI response:', result);
-
-  const needsFollowup = result.toLowerCase().includes('needs_followup: yes');
-  const questionMatch = result.match(/QUESTION:\s*(.+)/i);
-
-  console.log('[FollowUp] Needs follow-up:', needsFollowup);
-
-  return {
-    needsClarification: needsFollowup,
-    question: needsFollowup && questionMatch ? questionMatch[1].trim() : null
-  };
+  // Follow-up questions are disabled
+  return { needsClarification: false, question: null };
 }
 
 // Evaluate credibility of a response
