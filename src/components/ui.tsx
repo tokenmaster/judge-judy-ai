@@ -34,6 +34,20 @@ export function CredibilityBar({
   const lastA = history.filter(h => h.party === 'A').slice(-1)[0];
   const lastB = history.filter(h => h.party === 'B').slice(-1)[0];
   
+  const getBarColor = (score: number) => {
+    if (score >= 70) return 'bg-green-500';
+    if (score >= 40) return 'bg-yellow-500';
+    return 'bg-red-500';
+  };
+
+  const getLabel = (score: number) => {
+    if (score >= 80) return 'Very Credible';
+    if (score >= 60) return 'Credible';
+    if (score >= 40) return 'Questionable';
+    if (score >= 20) return 'Low Credibility';
+    return 'Not Credible';
+  };
+  
   return (
     <div className="bg-slate-800 rounded-lg p-4 mb-6">
       <div className="text-slate-400 text-sm mb-3 font-medium">CREDIBILITY METER</div>
@@ -44,7 +58,7 @@ export function CredibilityBar({
           <div className="flex justify-between text-sm mb-1">
             <span className="text-blue-400 font-medium">{partyA}</span>
             <span className="text-slate-300">
-              {credibilityA}% - {getCredibilityLabel(credibilityA)}
+              {credibilityA}% - {getLabel(credibilityA)}
               {lastA && (
                 <span className={lastA.change >= 0 ? 'text-green-400 ml-2' : 'text-red-400 ml-2'}>
                   {lastA.change >= 0 ? '+' : ''}{lastA.change}
@@ -54,7 +68,7 @@ export function CredibilityBar({
           </div>
           <div className="h-3 bg-slate-700 rounded-full overflow-hidden">
             <div 
-              className={`h-full ${getCredibilityColor(credibilityA)} transition-all duration-500`}
+              className={`h-full ${getBarColor(credibilityA)} transition-all duration-500`}
               style={{ width: `${credibilityA}%` }}
             />
           </div>
@@ -68,7 +82,7 @@ export function CredibilityBar({
           <div className="flex justify-between text-sm mb-1">
             <span className="text-red-400 font-medium">{partyB}</span>
             <span className="text-slate-300">
-              {credibilityB}% - {getCredibilityLabel(credibilityB)}
+              {credibilityB}% - {getLabel(credibilityB)}
               {lastB && (
                 <span className={lastB.change >= 0 ? 'text-green-400 ml-2' : 'text-red-400 ml-2'}>
                   {lastB.change >= 0 ? '+' : ''}{lastB.change}
@@ -78,7 +92,7 @@ export function CredibilityBar({
           </div>
           <div className="h-3 bg-slate-700 rounded-full overflow-hidden">
             <div 
-              className={`h-full ${getCredibilityColor(credibilityB)} transition-all duration-500`}
+              className={`h-full ${getBarColor(credibilityB)} transition-all duration-500`}
               style={{ width: `${credibilityB}%` }}
             />
           </div>
