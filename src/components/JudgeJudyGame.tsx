@@ -508,7 +508,8 @@ useEffect(() => {
     if (isClarifying) return;
 
     // Skip if we already have a question for this exact target in this round
-    if (questionTargetRef.current === `${examRound}-${examTarget}`) return;
+    const questionKey = `${examRound}-${examTarget}`;
+    if (questionTargetRef.current === questionKey) return;
 
     // Skip if already generating a question
     if (isGeneratingQuestion.current) return;
@@ -516,46 +517,57 @@ useEffect(() => {
     // In multiplayer, only the target player generates questions
     if (isMultiplayer && myRole !== examTarget) return;
 
-    // Mark that we're generating a question
-    isGeneratingQuestion.current = true;
-
-    setIsLoading(true);
-    setLoadingState('question');
-    setCanObjectToQuestion(false);
-    setCurrentQuestion(''); // Clear old question first
-
-    // Capture current state to avoid stale closure issues
+    // Capture current state
     const targetForQuestion = examTarget;
     const roundForQuestion = examRound;
 
-    generateMainQuestion(caseData.judge, caseData, responses, roundForQuestion, targetForQuestion, objections)
-      .then(async (question) => {
-        // Only update if we're still targeting the same party in the same round
-        if (examTarget === targetForQuestion && examRound === roundForQuestion) {
-          const finalQuestion = question || `${targetForQuestion === 'A' ? caseData.partyA : caseData.partyB}, can you explain your side of what happened?`;
-          questionTargetRef.current = `${roundForQuestion}-${targetForQuestion}`;
-          setCurrentQuestion(finalQuestion);
-          setClarificationCount(0);
-          setCanObjectToQuestion(true);
-          setObjectionWindow({ type: 'question', content: finalQuestion, targetParty: targetForQuestion });
+    // Add a small delay to let state settle and prevent race conditions
+    const timeoutId = setTimeout(() => {
+      // Double-check conditions after delay (state may have changed)
+      const currentKey = `${roundForQuestion}-${targetForQuestion}`;
+      if (questionTargetRef.current === currentKey) return;
+      if (isGeneratingQuestion.current) return;
 
-          if (isMultiplayer) {
-            await updateCase({ current_question: finalQuestion });
+      // Mark that we're generating a question
+      isGeneratingQuestion.current = true;
+
+      setIsLoading(true);
+      setLoadingState('question');
+      setCanObjectToQuestion(false);
+      setCurrentQuestion(''); // Clear old question first
+
+      generateMainQuestion(caseData.judge, caseData, responses, roundForQuestion, targetForQuestion, objections)
+        .then(async (question) => {
+          // Only update if we're still targeting the same party in the same round
+          if (examTarget === targetForQuestion && examRound === roundForQuestion) {
+            const finalQuestion = question || `${targetForQuestion === 'A' ? caseData.partyA : caseData.partyB}, can you explain your side of what happened?`;
+            questionTargetRef.current = `${roundForQuestion}-${targetForQuestion}`;
+            setCurrentQuestion(finalQuestion);
+            setClarificationCount(0);
+            setCanObjectToQuestion(true);
+            setObjectionWindow({ type: 'question', content: finalQuestion, targetParty: targetForQuestion });
+
+            if (isMultiplayer) {
+              await updateCase({ current_question: finalQuestion });
+            }
           }
-        }
-      })
-      .catch((error) => {
-        console.error('Failed to generate question:', error);
-        // Provide a fallback question so the game can continue
-        const fallbackQuestion = `${targetForQuestion === 'A' ? caseData.partyA : caseData.partyB}, please explain your version of events.`;
-        questionTargetRef.current = `${roundForQuestion}-${targetForQuestion}`;
-        setCurrentQuestion(fallbackQuestion);
-        setCanObjectToQuestion(true);
-      })
-      .finally(() => {
-        isGeneratingQuestion.current = false;
-        setIsLoading(false);
-      });
+        })
+        .catch((error) => {
+          console.error('Failed to generate question:', error);
+          // Provide a fallback question so the game can continue
+          const fallbackQuestion = `${targetForQuestion === 'A' ? caseData.partyA : caseData.partyB}, please explain your version of events.`;
+          questionTargetRef.current = `${roundForQuestion}-${targetForQuestion}`;
+          setCurrentQuestion(fallbackQuestion);
+          setCanObjectToQuestion(true);
+        })
+        .finally(() => {
+          isGeneratingQuestion.current = false;
+          setIsLoading(false);
+        });
+    }, 100); // 100ms delay to let state settle
+
+    // Cleanup timeout if effect re-runs
+    return () => clearTimeout(timeoutId);
   }, [phase, examRound, examTarget, isClarifying, myRole, isMultiplayer]);
 
   // Generate verdict
