@@ -98,8 +98,17 @@ export default function JudgeJudyGame({ initialRoomCode }: { initialRoomCode?: s
   const QUESTION_GEN_COOLDOWN = 3000;
   // Track if we're in the middle of processing a response submission
   const isProcessingResponse = useRef(false);
+  // Ref to always have the latest handleCaseUpdate (fixes stale closure in subscription)
+  const handleCaseUpdateRef = useRef<(updatedCase: any) => void>(() => {});
+  // Ref for myRole to fix stale closure in typing indicator
+  const myRoleRef = useRef<string | null>(null);
 
   const MAX_CLARIFICATIONS = 1;
+
+// Keep myRoleRef in sync with myRole state
+useEffect(() => {
+  myRoleRef.current = myRole;
+}, [myRole]);
 
 // Auto-join if room code is in URL
 useEffect(() => {
@@ -289,7 +298,8 @@ useEffect(() => {
         },
         (payload: any) => {
           console.log('Case updated:', payload);
-          handleCaseUpdate(payload.new);
+          // Use ref to always call latest version (fixes stale closure)
+          handleCaseUpdateRef.current(payload.new);
         }
       )
       .on(
@@ -316,7 +326,8 @@ useEffect(() => {
       .channel(`typing:${caseIdToSubscribe}`)
       .on('broadcast', { event: 'typing' }, (payload: any) => {
         // Only show typing indicator if it's from the other player
-        if (payload.payload?.party !== myRole) {
+        // Use ref to get current myRole (fixes stale closure)
+        if (payload.payload?.party !== myRoleRef.current) {
           setIsOtherTyping(true);
 
           // Clear any existing timeout
@@ -435,6 +446,9 @@ useEffect(() => {
       setVerdict(updatedCase.verdict);
     }
   };
+
+  // Keep ref updated so subscription always calls latest version
+  handleCaseUpdateRef.current = handleCaseUpdate;
 
   const updateCase = async (updates: any) => {
     if (!caseId) return;
