@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { supabase, generateRoomCode, getSessionId } from '@/lib/supabase';
 import { 
   JUDGE_PERSONALITIES, 
@@ -77,6 +77,9 @@ export default function JudgeJudyGame() {
   // Snap judgment state
   const [snapJudgment, setSnapJudgment] = useState<any>(null);
   const [showSnapJudgment, setShowSnapJudgment] = useState(false);
+
+  // Track response IDs to prevent duplicates
+  const processedResponseIds = useRef<Set<string>>(new Set());
 
   const MAX_CLARIFICATIONS = 3;
 
@@ -156,6 +159,18 @@ export default function JudgeJudyGame() {
       return;
     }
 
+    // Fetch existing responses
+    const { data: existingResponses } = await supabase
+      .from('responses')
+      .select('*')
+      .eq('case_id', caseRecord.id)
+      .order('created_at', { ascending: true });
+
+    if (existingResponses) {
+      setResponses(existingResponses);
+      existingResponses.forEach((r: any) => processedResponseIds.current.add(r.id));
+    }
+
     setCaseId(caseRecord.id);
     setRoomCode(caseRecord.room_code);
     setMyRole('B');
@@ -220,8 +235,12 @@ export default function JudgeJudyGame() {
           filter: `case_id=eq.${caseIdToSubscribe}`
         },
         (payload: any) => {
-          console.log('New response:', payload);
-          setResponses(prev => [...prev, payload.new]);
+          console.log('New response from subscription:', payload);
+          // Only add if we haven't already processed this response
+          if (payload.new && payload.new.id && !processedResponseIds.current.has(payload.new.id)) {
+            processedResponseIds.current.add(payload.new.id);
+            setResponses(prev => [...prev, payload.new]);
+          }
         }
       )
       .subscribe();
@@ -285,15 +304,25 @@ export default function JudgeJudyGame() {
   };
 
   const addResponse = async (responseData: any) => {
-    if (!caseId) return;
+    if (!caseId) return null;
 
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from('responses')
-      .insert({ case_id: caseId, ...responseData });
+      .insert({ case_id: caseId, ...responseData })
+      .select()
+      .single();
 
     if (error) {
       console.error('Error adding response:', error);
+      return null;
     }
+
+    // Mark this response as processed so we don't duplicate from subscription
+    if (data && data.id) {
+      processedResponseIds.current.add(data.id);
+    }
+
+    return data;
   };
 
   // ========== GAME LOGIC ==========
@@ -412,9 +441,12 @@ export default function JudgeJudyGame() {
       answer: currentResponse,
       is_clarification: isClarifying
     };
+    
+    // Add to local state first
     const updatedResponses = [...responses, newResponse];
     setResponses(updatedResponses);
 
+    // Save to database (this will mark it as processed to avoid duplicates)
     if (isMultiplayer) {
       await addResponse(newResponse);
     }
@@ -461,16 +493,18 @@ export default function JudgeJudyGame() {
       return;
     }
 
-    if (clarificationCount < MAX_CLARIFICATIONS) {
+    // FIXED: Strict check for follow-up limit (max 3 per party per round)
+    const currentClarifications = clarificationCount;
+    if (currentClarifications < 3) {
       setLoadingState('followUp');
       const followUp = await generateAIFollowUp(
-        caseData.judge, caseData, updatedResponses, examTarget, currentResponse, clarificationCount, objections
+        caseData.judge, caseData, updatedResponses, examTarget, currentResponse, currentClarifications, objections
       );
 
-      if (followUp.needsClarification && followUp.question) {
+      if (followUp.needsClarification && followUp.question && currentClarifications < 3) {
         setCurrentResponse('');
         setCurrentQuestion(followUp.question);
-        setClarificationCount(prev => prev + 1);
+        setClarificationCount(currentClarifications + 1);
         setIsClarifying(true);
 
         if (isMultiplayer) {
@@ -575,6 +609,7 @@ export default function JudgeJudyGame() {
     setJoinError('');
     setIsMultiplayer(false);
     setOtherPlayerJoined(false);
+    processedResponseIds.current.clear();
   };
 
   // ========== RENDER ==========
@@ -906,10 +941,13 @@ export default function JudgeJudyGame() {
           <StakesBadge stakes={caseData.stakes} />
           <CredibilityBar partyA={caseData.partyA} partyB={caseData.partyB} credibilityA={credibilityA} credibilityB={credibilityB} history={credibilityHistory} />
 
+          {/* Transcript ABOVE the question/response area */}
+          <Transcript caseData={caseData} responses={responses} objections={objections} isOpen={transcriptOpen} onToggle={() => setTranscriptOpen(!transcriptOpen)} />
+
           {isLoading ? (
             <LoadingOverlay emoji={loadingEmoji} message={loadingMessage} />
           ) : currentQuestion ? (
-            <div className="space-y-4">
+            <div className="space-y-4 mt-4">
               <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-4">
                 <div className="text-amber-500 text-sm font-medium mb-1">
                   {JUDGE_PERSONALITIES[caseData.judge as keyof typeof JUDGE_PERSONALITIES]?.name || 'Judge'}:
@@ -954,8 +992,6 @@ export default function JudgeJudyGame() {
           ) : (
             <LoadingOverlay emoji="📝" message="Preparing question..." />
           )}
-
-          <Transcript caseData={caseData} responses={responses} objections={objections} isOpen={transcriptOpen} onToggle={() => setTranscriptOpen(!transcriptOpen)} />
         </div>
       </div>
     );
