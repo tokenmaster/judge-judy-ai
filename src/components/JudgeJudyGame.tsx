@@ -513,13 +513,13 @@ const handleResponseSubmit = async () => {
 
     // FIXED: Strict check for follow-up limit (max 3 per party per round)
     const currentClarifications = clarificationCount;
-    if (currentClarifications < 3) {
+    if (currentClarifications < 2) {
       setLoadingState('followUp');
       const followUp = await generateAIFollowUp(
         caseData.judge, caseData, updatedResponses, examTarget, savedResponse, currentClarifications, objections
       );
 
-      if (followUp.needsClarification && followUp.question && currentClarifications < 3) {
+      if (followUp.needsClarification && followUp.question && currentClarifications < 2) {
         setCurrentResponse('');
         setCurrentQuestion(followUp.question);
         setClarificationCount(currentClarifications + 1);
