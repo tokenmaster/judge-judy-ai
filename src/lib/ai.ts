@@ -4,12 +4,17 @@ const ANTHROPIC_API_KEY = process.env.NEXT_PUBLIC_ANTHROPIC_API_KEY;
 
 // Helper to call Claude API
 async function callClaude(prompt: string, maxTokens: number = 300): Promise<string> {
+  if (!ANTHROPIC_API_KEY) {
+    console.error('Claude API error: Missing API key');
+    return '';
+  }
+
   try {
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': ANTHROPIC_API_KEY || '',
+        'x-api-key': ANTHROPIC_API_KEY,
         'anthropic-version': '2023-06-01',
         'anthropic-dangerous-direct-browser-access': 'true'
       },
@@ -19,6 +24,12 @@ async function callClaude(prompt: string, maxTokens: number = 300): Promise<stri
         messages: [{ role: 'user', content: prompt }]
       })
     });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      console.error('Claude API error:', response.status, errorData);
+      return '';
+    }
 
     const data = await response.json();
     return data.content?.[0]?.text || '';

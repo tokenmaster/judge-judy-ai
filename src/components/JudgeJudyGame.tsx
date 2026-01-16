@@ -81,6 +81,13 @@ export default function JudgeJudyGame({ initialRoomCode }: { initialRoomCode?: s
   // Track response IDs to prevent duplicates
   const processedResponseIds = useRef<Set<string>>(new Set());
 
+  // Track if we're currently generating a question to prevent loops
+  const isGeneratingQuestion = useRef(false);
+  // Track which target the current question is for
+  const questionTargetRef = useRef<string | null>(null);
+  // Store subscription cleanup function
+  const subscriptionCleanup = useRef<(() => void) | null>(null);
+
   const MAX_CLARIFICATIONS = 3;
 
 // Auto-join if room code is in URL
@@ -90,6 +97,16 @@ useEffect(() => {
     setPhase('join');
   }
 }, [initialRoomCode]);
+
+  // Cleanup subscription on unmount
+  useEffect(() => {
+    return () => {
+      if (subscriptionCleanup.current) {
+        subscriptionCleanup.current();
+        subscriptionCleanup.current = null;
+      }
+    };
+  }, []);
 
   const setLoadingState = (type: 'question' | 'credibility' | 'snapJudgment' | 'followUp' | 'verdict' | 'objection') => {
     const state = getRandomLoadingState(type);
@@ -219,6 +236,12 @@ useEffect(() => {
   };
 
   const subscribeToCase = (caseIdToSubscribe: string) => {
+    // Clean up any existing subscription first
+    if (subscriptionCleanup.current) {
+      subscriptionCleanup.current();
+      subscriptionCleanup.current = null;
+    }
+
     const channel = supabase
       .channel(`case:${caseIdToSubscribe}`)
       .on(
@@ -253,7 +276,8 @@ useEffect(() => {
       )
       .subscribe();
 
-    return () => {
+    // Store the cleanup function
+    subscriptionCleanup.current = () => {
       supabase.removeChannel(channel);
     };
   };
@@ -278,7 +302,15 @@ useEffect(() => {
   }
     setExamRound(updatedCase.exam_round || 0);
     setExamTarget(updatedCase.exam_target || 'A');
-    setCurrentQuestion(updatedCase.current_question || '');
+
+    // Update current question and track which target it's for
+    const newQuestion = updatedCase.current_question || '';
+    setCurrentQuestion(newQuestion);
+    if (newQuestion) {
+      questionTargetRef.current = updatedCase.exam_target || 'A';
+    } else {
+      questionTargetRef.current = null;
+    }
     setObjectionsUsed({
       A: updatedCase.objections_used_a || false,
       B: updatedCase.objections_used_b || false
@@ -407,27 +439,60 @@ useEffect(() => {
 
   // Generate question when entering cross-exam
   useEffect(() => {
-    if (phase === 'crossExam' && !currentQuestion && !isClarifying && !isLoading) {
-      if (isMultiplayer && myRole !== examTarget) return;
+    // Skip if not in cross-exam phase
+    if (phase !== 'crossExam') return;
 
-      setIsLoading(true);
-      setLoadingState('question');
-      setCanObjectToQuestion(false);
+    // Skip if already loading or clarifying
+    if (isLoading || isClarifying) return;
 
-      generateMainQuestion(caseData.judge, caseData, responses, examRound, examTarget, objections)
-        .then(async (question) => {
-          setCurrentQuestion(question);
-          setIsLoading(false);
+    // Skip if we already have a question for the current target
+    if (currentQuestion && questionTargetRef.current === examTarget) return;
+
+    // Skip if already generating a question
+    if (isGeneratingQuestion.current) return;
+
+    // In multiplayer, only the target player generates questions
+    if (isMultiplayer && myRole !== examTarget) return;
+
+    // Mark that we're generating a question
+    isGeneratingQuestion.current = true;
+
+    setIsLoading(true);
+    setLoadingState('question');
+    setCanObjectToQuestion(false);
+
+    // Capture current examTarget to avoid stale closure issues
+    const targetForQuestion = examTarget;
+
+    generateMainQuestion(caseData.judge, caseData, responses, examRound, targetForQuestion, objections)
+      .then(async (question) => {
+        // Only update if we're still targeting the same party
+        if (examTarget === targetForQuestion) {
+          const finalQuestion = question || `${targetForQuestion === 'A' ? caseData.partyA : caseData.partyB}, can you explain your side of what happened?`;
+          questionTargetRef.current = targetForQuestion;
+          setCurrentQuestion(finalQuestion);
           setClarificationCount(0);
           setCanObjectToQuestion(true);
-          setObjectionWindow({ type: 'question', content: question, targetParty: examTarget });
+          setObjectionWindow({ type: 'question', content: finalQuestion, targetParty: targetForQuestion });
 
           if (isMultiplayer) {
-            await updateCase({ current_question: question });
+            await updateCase({ current_question: finalQuestion });
           }
-        });
-    }
-  }, [phase, examRound, examTarget, isClarifying, myRole, isLoading]);
+        }
+      })
+      .catch((error) => {
+        console.error('Failed to generate question:', error);
+        // Provide a fallback question so the game can continue
+        const fallbackQuestion = `${targetForQuestion === 'A' ? caseData.partyA : caseData.partyB}, please explain your version of events.`;
+        questionTargetRef.current = targetForQuestion;
+        setCurrentQuestion(fallbackQuestion);
+        setCanObjectToQuestion(true);
+      })
+      .finally(() => {
+        isGeneratingQuestion.current = false;
+        setIsLoading(false);
+      });
+  }, [phase, examRound, examTarget, isClarifying, myRole, isLoading, currentQuestion]);
 
   // Generate verdict
   useEffect(() => {
@@ -438,11 +503,26 @@ useEffect(() => {
       generateAIVerdict(caseData.judge, caseData, responses, credibilityA, credibilityB, objections)
         .then(async (v) => {
           setVerdict(v);
-          setIsLoading(false);
 
           if (isMultiplayer) {
             await updateCase({ verdict: v });
           }
+        })
+        .catch((error) => {
+          console.error('Failed to generate verdict:', error);
+          // Set a fallback verdict so the UI doesn't get stuck
+          setVerdict({
+            winner: credibilityA >= credibilityB ? 'A' : 'B',
+            winnerName: credibilityA >= credibilityB ? caseData.partyA : caseData.partyB,
+            loserName: credibilityA >= credibilityB ? caseData.partyB : caseData.partyA,
+            summary: 'The judge has reached a decision based on the evidence presented.',
+            reasoning: 'Based on the credibility scores and testimony provided.',
+            quotes: [],
+            credibilityImpact: 'Credibility was a determining factor.'
+          });
+        })
+        .finally(() => {
+          setIsLoading(false);
         });
     }
   }, [phase]);
@@ -477,7 +557,7 @@ const handleResponseSubmit = async () => {
 
     const currentCred = examTarget === 'A' ? credibilityA : credibilityB;
     const credEval = await evaluateCredibility(
-      caseData, responses, examTarget, savedResponse, currentQuestion, currentCred
+      caseData, updatedResponses, examTarget, savedResponse, currentQuestion, currentCred
     );
 
     const newCredA = examTarget === 'A' ? credEval.newCredibility : credibilityA;
@@ -492,7 +572,7 @@ const handleResponseSubmit = async () => {
     setCredibilityHistory(prev => [...prev, {
       party: examTarget,
       name: newResponse.party_name,
-      response: currentResponse.substring(0, 50) + '...',
+      response: savedResponse.substring(0, 50) + '...',
       change: credEval.change,
       newScore: credEval.newCredibility,
       analysis: credEval.analysis,
@@ -501,7 +581,7 @@ const handleResponseSubmit = async () => {
 
     setLoadingState('snapJudgment');
     const snapCheck = await checkForSnapJudgment(
-      caseData.judge, caseData, responses, examTarget, savedResponse, newCredA, newCredB, objections
+      caseData.judge, caseData, updatedResponses, examTarget, savedResponse, newCredA, newCredB, objections
     );
 
     if (snapCheck.triggered) {
@@ -564,6 +644,9 @@ const handleResponseSubmit = async () => {
     setCurrentQuestion('');
     setIsClarifying(false);
     setClarificationCount(0);
+
+    // Clear the question target ref so a new question will be generated for the next target
+    questionTargetRef.current = null;
 
     if (examTarget === 'A') {
       setExamTarget('B');
@@ -629,6 +712,13 @@ const handleResponseSubmit = async () => {
     setIsMultiplayer(false);
     setOtherPlayerJoined(false);
     processedResponseIds.current.clear();
+    isGeneratingQuestion.current = false;
+    questionTargetRef.current = null;
+    // Clean up subscription
+    if (subscriptionCleanup.current) {
+      subscriptionCleanup.current();
+      subscriptionCleanup.current = null;
+    }
   };
 
   // ========== RENDER ==========
