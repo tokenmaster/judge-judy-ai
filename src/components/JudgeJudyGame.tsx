@@ -501,7 +501,7 @@ const handleResponseSubmit = async () => {
 
     setLoadingState('snapJudgment');
     const snapCheck = await checkForSnapJudgment(
-      caseData.judge, caseData, responses, examTarget, currentResponse, newCredA, newCredB, objections
+      caseData.judge, caseData, responses, examTarget, savedResponse, newCredA, newCredB, objections
     );
 
     if (snapCheck.triggered) {
@@ -516,7 +516,7 @@ const handleResponseSubmit = async () => {
     if (currentClarifications < 3) {
       setLoadingState('followUp');
       const followUp = await generateAIFollowUp(
-        caseData.judge, caseData, updatedResponses, examTarget, currentResponse, currentClarifications, objections
+        caseData.judge, caseData, updatedResponses, examTarget, savedResponse, currentClarifications, objections
       );
 
       if (followUp.needsClarification && followUp.question && currentClarifications < 3) {
