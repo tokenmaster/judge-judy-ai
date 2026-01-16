@@ -929,6 +929,31 @@ const handleResponseSubmit = async () => {
 
   // ========== RENDER ==========
 
+  // OBJECTION MODAL - Show immediately when triggered, regardless of phase
+  if (showObjectionModal) {
+    return (
+      <ObjectionModal
+        isOpen={showObjectionModal}
+        onClose={() => {
+          setShowObjectionModal(false);
+          setObjectionWindow(null);
+        }}
+        onSubmit={handleObjectionSubmit}
+        objectorName={targetName}
+        targetName="Judge"
+        isQuestionObjection={objectionWindow?.type === 'question'}
+        objectionTarget={objectionWindow?.content}
+      />
+    );
+  }
+
+  // OBJECTION RULING - Show immediately when there's a ruling
+  if (currentObjectionRuling) {
+    return (
+      <ObjectionRuling ruling={currentObjectionRuling} onContinue={handleObjectionRulingContinue} />
+    );
+  }
+
   // SNAP JUDGMENT - Show immediately when triggered, regardless of phase
   if (showSnapJudgment && snapJudgment) {
     return (
