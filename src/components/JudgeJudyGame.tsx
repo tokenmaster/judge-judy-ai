@@ -464,13 +464,22 @@ useEffect(() => {
       setCurrentParty(updatedCase.current_turn);
     }
 
-    // Handle snap judgment from other player
-    if (updatedCase.verdict?.isSnapJudgment && !showSnapJudgment) {
-      console.log('[CaseUpdate] Received snap judgment from other player');
-      setSnapJudgment(updatedCase.verdict);
-      setShowSnapJudgment(true);
-    } else if (updatedCase.verdict && !updatedCase.verdict.isSnapJudgment) {
-      setVerdict(updatedCase.verdict);
+    // Handle verdict updates from other player
+    if (updatedCase.verdict) {
+      // Check if this is a FULL verdict (has winnerName and reasoning) vs just a snap judgment notification
+      const isFullVerdict = updatedCase.verdict.winnerName && updatedCase.verdict.reasoning;
+
+      if (isFullVerdict) {
+        // This is a complete verdict - set it directly
+        console.log('[CaseUpdate] Received full verdict from other player');
+        setVerdict(updatedCase.verdict);
+        setShowSnapJudgment(false); // Hide snap judgment if showing
+      } else if (updatedCase.verdict.isSnapJudgment && !showSnapJudgment) {
+        // This is just a snap judgment notification (no full verdict yet)
+        console.log('[CaseUpdate] Received snap judgment notification from other player');
+        setSnapJudgment(updatedCase.verdict);
+        setShowSnapJudgment(true);
+      }
     }
   };
 
@@ -961,28 +970,60 @@ const handleResponseSubmit = async () => {
         judgment={snapJudgment}
         onContinue={async () => {
           setShowSnapJudgment(false);
-
-          // Create verdict from snap judgment
-          const snapVerdict = {
-            winner: snapJudgment.winner === caseData.partyA ? 'A' : 'B',
-            winnerName: snapJudgment.winner,
-            loserName: snapJudgment.winner === caseData.partyA ? caseData.partyB : caseData.partyA,
-            summary: snapJudgment.reason || 'Case decided by snap judgment.',
-            reasoning: `Snap judgment: ${snapJudgment.reason}`,
-            quotes: [],
-            credibilityImpact: 'Credibility difference led to early judgment.',
-            isSnapJudgment: true
-          };
-
-          setVerdict(snapVerdict);
+          setIsLoading(true);
+          setLoadingState('verdict');
           setPhase('verdict');
 
-          // Update database in multiplayer
-          if (isMultiplayer) {
-            await updateCase({
-              phase: 'verdict',
-              verdict: snapVerdict
-            });
+          try {
+            // Generate a FULL AI verdict (not just snap judgment summary)
+            const fullVerdict = await generateAIVerdict(
+              caseData.judge,
+              caseData,
+              responses,
+              credibilityA,
+              credibilityB,
+              objections
+            );
+
+            // Mark it as originating from snap judgment
+            const verdictWithSnapFlag = {
+              ...fullVerdict,
+              isSnapJudgment: true,
+              snapReason: snapJudgment.reason
+            };
+
+            setVerdict(verdictWithSnapFlag);
+
+            // Update database in multiplayer
+            if (isMultiplayer) {
+              await updateCase({
+                phase: 'verdict',
+                verdict: verdictWithSnapFlag
+              });
+            }
+          } catch (error) {
+            console.error('Failed to generate verdict after snap judgment:', error);
+            // Fallback to simplified verdict if AI fails
+            const fallbackVerdict = {
+              winner: snapJudgment.winner === caseData.partyA ? 'A' : 'B',
+              winnerName: snapJudgment.winner,
+              loserName: snapJudgment.winner === caseData.partyA ? caseData.partyB : caseData.partyA,
+              summary: snapJudgment.reason || 'Case decided by snap judgment.',
+              reasoning: `Snap judgment: ${snapJudgment.reason}`,
+              quotes: [],
+              credibilityImpact: 'Credibility difference led to early judgment.',
+              isSnapJudgment: true
+            };
+            setVerdict(fallbackVerdict);
+
+            if (isMultiplayer) {
+              await updateCase({
+                phase: 'verdict',
+                verdict: fallbackVerdict
+              });
+            }
+          } finally {
+            setIsLoading(false);
           }
         }}
       />
