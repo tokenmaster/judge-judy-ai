@@ -55,6 +55,7 @@ export default function JudgeJudyGame({ initialRoomCode }: { initialRoomCode?: s
   const [joinError, setJoinError] = useState('');
   const [isMultiplayer, setIsMultiplayer] = useState(false);
   const [otherPlayerJoined, setOtherPlayerJoined] = useState(false);
+  const [isOtherTyping, setIsOtherTyping] = useState(false);
 
   // Game state
   const [verdict, setVerdict] = useState<any>(null);
@@ -87,6 +88,10 @@ export default function JudgeJudyGame({ initialRoomCode }: { initialRoomCode?: s
   const questionTargetRef = useRef<string | null>(null);
   // Store subscription cleanup function
   const subscriptionCleanup = useRef<(() => void) | null>(null);
+  // Typing indicator refs
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const broadcastChannelRef = useRef<any>(null);
+  const lastTypingBroadcast = useRef<number>(0);
 
   const MAX_CLARIFICATIONS = 3;
 
@@ -118,6 +123,30 @@ useEffect(() => {
   const watchingParty = examTarget === 'A' ? 'B' : 'A';
   const watchingName = watchingParty === 'A' ? caseData.partyA : caseData.partyB;
   const targetName = examTarget === 'A' ? caseData.partyA : caseData.partyB;
+
+  // Broadcast typing status (throttled to max once per 500ms)
+  const broadcastTyping = () => {
+    if (!isMultiplayer || !broadcastChannelRef.current) return;
+
+    const now = Date.now();
+    if (now - lastTypingBroadcast.current < 500) return;
+    lastTypingBroadcast.current = now;
+
+    broadcastChannelRef.current.send({
+      type: 'broadcast',
+      event: 'typing',
+      payload: {
+        party: myRole,
+        name: myRole === 'A' ? caseData.partyA : caseData.partyB
+      }
+    });
+  };
+
+  // Handle typing input with broadcast
+  const handleTypingInput = (value: string, setter: (v: string) => void) => {
+    setter(value);
+    broadcastTyping();
+  };
 
   // ========== MULTIPLAYER FUNCTIONS ==========
 
@@ -276,9 +305,38 @@ useEffect(() => {
       )
       .subscribe();
 
+    // Set up broadcast channel for typing indicator
+    const typingChannel = supabase
+      .channel(`typing:${caseIdToSubscribe}`)
+      .on('broadcast', { event: 'typing' }, (payload: any) => {
+        // Only show typing indicator if it's from the other player
+        if (payload.payload?.party !== myRole) {
+          setIsOtherTyping(true);
+
+          // Clear any existing timeout
+          if (typingTimeoutRef.current) {
+            clearTimeout(typingTimeoutRef.current);
+          }
+
+          // Hide typing indicator after 2 seconds of no typing
+          typingTimeoutRef.current = setTimeout(() => {
+            setIsOtherTyping(false);
+          }, 2000);
+        }
+      })
+      .subscribe();
+
+    // Store the broadcast channel ref for sending typing events
+    broadcastChannelRef.current = typingChannel;
+
     // Store the cleanup function
     subscriptionCleanup.current = () => {
       supabase.removeChannel(channel);
+      supabase.removeChannel(typingChannel);
+      broadcastChannelRef.current = null;
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
     };
   };
 
@@ -711,9 +769,11 @@ const handleResponseSubmit = async () => {
     setJoinError('');
     setIsMultiplayer(false);
     setOtherPlayerJoined(false);
+    setIsOtherTyping(false);
     processedResponseIds.current.clear();
     isGeneratingQuestion.current = false;
     questionTargetRef.current = null;
+    lastTypingBroadcast.current = 0;
     // Clean up subscription
     if (subscriptionCleanup.current) {
       subscriptionCleanup.current();
@@ -920,7 +980,10 @@ const handleResponseSubmit = async () => {
     const isPartyA = currentParty === 'A';
     const currentName = isPartyA ? caseData.partyA : caseData.partyB;
     const currentStatement = isPartyA ? caseData.statementA : caseData.statementB;
-    const handleStatementChange = (value: string) => setCaseData({...caseData, [isPartyA ? 'statementA' : 'statementB']: value});
+    const handleStatementChange = (value: string) => {
+      setCaseData({...caseData, [isPartyA ? 'statementA' : 'statementB']: value});
+      broadcastTyping();
+    };
 
     if (isMultiplayer && !isMyTurn) {
       const waitingForName = currentParty === 'A' ? caseData.partyA : caseData.partyB;
@@ -933,9 +996,23 @@ const handleResponseSubmit = async () => {
               <div className="text-slate-500 text-xs mt-1">Room: {roomCode}</div>
             </div>
 
-            <div className="text-5xl mb-4 animate-pulse">⏳</div>
-            <h2 className="text-xl font-bold text-white mb-2">Waiting for {waitingForName}</h2>
-            <p className="text-slate-400 mb-6">They're writing their opening statement...</p>
+            {isOtherTyping ? (
+              <>
+                <div className="text-5xl mb-4">✍️</div>
+                <h2 className="text-xl font-bold text-white mb-2">{waitingForName} is typing...</h2>
+                <div className="flex justify-center gap-1 mb-6">
+                  <span className="w-2 h-2 bg-amber-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                  <span className="w-2 h-2 bg-amber-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
+                  <span className="w-2 h-2 bg-amber-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="text-5xl mb-4 animate-pulse">⏳</div>
+                <h2 className="text-xl font-bold text-white mb-2">Waiting for {waitingForName}</h2>
+                <p className="text-slate-400 mb-6">They're writing their opening statement...</p>
+              </>
+            )}
 
             <div className="bg-slate-800/50 rounded-lg p-4">
               <div className="text-slate-400 text-sm">
@@ -1013,9 +1090,23 @@ if (isMultiplayer && !isMyTurn && !isLoading) {
             </div>
 
             <div className="text-center py-4">
-              <div className="text-5xl mb-4">⏳</div>
-              <h2 className="text-xl font-bold text-white mb-2">{targetName} is on the stand</h2>
-              <p className="text-slate-400 mb-2">Waiting for them to answer...</p>
+              {isOtherTyping ? (
+                <>
+                  <div className="text-5xl mb-4">✍️</div>
+                  <h2 className="text-xl font-bold text-white mb-2">{targetName} is typing...</h2>
+                  <div className="flex justify-center gap-1 mb-2">
+                    <span className="w-2 h-2 bg-amber-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                    <span className="w-2 h-2 bg-amber-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
+                    <span className="w-2 h-2 bg-amber-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="text-5xl mb-4">⏳</div>
+                  <h2 className="text-xl font-bold text-white mb-2">{targetName} is on the stand</h2>
+                  <p className="text-slate-400 mb-2">Waiting for them to answer...</p>
+                </>
+              )}
             </div>
 
             <CredibilityBar partyA={caseData.partyA} partyB={caseData.partyB} credibilityA={credibilityA} credibilityB={credibilityB} history={credibilityHistory} />
@@ -1100,7 +1191,10 @@ if (isMultiplayer && !isMyTurn && !isLoading) {
                 <textarea
                   placeholder="Type your answer..."
                   value={currentResponse}
-                  onChange={(e) => setCurrentResponse(e.target.value)}
+                  onChange={(e) => {
+                    setCurrentResponse(e.target.value);
+                    broadcastTyping();
+                  }}
                   rows={4}
                   className="w-full bg-slate-800 border border-slate-600 rounded-lg px-4 py-3 text-white resize-none"
                 />
