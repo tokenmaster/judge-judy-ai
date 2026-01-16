@@ -267,8 +267,15 @@ useEffect(() => {
       statementB: updatedCase.statement_b || prev.statementB
     }));
 
-    setCredibilityA(updatedCase.credibility_a || 50);
-    setCredibilityB(updatedCase.credibility_b || 50);
+  // Only update credibility from database if we're NOT the one who just changed it
+  if (myRole !== examTarget) {
+    if (updatedCase.credibility_a !== undefined && updatedCase.credibility_a !== null) {
+      setCredibilityA(updatedCase.credibility_a);
+    }
+    if (updatedCase.credibility_b !== undefined && updatedCase.credibility_b !== null) {
+      setCredibilityB(updatedCase.credibility_b);
+    }
+  }
     setExamRound(updatedCase.exam_round || 0);
     setExamTarget(updatedCase.exam_target || 'A');
     setCurrentQuestion(updatedCase.current_question || '');
