@@ -363,18 +363,18 @@ useEffect(() => {
     setExamRound(newRound);
     setExamTarget(newTarget);
 
-    // Update current question and track which round-target it's for
+    // Update current question from database
     const newQuestion = updatedCase.current_question || '';
-    setCurrentQuestion(newQuestion);
-    if (newQuestion) {
+
+    // Only update question if it's different from what we have
+    if (newQuestion && newQuestion !== currentQuestion) {
+      console.log('[CaseUpdate] New question received:', newQuestion.substring(0, 50) + '...');
+      setCurrentQuestion(newQuestion);
       questionTargetRef.current = `${newRound}-${newTarget}`;
-      // Enable objection button when a new question arrives
       setCanObjectToQuestion(true);
       setObjectionWindow({ type: 'question', content: newQuestion, targetParty: newTarget });
-    } else {
-      questionTargetRef.current = null;
-      setCanObjectToQuestion(false);
     }
+    // Don't clear questionTargetRef when question is empty - let the useEffect handle new question generation
     setObjectionsUsed({
       A: updatedCase.objections_used_a || false,
       B: updatedCase.objections_used_b || false
@@ -502,77 +502,83 @@ useEffect(() => {
   };
 
   // Generate question when entering cross-exam
-  // Only depends on phase, examRound, examTarget - NOT isLoading or currentQuestion
-  // This prevents re-triggering when loading state changes
   useEffect(() => {
     // Skip if not in cross-exam phase
     if (phase !== 'crossExam') return;
 
-    // Skip if clarifying (follow-up questions)
+    // Skip if clarifying (follow-up questions handle their own questions)
     if (isClarifying) return;
 
-    // Skip if we already have a question for this exact target in this round
-    const questionKey = `${examRound}-${examTarget}`;
-    if (questionTargetRef.current === questionKey) return;
+    // Skip if we already have a question displayed
+    if (currentQuestion) {
+      console.log('[QuestionGen] Already have question, skipping');
+      return;
+    }
 
-    // Skip if already generating a question
-    if (isGeneratingQuestion.current) return;
+    // Skip if already generating
+    if (isGeneratingQuestion.current) {
+      console.log('[QuestionGen] Already generating, skipping');
+      return;
+    }
 
     // In multiplayer, only the target player generates questions
-    if (isMultiplayer && myRole !== examTarget) return;
+    if (isMultiplayer && myRole !== examTarget) {
+      console.log('[QuestionGen] Not my turn to generate (myRole:', myRole, 'examTarget:', examTarget, ')');
+      return;
+    }
 
-    // Capture current state
+    // Build unique key for this question slot
+    const questionKey = `${examRound}-${examTarget}`;
+
+    // Skip if we already generated for this slot
+    if (questionTargetRef.current === questionKey) {
+      console.log('[QuestionGen] Already generated for', questionKey);
+      return;
+    }
+
+    console.log('[QuestionGen] Generating question for', questionKey);
+
+    // Mark as generating immediately
+    isGeneratingQuestion.current = true;
+
+    // Capture values for async operation
     const targetForQuestion = examTarget;
     const roundForQuestion = examRound;
+    const currentResponses = [...responses]; // Copy to avoid stale closure
 
-    // Add a small delay to let state settle and prevent race conditions
-    const timeoutId = setTimeout(() => {
-      // Double-check conditions after delay (state may have changed)
-      const currentKey = `${roundForQuestion}-${targetForQuestion}`;
-      if (questionTargetRef.current === currentKey) return;
-      if (isGeneratingQuestion.current) return;
+    setIsLoading(true);
+    setLoadingState('question');
+    setCanObjectToQuestion(false);
 
-      // Mark that we're generating a question
-      isGeneratingQuestion.current = true;
+    generateMainQuestion(caseData.judge, caseData, currentResponses, roundForQuestion, targetForQuestion, objections)
+      .then(async (question) => {
+        const finalQuestion = question || `${targetForQuestion === 'A' ? caseData.partyA : caseData.partyB}, can you explain your side of what happened?`;
 
-      setIsLoading(true);
-      setLoadingState('question');
-      setCanObjectToQuestion(false);
-      setCurrentQuestion(''); // Clear old question first
+        console.log('[QuestionGen] Generated:', finalQuestion.substring(0, 50) + '...');
 
-      generateMainQuestion(caseData.judge, caseData, responses, roundForQuestion, targetForQuestion, objections)
-        .then(async (question) => {
-          // Only update if we're still targeting the same party in the same round
-          if (examTarget === targetForQuestion && examRound === roundForQuestion) {
-            const finalQuestion = question || `${targetForQuestion === 'A' ? caseData.partyA : caseData.partyB}, can you explain your side of what happened?`;
-            questionTargetRef.current = `${roundForQuestion}-${targetForQuestion}`;
-            setCurrentQuestion(finalQuestion);
-            setClarificationCount(0);
-            setCanObjectToQuestion(true);
-            setObjectionWindow({ type: 'question', content: finalQuestion, targetParty: targetForQuestion });
+        // Mark this slot as done
+        questionTargetRef.current = `${roundForQuestion}-${targetForQuestion}`;
+        setCurrentQuestion(finalQuestion);
+        setClarificationCount(0);
+        setCanObjectToQuestion(true);
+        setObjectionWindow({ type: 'question', content: finalQuestion, targetParty: targetForQuestion });
 
-            if (isMultiplayer) {
-              await updateCase({ current_question: finalQuestion });
-            }
-          }
-        })
-        .catch((error) => {
-          console.error('Failed to generate question:', error);
-          // Provide a fallback question so the game can continue
-          const fallbackQuestion = `${targetForQuestion === 'A' ? caseData.partyA : caseData.partyB}, please explain your version of events.`;
-          questionTargetRef.current = `${roundForQuestion}-${targetForQuestion}`;
-          setCurrentQuestion(fallbackQuestion);
-          setCanObjectToQuestion(true);
-        })
-        .finally(() => {
-          isGeneratingQuestion.current = false;
-          setIsLoading(false);
-        });
-    }, 100); // 100ms delay to let state settle
-
-    // Cleanup timeout if effect re-runs
-    return () => clearTimeout(timeoutId);
-  }, [phase, examRound, examTarget, isClarifying, myRole, isMultiplayer]);
+        if (isMultiplayer) {
+          await updateCase({ current_question: finalQuestion });
+        }
+      })
+      .catch((error) => {
+        console.error('[QuestionGen] Failed:', error);
+        const fallbackQuestion = `${targetForQuestion === 'A' ? caseData.partyA : caseData.partyB}, please explain your version of events.`;
+        questionTargetRef.current = `${roundForQuestion}-${targetForQuestion}`;
+        setCurrentQuestion(fallbackQuestion);
+        setCanObjectToQuestion(true);
+      })
+      .finally(() => {
+        isGeneratingQuestion.current = false;
+        setIsLoading(false);
+      });
+  }, [phase, examRound, examTarget, isClarifying, myRole, isMultiplayer, currentQuestion]);
 
   // Generate verdict
   useEffect(() => {
@@ -750,12 +756,14 @@ const handleResponseSubmit = async () => {
 
     setIsLoading(false);
     setCurrentResponse('');
-    setCurrentQuestion('');
+    setCurrentQuestion(''); // Clear so useEffect generates new question
     setIsClarifying(false);
     setClarificationCount(0);
 
     // Clear the question target ref so a new question will be generated for the next target
     questionTargetRef.current = null;
+
+    console.log('[ResponseSubmit] Transitioning from', examTarget, 'round', examRound, 'to', nextTarget, 'round', nextRound);
 
     if (examTarget === 'A') {
       setExamTarget('B');
@@ -763,6 +771,7 @@ const handleResponseSubmit = async () => {
       setExamRound(examRound + 1);
       setExamTarget('A');
     } else {
+      console.log('[ResponseSubmit] Moving to verdict phase');
       setPhase('verdict');
     }
   };
