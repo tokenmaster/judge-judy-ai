@@ -81,6 +81,13 @@ export async function generateAIFollowUp(
   clarificationCount: number,
   objections: any[]
 ): Promise<{ needsClarification: boolean; question: string | null }> {
+  
+  // STRICT LIMIT: No more than 3 follow-ups
+  if (clarificationCount >= 3) {
+    console.log('Follow-up limit reached:', clarificationCount);
+    return { needsClarification: false, question: null };
+  }
+
   const judge = JUDGE_PERSONALITIES[judgeId as keyof typeof JUDGE_PERSONALITIES];
   const targetName = examTarget === 'A' ? caseData.partyA : caseData.partyB;
   
@@ -88,25 +95,34 @@ export async function generateAIFollowUp(
 
 The witness ${targetName} just answered: "${lastResponse}"
 
-Based on this response, decide if you need to ask a follow-up question. Consider:
-- Did they actually answer the question?
-- Did they reveal something that needs probing?
-- Are there obvious gaps or contradictions?
+You have asked ${clarificationCount} follow-up questions already (maximum is 3).
 
-You've already asked ${clarificationCount} follow-ups (max 3).
+Should you ask ONE more follow-up? Only say yes if:
+- They completely dodged the question
+- They made a suspicious contradiction
+- Their answer was extremely vague (just a few words)
 
-Respond in this exact format:
+If their answer was reasonable (even if not perfect), say no and move on.
+
+Respond ONLY in this exact format:
 NEEDS_FOLLOWUP: yes or no
 QUESTION: your follow-up question (only if yes)`;
 
   const result = await callClaude(prompt, 200);
   
+  console.log('Follow-up check result:', result, 'Count:', clarificationCount);
+  
   const needsFollowup = result.toLowerCase().includes('needs_followup: yes');
   const questionMatch = result.match(/QUESTION:\s*(.+)/i);
   
+  // Double-check the limit
+  if (clarificationCount >= 3) {
+    return { needsClarification: false, question: null };
+  }
+  
   return {
-    needsClarification: needsFollowup && clarificationCount < 3,
-    question: questionMatch ? questionMatch[1].trim() : null
+    needsClarification: needsFollowup,
+    question: needsFollowup && questionMatch ? questionMatch[1].trim() : null
   };
 }
 
