@@ -688,30 +688,34 @@ const handleResponseSubmit = async () => {
       // Continue without snap judgment
     }
 
-    // FIXED: Strict check for follow-up limit (max 3 per party per round)
-  /*
-    const currentClarifications = clarificationCount;
-    if (currentClarifications < 2) {
-      setLoadingState('followUp');
-      const followUp = await generateAIFollowUp(
-        caseData.judge, caseData, updatedResponses, examTarget, savedResponse, currentClarifications, objections
-      );
+    // Check if follow-up is needed (max 1 per party per round)
+    if (clarificationCount < 1) {
+      try {
+        setLoadingState('followUp');
+        const followUp = await generateAIFollowUp(
+          caseData.judge, caseData, updatedResponses, examTarget, savedResponse, clarificationCount, objections
+        );
 
-      if (followUp.needsClarification && followUp.question && currentClarifications < 2) {
-        setCurrentResponse('');
-        setCurrentQuestion(followUp.question);
-        setClarificationCount(currentClarifications + 1);
-        setIsClarifying(true);
+        if (followUp.needsClarification && followUp.question) {
+          setCurrentResponse('');
+          setCurrentQuestion(followUp.question);
+          setClarificationCount(clarificationCount + 1);
+          setIsClarifying(true);
+          setCanObjectToQuestion(true);
+          setObjectionWindow({ type: 'question', content: followUp.question, targetParty: examTarget });
 
-        if (isMultiplayer) {
-          await updateCase({ current_question: followUp.question });
+          if (isMultiplayer) {
+            await updateCase({ current_question: followUp.question });
+          }
+
+          setIsLoading(false);
+          return;
         }
-
-        setIsLoading(false);
-        return;
+      } catch (error) {
+        console.error('Follow-up check failed:', error);
+        // Continue without follow-up
       }
     }
-*/
     let nextTarget = examTarget;
     let nextRound = examRound;
     let nextPhase = 'crossExam';

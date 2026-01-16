@@ -92,45 +92,41 @@ export async function generateAIFollowUp(
   clarificationCount: number,
   objections: any[]
 ): Promise<{ needsClarification: boolean; question: string | null }> {
-  
-  // STRICT LIMIT: No more than 3 follow-ups
-  if (clarificationCount >= 3) {
-    console.log('Follow-up limit reached:', clarificationCount);
+
+  // STRICT LIMIT: Only 1 follow-up per party per round
+  if (clarificationCount >= 1) {
+    console.log('[FollowUp] Limit reached:', clarificationCount);
     return { needsClarification: false, question: null };
   }
 
   const judge = JUDGE_PERSONALITIES[judgeId as keyof typeof JUDGE_PERSONALITIES];
   const targetName = examTarget === 'A' ? caseData.partyA : caseData.partyB;
-  
+
   const prompt = `${judge.style}
 
 The witness ${targetName} just answered: "${lastResponse}"
 
-You have asked ${clarificationCount} follow-up questions already (maximum is 3).
+Was this answer UNCLEAR? You can ask ONE follow-up question if:
+- They completely dodged or ignored the question
+- Their answer was confusing or contradictory
+- Their answer was too vague (just a few words, no real substance)
+- They gave an evasive non-answer
 
-Should you ask ONE more follow-up? Only say yes if:
-- They completely dodged the question
-- They made a suspicious contradiction
-- Their answer was extremely vague (just a few words)
-
-If their answer was reasonable (even if not perfect), say no and move on.
+If their answer made sense (even if you disagree), say no.
 
 Respond ONLY in this exact format:
 NEEDS_FOLLOWUP: yes or no
 QUESTION: your follow-up question (only if yes)`;
 
   const result = await callClaude(prompt, 200);
-  
-  console.log('Follow-up check result:', result, 'Count:', clarificationCount);
-  
+
+  console.log('[FollowUp] AI response:', result);
+
   const needsFollowup = result.toLowerCase().includes('needs_followup: yes');
   const questionMatch = result.match(/QUESTION:\s*(.+)/i);
-  
-  // Double-check the limit
-  if (clarificationCount >= 3) {
-    return { needsClarification: false, question: null };
-  }
-  
+
+  console.log('[FollowUp] Needs follow-up:', needsFollowup);
+
   return {
     needsClarification: needsFollowup,
     question: needsFollowup && questionMatch ? questionMatch[1].trim() : null
