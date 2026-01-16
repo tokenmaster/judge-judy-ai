@@ -878,7 +878,7 @@ export default function JudgeJudyGame() {
   if (phase === 'crossExam') {
     const isMyTurn = isMultiplayer ? (myRole === examTarget) : true;
 
-    if (isMultiplayer && !isMyTurn && !isLoading) {
+if (isMultiplayer && !isMyTurn && !isLoading) {
       return (
         <div className="min-h-screen bg-slate-900 p-4">
           <div className="max-w-lg mx-auto">
@@ -888,28 +888,29 @@ export default function JudgeJudyGame() {
               <div className="text-slate-500 text-xs mt-1">Room: {roomCode}</div>
             </div>
 
-            <div className="text-center py-8">
-              <div className="text-5xl mb-4 animate-pulse">⏳</div>
+            <div className="text-center py-4">
+              <div className="text-5xl mb-4">⏳</div>
               <h2 className="text-xl font-bold text-white mb-2">{targetName} is on the stand</h2>
-              <p className="text-slate-400 mb-4">Waiting for them to answer...</p>
-
-              {currentQuestion && (
-                <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-4 text-left mb-4">
-                  <div className="text-amber-500 text-sm font-medium mb-1">Judge's Question:</div>
-                  <div className="text-white">{currentQuestion}</div>
-                </div>
-              )}
-
-              <div className="bg-slate-800/50 rounded-lg p-4">
-                <div className="text-slate-400 text-sm">
-                  You are: <span className={myRole === 'A' ? 'text-blue-400' : 'text-red-400'}>{myRole === 'A' ? caseData.partyA : caseData.partyB}</span>
-                  <span className="text-slate-500"> (watching)</span>
-                </div>
-              </div>
+              <p className="text-slate-400 mb-2">Waiting for them to answer...</p>
             </div>
 
             <CredibilityBar partyA={caseData.partyA} partyB={caseData.partyB} credibilityA={credibilityA} credibilityB={credibilityB} history={credibilityHistory} />
+            
             <Transcript caseData={caseData} responses={responses} objections={objections} isOpen={transcriptOpen} onToggle={() => setTranscriptOpen(!transcriptOpen)} />
+
+            {currentQuestion && (
+              <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-4 text-left mb-4 mt-4">
+                <div className="text-amber-500 text-sm font-medium mb-1">Judge's Question:</div>
+                <div className="text-white">{currentQuestion}</div>
+              </div>
+            )}
+
+            <div className="bg-slate-800/50 rounded-lg p-4">
+              <div className="text-slate-400 text-sm text-center">
+                You are: <span className={myRole === 'A' ? 'text-blue-400' : 'text-red-400'}>{myRole === 'A' ? caseData.partyA : caseData.partyB}</span>
+                <span className="text-slate-500"> (watching)</span>
+              </div>
+            </div>
           </div>
         </div>
       );
