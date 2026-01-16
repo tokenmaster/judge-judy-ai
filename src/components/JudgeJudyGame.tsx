@@ -407,7 +407,7 @@ useEffect(() => {
 
   // Generate question when entering cross-exam
   useEffect(() => {
-    if (phase === 'crossExam' && !currentQuestion && !isClarifying) {
+    if (phase === 'crossExam' && !currentQuestion && !isClarifying && !isLoading) {
       if (isMultiplayer && myRole !== examTarget) return;
 
       setIsLoading(true);
@@ -427,7 +427,7 @@ useEffect(() => {
           }
         });
     }
-  }, [phase, examRound, examTarget, isClarifying, myRole]);
+  }, [phase, examRound, examTarget, isClarifying, myRole, isLoading]);
 
   // Generate verdict
   useEffect(() => {
