@@ -913,6 +913,19 @@ const handleResponseSubmit = async () => {
 
   // ========== RENDER ==========
 
+  // SNAP JUDGMENT - Show immediately when triggered, regardless of phase
+  if (showSnapJudgment && snapJudgment) {
+    return (
+      <SnapJudgmentDisplay
+        judgment={snapJudgment}
+        onContinue={() => {
+          setShowSnapJudgment(false);
+          setPhase('verdict');
+        }}
+      />
+    );
+  }
+
   // HOME
   if (phase === 'home') {
     return (
