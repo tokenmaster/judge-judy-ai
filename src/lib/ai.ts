@@ -77,16 +77,24 @@ ${targetResponses ? `${targetName}'s previous testimony:\n${targetResponses}\n` 
 
 This is Round ${examRound + 1} of cross-examination. You're questioning ${targetName}.
 
-Generate ONE pointed question that:
-- DIRECTLY CONFRONTS ${targetName} with what ${otherName} claimed or said
-- References specific contradictions between the two parties
-- Demands they respond to the opponent's version of events
+Generate ONE clear, direct question that:
+- Quotes or paraphrases something specific ${otherName} said, then asks ${targetName} to respond
+- Can be answered with a simple yes/no plus explanation, or a clear factual response
+- Focuses on WHO did WHAT, WHEN, and WHY - the actual facts of the dispute
 - Stays in character with your judicial style
-- Is direct and requires a real answer
 
-IMPORTANT: Your question MUST reference something specific that ${otherName} said (either in their opening statement or testimony) and ask ${targetName} to respond to it.
+GOOD QUESTION EXAMPLES:
+- "${otherName} says you promised to [specific thing]. Did you make that promise or not?"
+- "${otherName} claims [specific claim]. Is that true?"
+- "According to ${otherName}, you [did something]. What's your side of that?"
 
-Just output the question, nothing else.`;
+BAD QUESTIONS TO AVOID:
+- Meta-commentary about the trial ("how am I supposed to ask you about...")
+- Vague questions ("explain yourself")
+- Questions about feelings instead of facts
+- Rhetorical questions that don't need an answer
+
+Just output ONE direct question, nothing else.`;
 
   const question = await callClaude(prompt, 150);
   return question || `${targetName}, can you explain your side of what happened?`;
