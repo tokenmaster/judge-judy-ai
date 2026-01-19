@@ -1197,40 +1197,40 @@ const handleResponseSubmit = async () => {
   // HOME
   if (phase === 'home') {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="max-w-md w-full">
+      <div className="min-h-screen flex items-center justify-center p-2 sm:p-4 md:p-6 lg:p-8">
+        <div className="w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl">
           <TVFrame>
-            <div className="text-center">
-              <div className="text-7xl mb-4">⚖️</div>
-              <h1 className="tv-title text-4xl mb-2">Judge Judy AI</h1>
-              <p className="tv-subtitle text-lg mb-8">Settle disputes. Real stakes. No lawyers.</p>
+            <div className="text-center p-1 sm:p-2 md:p-4 lg:p-6">
+              <div className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl mb-3 md:mb-6">⚖️</div>
+              <h1 className="tv-title text-xl sm:text-2xl md:text-4xl lg:text-5xl mb-2 md:mb-4">Judge Judy AI</h1>
+              <p className="tv-subtitle text-xs sm:text-sm md:text-lg lg:text-xl mb-4 sm:mb-6 md:mb-8">Settle disputes. Real stakes. No lawyers.</p>
 
-              <div className="space-y-3 mb-6">
+              <div className="space-y-2 sm:space-y-3 mb-4 sm:mb-6 md:mb-8 md:flex md:gap-4 md:space-y-0">
                 <button
                   onClick={() => setPhase('create')}
-                  className="w-full tv-button text-lg py-4"
+                  className="w-full tv-button text-sm sm:text-base md:text-lg py-2 sm:py-3 md:py-4"
                 >
                   🆕 CREATE NEW CASE
                 </button>
                 <button
                   onClick={() => setPhase('join')}
-                  className="w-full tv-button bg-gray-700 border-gray-600 text-white text-lg py-4"
+                  className="w-full tv-button bg-gray-700 border-gray-600 text-white text-sm sm:text-base md:text-lg py-2 sm:py-3 md:py-4"
                 >
                   🔗 JOIN EXISTING CASE
                 </button>
               </div>
 
-              <div className="tv-card p-4 mb-6">
-                <div className="text-gray-300 text-sm">
+              <div className="tv-card p-2 sm:p-3 md:p-4 mb-4 sm:mb-6 md:mb-8">
+                <div className="text-gray-300 text-xs sm:text-sm">
                   <span className="text-yellow-500 font-bold">✨ MULTIPLAYER:</span> Create a case and share the room code!
                 </div>
               </div>
 
-              <div className="grid grid-cols-4 gap-2">
-                <div className="tv-card p-3 text-center"><div className="text-2xl mb-1">📝</div><div className="text-yellow-500 text-xs font-bold">PRESENT</div></div>
-                <div className="tv-card p-3 text-center"><div className="text-2xl mb-1">🔥</div><div className="text-yellow-500 text-xs font-bold">GRILLED</div></div>
-                <div className="tv-card p-3 text-center"><div className="text-2xl mb-1">⚠️</div><div className="text-yellow-500 text-xs font-bold">OBJECT</div></div>
-                <div className="tv-card p-3 text-center"><div className="text-2xl mb-1">🏆</div><div className="text-yellow-500 text-xs font-bold">WIN</div></div>
+              <div className="grid grid-cols-4 gap-1 sm:gap-2 md:gap-3">
+                <div className="tv-card p-1.5 sm:p-2 md:p-4 text-center"><div className="text-lg sm:text-xl md:text-3xl mb-1">📝</div><div className="text-yellow-500 text-[8px] sm:text-[10px] md:text-xs font-bold">PRESENT</div></div>
+                <div className="tv-card p-1.5 sm:p-2 md:p-4 text-center"><div className="text-lg sm:text-xl md:text-3xl mb-1">🔥</div><div className="text-yellow-500 text-[8px] sm:text-[10px] md:text-xs font-bold">GRILLED</div></div>
+                <div className="tv-card p-1.5 sm:p-2 md:p-4 text-center"><div className="text-lg sm:text-xl md:text-3xl mb-1">⚠️</div><div className="text-yellow-500 text-[8px] sm:text-[10px] md:text-xs font-bold">OBJECT</div></div>
+                <div className="tv-card p-1.5 sm:p-2 md:p-4 text-center"><div className="text-lg sm:text-xl md:text-3xl mb-1">🏆</div><div className="text-yellow-500 text-[8px] sm:text-[10px] md:text-xs font-bold">WIN</div></div>
               </div>
             </div>
             <ChannelBug text="COURT TV" />
@@ -1243,26 +1243,26 @@ const handleResponseSubmit = async () => {
   // JOIN
   if (phase === 'join') {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="max-w-md w-full">
+      <div className="min-h-screen flex items-center justify-center p-2 sm:p-4 md:p-6">
+        <div className="w-full max-w-sm sm:max-w-md md:max-w-lg">
           <TVFrame>
-            <button onClick={() => setPhase('home')} className="text-yellow-500 hover:text-yellow-300 mb-6 font-bold">← BACK</button>
+            <button onClick={() => setPhase('home')} className="text-yellow-500 hover:text-yellow-300 mb-4 sm:mb-6 font-bold text-sm sm:text-base">← BACK</button>
 
-            <div className="text-center mb-6">
-              <div className="text-5xl mb-4">🔗</div>
-              <h2 className="tv-title text-2xl mb-2">Join a Case</h2>
-              <p className="text-gray-400">Enter the room code shared by the other party</p>
+            <div className="text-center mb-4 sm:mb-6">
+              <div className="text-4xl sm:text-5xl md:text-6xl mb-3 sm:mb-4">🔗</div>
+              <h2 className="tv-title text-xl sm:text-2xl md:text-3xl mb-2">Join a Case</h2>
+              <p className="text-gray-400 text-xs sm:text-sm md:text-base">Enter the room code shared by the other party</p>
             </div>
 
             <div className="mb-4">
-              <label className="block text-yellow-500 mb-2 text-center font-bold text-xs tracking-widest">ROOM CODE</label>
+              <label className="block text-yellow-500 mb-2 text-center font-bold text-[10px] sm:text-xs tracking-widest">ROOM CODE</label>
               <input
                 type="text"
                 placeholder="e.g., JUDY7X"
                 value={joinCode}
                 onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
                 maxLength={6}
-                className="w-full tv-input text-center text-3xl tracking-widest uppercase"
+                className="w-full tv-input text-center text-2xl sm:text-3xl md:text-4xl tracking-widest uppercase"
               />
             </div>
 
@@ -1301,7 +1301,7 @@ const handleResponseSubmit = async () => {
             <button
               onClick={handleJoinCase}
               disabled={joinCode.length !== 6 || isLoading || !joinPreview}
-              className="w-full tv-button text-lg py-4"
+              className="w-full tv-button text-sm sm:text-base md:text-lg py-3 sm:py-4"
             >
               {isLoading ? 'JOINING...' : joinPreview ? `JOIN AS ${joinPreview.partyB.toUpperCase()} →` : 'JOIN CASE →'}
             </button>
@@ -1315,11 +1315,11 @@ const handleResponseSubmit = async () => {
   // CREATE
   if (phase === 'create') {
     return (
-      <div className="min-h-screen p-4">
-        <div className="max-w-lg mx-auto">
+      <div className="min-h-screen p-2 sm:p-4 md:p-6">
+        <div className="w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-2xl mx-auto">
           <TVFrame showLive={false}>
-            <button onClick={() => setPhase('home')} className="text-yellow-500 hover:text-yellow-300 mb-6 font-bold">← BACK</button>
-            <h2 className="tv-title text-2xl mb-6 text-center">File a New Case</h2>
+            <button onClick={() => setPhase('home')} className="text-yellow-500 hover:text-yellow-300 mb-4 sm:mb-6 font-bold text-sm sm:text-base">← BACK</button>
+            <h2 className="tv-title text-lg sm:text-xl md:text-2xl lg:text-3xl mb-4 sm:mb-6 text-center">File a New Case</h2>
 
             <div className="mb-4">
               <label className="block text-yellow-500 mb-2 font-bold text-xs tracking-widest">WHAT&apos;S THE DISPUTE?</label>
@@ -1341,24 +1341,24 @@ const handleResponseSubmit = async () => {
               </div>
             </div>
 
-            <div className="mb-4">
-              <label className="block text-yellow-500 mb-2 font-bold text-xs tracking-widest">CATEGORY</label>
-              <div className="grid grid-cols-2 gap-2">
-                {CATEGORIES.map(cat => (<button key={cat.id} onClick={() => setCaseData({...caseData, category: cat.id})} className={`p-3 border-2 text-left font-bold ${caseData.category === cat.id ? 'tv-gradient-gold text-black border-yellow-300' : 'tv-card border-gray-600 text-gray-300 hover:border-gray-500'}`}>{cat.label}</button>))}
+            <div className="mb-3 sm:mb-4">
+              <label className="block text-yellow-500 mb-2 font-bold text-[10px] sm:text-xs tracking-widest">CATEGORY</label>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-1 sm:gap-2">
+                {CATEGORIES.map(cat => (<button key={cat.id} onClick={() => setCaseData({...caseData, category: cat.id})} className={`p-2 sm:p-3 border-2 text-left font-bold text-xs sm:text-sm ${caseData.category === cat.id ? 'tv-gradient-gold text-black border-yellow-300' : 'tv-card border-gray-600 text-gray-300 hover:border-gray-500'}`}>{cat.label}</button>))}
               </div>
             </div>
 
-            <div className="mb-6">
-              <label className="block text-yellow-500 mb-2 font-bold text-xs tracking-widest">CHOOSE YOUR JUDGE</label>
-              <div className="space-y-2">
-                {Object.entries(JUDGE_PERSONALITIES).map(([id, judge]) => (<button key={id} onClick={() => setCaseData({...caseData, judge: id})} className={`w-full p-4 border-2 text-left ${caseData.judge === id ? 'tv-gradient-gold text-black border-yellow-300' : 'tv-card border-gray-600 text-gray-300 hover:border-gray-500'}`}><div className="font-bold uppercase">{judge.name}</div><div className={`text-sm ${caseData.judge === id ? 'text-yellow-900' : 'text-gray-500'}`}>{judge.tagline}</div></button>))}
+            <div className="mb-4 sm:mb-6">
+              <label className="block text-yellow-500 mb-2 font-bold text-[10px] sm:text-xs tracking-widest">CHOOSE YOUR JUDGE</label>
+              <div className="space-y-1 sm:space-y-2 md:grid md:grid-cols-2 md:gap-2 md:space-y-0">
+                {Object.entries(JUDGE_PERSONALITIES).map(([id, judge]) => (<button key={id} onClick={() => setCaseData({...caseData, judge: id})} className={`w-full p-2 sm:p-3 md:p-4 border-2 text-left ${caseData.judge === id ? 'tv-gradient-gold text-black border-yellow-300' : 'tv-card border-gray-600 text-gray-300 hover:border-gray-500'}`}><div className="font-bold uppercase text-xs sm:text-sm md:text-base">{judge.name}</div><div className={`text-[10px] sm:text-xs md:text-sm ${caseData.judge === id ? 'text-yellow-900' : 'text-gray-500'}`}>{judge.tagline}</div></button>))}
               </div>
             </div>
 
             <button
               onClick={handleCreateCase}
               disabled={!caseData.title || !caseData.category || !caseData.partyA || !caseData.partyB || !caseData.stakes || isLoading}
-              className="w-full tv-button text-lg py-4"
+              className="w-full tv-button text-sm sm:text-base md:text-lg py-3 sm:py-4"
             >
               {isLoading ? 'CREATING...' : 'CREATE CASE & GET ROOM CODE →'}
             </button>
@@ -1371,32 +1371,32 @@ const handleResponseSubmit = async () => {
   // WAITING ROOM
   if (phase === 'waiting-room') {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="max-w-md w-full">
+      <div className="min-h-screen flex items-center justify-center p-2 sm:p-4 md:p-6">
+        <div className="w-full max-w-sm sm:max-w-md md:max-w-lg">
           <TVFrame>
-            <div className="text-center">
+            <div className="text-center p-1 sm:p-2">
               {/* Case Title - Prominent */}
-              <div className="lower-third mb-6 pl-6 text-left">
-                <div className="text-xs font-bold text-yellow-900 tracking-widest">⚖️ DISPUTE</div>
-                <div className="text-black font-bold text-lg">{caseData.title}</div>
-                <div className="text-sm mt-1">
+              <div className="lower-third mb-4 sm:mb-6 pl-4 sm:pl-6 text-left">
+                <div className="text-[10px] sm:text-xs font-bold text-yellow-900 tracking-widest">⚖️ DISPUTE</div>
+                <div className="text-black font-bold text-sm sm:text-lg">{caseData.title}</div>
+                <div className="text-xs sm:text-sm mt-1">
                   <span className="text-blue-800 font-bold">{caseData.partyA}</span>
-                  <span className="text-yellow-900 mx-2 font-bold">VS</span>
+                  <span className="text-yellow-900 mx-1 sm:mx-2 font-bold">VS</span>
                   <span className="text-red-800 font-bold">{caseData.partyB}</span>
                 </div>
               </div>
 
-              <div className="on-air-badge inline-block mb-4">ON AIR</div>
-              <h2 className="tv-title text-xl mb-2">Share This Room</h2>
-              <p className="text-gray-400 mb-4 text-sm">Send this code to {caseData.partyB} so they can join</p>
+              <div className="on-air-badge inline-block mb-3 sm:mb-4">ON AIR</div>
+              <h2 className="tv-title text-lg sm:text-xl md:text-2xl mb-2">Share This Room</h2>
+              <p className="text-gray-400 mb-3 sm:mb-4 text-xs sm:text-sm">Send this code to {caseData.partyB} so they can join</p>
 
-              <div className="tv-card p-6 mb-6">
-                <div className="text-yellow-500 text-xs font-bold tracking-widest mb-2">ROOM CODE</div>
-                <div className="tv-stat-value text-5xl tracking-widest mb-4" style={{ color: '#d4af37' }}>{roomCode}</div>
-                <div className="space-y-3">
+              <div className="tv-card p-3 sm:p-4 md:p-6 mb-4 sm:mb-6">
+                <div className="text-yellow-500 text-[10px] sm:text-xs font-bold tracking-widest mb-2">ROOM CODE</div>
+                <div className="tv-stat-value text-3xl sm:text-4xl md:text-5xl tracking-widest mb-3 sm:mb-4" style={{ color: '#d4af37' }}>{roomCode}</div>
+                <div className="space-y-2 sm:space-y-3 sm:flex sm:gap-3 sm:space-y-0">
                   <button
                     onClick={() => navigator.clipboard.writeText(roomCode)}
-                    className="tv-button bg-gray-700 border-gray-600 text-white w-full py-2"
+                    className="tv-button bg-gray-700 border-gray-600 text-white w-full py-2 text-xs sm:text-sm"
                   >
                     📋 COPY CODE
                   </button>
@@ -1405,25 +1405,25 @@ const handleResponseSubmit = async () => {
                       const shareUrl = `${window.location.origin}?room=${roomCode}`;
                       navigator.clipboard.writeText(shareUrl);
                     }}
-                    className="tv-button w-full py-2"
+                    className="tv-button w-full py-2 text-xs sm:text-sm"
                   >
                     🔗 COPY SHARE LINK
                   </button>
                 </div>
 
-                <div className="mt-4 text-gray-500 text-xs break-all">
+                <div className="mt-3 sm:mt-4 text-gray-500 text-[10px] sm:text-xs break-all">
                   {typeof window !== 'undefined' && `${window.location.origin}?room=${roomCode}`}
                 </div>
               </div>
 
-              <div className="tv-card p-4 mb-6">
-                <div className="flex items-center justify-center gap-3">
-                  <div className="animate-pulse text-3xl">⏳</div>
-                  <div className="text-yellow-500 font-bold">Waiting for {caseData.partyB} to join...</div>
+              <div className="tv-card p-3 sm:p-4 mb-4 sm:mb-6">
+                <div className="flex items-center justify-center gap-2 sm:gap-3">
+                  <div className="animate-pulse text-2xl sm:text-3xl">⏳</div>
+                  <div className="text-yellow-500 font-bold text-xs sm:text-sm md:text-base">Waiting for {caseData.partyB} to join...</div>
                 </div>
               </div>
 
-              <button onClick={resetCase} className="text-gray-500 hover:text-gray-300 text-sm font-bold">CANCEL</button>
+              <button onClick={resetCase} className="text-gray-500 hover:text-gray-300 text-xs sm:text-sm font-bold">CANCEL</button>
             </div>
             <ChannelBug text="COURT TV" />
           </TVFrame>
@@ -1446,37 +1446,37 @@ const handleResponseSubmit = async () => {
     if (isMultiplayer && !isMyTurn) {
       const waitingForName = currentParty === 'A' ? caseData.partyA : caseData.partyB;
       return (
-        <div className="min-h-screen flex items-center justify-center p-4">
-          <div className="max-w-md w-full">
+        <div className="min-h-screen flex items-center justify-center p-2 sm:p-4 md:p-6">
+          <div className="w-full max-w-sm sm:max-w-md md:max-w-lg">
             <TVFrame>
-              <div className="text-center">
+              <div className="text-center p-1 sm:p-2">
                 <ProgressIndicator currentPhase="statements" />
-                <div className="lower-third mb-6 pl-6 text-left">
-                  <div className="text-xs font-bold text-yellow-900 tracking-widest">OPENING STATEMENTS</div>
-                  <div className="text-black font-bold text-lg">{caseData.title}</div>
-                  <div className="text-xs text-yellow-900 mt-1">Room: {roomCode}</div>
+                <div className="lower-third mb-4 sm:mb-6 pl-4 sm:pl-6 text-left">
+                  <div className="text-[10px] sm:text-xs font-bold text-yellow-900 tracking-widest">OPENING STATEMENTS</div>
+                  <div className="text-black font-bold text-sm sm:text-lg">{caseData.title}</div>
+                  <div className="text-[10px] sm:text-xs text-yellow-900 mt-1">Room: {roomCode}</div>
                 </div>
 
                 {isOtherTyping ? (
                   <>
-                    <div className="text-5xl mb-4">✍️</div>
-                    <h2 className="tv-title text-xl mb-2">{waitingForName} is typing...</h2>
-                    <div className="flex justify-center gap-1 mb-6">
-                      <span className="w-2 h-2 bg-yellow-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
-                      <span className="w-2 h-2 bg-yellow-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
-                      <span className="w-2 h-2 bg-yellow-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+                    <div className="text-4xl sm:text-5xl mb-3 sm:mb-4">✍️</div>
+                    <h2 className="tv-title text-lg sm:text-xl mb-2">{waitingForName} is typing...</h2>
+                    <div className="flex justify-center gap-1 mb-4 sm:mb-6">
+                      <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-yellow-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                      <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-yellow-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
+                      <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-yellow-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
                     </div>
                   </>
                 ) : (
                   <>
-                    <div className="text-5xl mb-4 animate-pulse">⏳</div>
-                    <h2 className="tv-title text-xl mb-2">Waiting for {waitingForName}</h2>
-                    <p className="text-gray-400 mb-6">They&apos;re writing their opening statement...</p>
+                    <div className="text-4xl sm:text-5xl mb-3 sm:mb-4 animate-pulse">⏳</div>
+                    <h2 className="tv-title text-lg sm:text-xl mb-2">Waiting for {waitingForName}</h2>
+                    <p className="text-gray-400 text-xs sm:text-sm mb-4 sm:mb-6">They&apos;re writing their opening statement...</p>
                   </>
                 )}
 
-                <div className="tv-card p-4">
-                  <div className="text-gray-400 text-sm">
+                <div className="tv-card p-3 sm:p-4">
+                  <div className="text-gray-400 text-xs sm:text-sm">
                     You are: <span className={`font-bold ${myRole === 'A' ? 'text-blue-400' : 'text-red-400'}`}>{myRole === 'A' ? caseData.partyA : caseData.partyB}</span>
                   </div>
                 </div>
@@ -1489,26 +1489,26 @@ const handleResponseSubmit = async () => {
     }
 
     return (
-      <div className="min-h-screen p-4">
-        <div className="max-w-lg mx-auto">
+      <div className="min-h-screen p-2 sm:p-4 md:p-6">
+        <div className="w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-2xl mx-auto">
           <TVFrame>
             <ProgressIndicator currentPhase="statements" />
-            <div className="lower-third mb-6 pl-6">
-              <div className="text-xs font-bold text-yellow-900 tracking-widest">OPENING STATEMENTS</div>
-              <div className="text-black font-bold text-lg">{caseData.title}</div>
-              {isMultiplayer && <div className="text-xs text-yellow-900 mt-1">Room: {roomCode}</div>}
+            <div className="lower-third mb-4 sm:mb-6 pl-4 sm:pl-6">
+              <div className="text-[10px] sm:text-xs font-bold text-yellow-900 tracking-widest">OPENING STATEMENTS</div>
+              <div className="text-black font-bold text-sm sm:text-lg">{caseData.title}</div>
+              {isMultiplayer && <div className="text-[10px] sm:text-xs text-yellow-900 mt-1">Room: {roomCode}</div>}
             </div>
 
             <StakesBadge stakes={caseData.stakes} />
 
-            <div className="mb-6">
-              <div className="flex gap-2">
+            <div className="mb-4 sm:mb-6">
+              <div className="flex flex-col sm:flex-row gap-2">
                 <PartyNamePlate
                   name={caseData.partyA}
                   party="A"
                   status={isPartyA ? 'active' : caseData.statementA ? 'done' : 'waiting'}
                 />
-                <div className="flex items-center text-yellow-500 font-black text-xl">VS</div>
+                <div className="hidden sm:flex items-center text-yellow-500 font-black text-lg sm:text-xl">VS</div>
                 <PartyNamePlate
                   name={caseData.partyB}
                   party="B"
@@ -1517,38 +1517,38 @@ const handleResponseSubmit = async () => {
               </div>
             </div>
 
-            {/* Guidance box */}
-            <div className="tv-card p-4 mb-4">
-              <div className="text-yellow-500 text-sm font-bold mb-2">💡 WHAT TO WRITE:</div>
-              <ul className="text-gray-400 text-sm space-y-1">
-                <li>• <span className="text-gray-300">What happened?</span> Describe the situation from your perspective</li>
-                <li>• <span className="text-gray-300">Why are you right?</span> Explain why you deserve to win</li>
-                <li>• <span className="text-gray-300">Be specific!</span> Include details, dates, or evidence</li>
+            {/* Guidance box - hidden on very small screens */}
+            <div className="tv-card p-2 sm:p-4 mb-3 sm:mb-4 hidden xs:block">
+              <div className="text-yellow-500 text-xs sm:text-sm font-bold mb-1 sm:mb-2">💡 WHAT TO WRITE:</div>
+              <ul className="text-gray-400 text-[10px] sm:text-sm space-y-0.5 sm:space-y-1">
+                <li>• <span className="text-gray-300">What happened?</span> Your perspective</li>
+                <li>• <span className="text-gray-300">Why are you right?</span> Explain your case</li>
+                <li>• <span className="text-gray-300">Be specific!</span> Include details</li>
               </ul>
             </div>
 
-            <div className={`tv-card p-4 mb-4 border-2 ${isPartyA ? 'border-blue-600' : 'border-red-600'}`}>
-              <div className="flex items-center gap-2 mb-2">
-                <span className={`font-bold text-lg ${isPartyA ? 'text-blue-400' : 'text-red-400'}`}>{currentName}</span>
-                <span className="text-gray-400 text-sm">— your opening statement</span>
+            <div className={`tv-card p-2 sm:p-4 mb-3 sm:mb-4 border-2 ${isPartyA ? 'border-blue-600' : 'border-red-600'}`}>
+              <div className="flex items-center gap-1 sm:gap-2 mb-1 sm:mb-2">
+                <span className={`font-bold text-sm sm:text-lg ${isPartyA ? 'text-blue-400' : 'text-red-400'}`}>{currentName}</span>
+                <span className="text-gray-400 text-[10px] sm:text-sm">— your statement</span>
               </div>
-              <div className="text-gray-500 text-xs mb-3">The judge will read this and question you about it</div>
+              <div className="text-gray-500 text-[10px] sm:text-xs mb-2 sm:mb-3">The judge will question you about this</div>
               <textarea
-                placeholder={`Example: "On Tuesday, ${isPartyA ? caseData.partyB || 'they' : caseData.partyA || 'they'} did [X] and I believe I'm right because [Y]. I have [evidence/witnesses] that prove..."`}
+                placeholder="Describe what happened and why you're right..."
                 value={currentStatement}
                 onChange={(e) => handleStatementChange(e.target.value)}
-                rows={6}
-                className={`w-full tv-input text-white placeholder-gray-600 resize-none ${isPartyA ? 'border-blue-600' : 'border-red-600'}`}
+                rows={4}
+                className={`w-full tv-input text-white placeholder-gray-600 resize-none text-sm sm:text-base ${isPartyA ? 'border-blue-600' : 'border-red-600'}`}
                 style={{ color: 'white' }}
               />
-              <div className="flex justify-between mt-2 text-xs text-gray-500">
-                <span>{currentStatement.length} characters</span>
-                <span className="text-yellow-500">{currentStatement.length < 50 ? '📝 Add more detail for a stronger case' : currentStatement.length > 500 ? '✂️ Consider being more concise' : '✓ Good length'}</span>
+              <div className="flex justify-between mt-1 sm:mt-2 text-[10px] sm:text-xs text-gray-500">
+                <span>{currentStatement.length} chars</span>
+                <span className="text-yellow-500">{currentStatement.length < 50 ? '📝 Add detail' : currentStatement.length > 500 ? '✂️ Be concise' : '✓ Good'}</span>
               </div>
             </div>
 
-            <button onClick={handleStatementSubmit} disabled={!currentStatement} className="w-full tv-button text-lg py-4">
-              {isPartyA ? `SUBMIT ${caseData.partyA.toUpperCase()}'S STATEMENT →` : `SUBMIT → CROSS-EXAMINATION`}
+            <button onClick={handleStatementSubmit} disabled={!currentStatement} className="w-full tv-button text-sm sm:text-base md:text-lg py-2 sm:py-3 md:py-4">
+              {isPartyA ? `SUBMIT STATEMENT →` : `SUBMIT → CROSS-EXAM`}
             </button>
             <ChannelBug text="COURT TV" />
           </TVFrame>
@@ -1563,14 +1563,14 @@ const handleResponseSubmit = async () => {
 
 if (isMultiplayer && !isMyTurn && !isLoading) {
       return (
-        <div className="min-h-screen p-4">
-          <div className="max-w-lg mx-auto">
+        <div className="min-h-screen p-2 sm:p-4 md:p-6">
+          <div className="w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-2xl mx-auto">
             <TVFrame>
               <ProgressIndicator currentPhase="crossExam" />
-              <div className="flex items-center justify-between mb-4">
-                <div className="lower-third pl-6 flex-1">
-                  <div className="text-xs font-bold text-yellow-900 tracking-widest">{isClarifying ? '🔄 FOLLOW-UP' : 'CROSS-EXAMINATION'}</div>
-                  <div className="text-black font-bold">{caseData.title}</div>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0 mb-3 sm:mb-4">
+                <div className="lower-third pl-4 sm:pl-6 flex-1">
+                  <div className="text-[10px] sm:text-xs font-bold text-yellow-900 tracking-widest">{isClarifying ? '🔄 FOLLOW-UP' : 'CROSS-EXAMINATION'}</div>
+                  <div className="text-black font-bold text-sm sm:text-base">{caseData.title}</div>
                 </div>
                 <RoundIndicator round={examRound + 1} totalRounds={3} />
               </div>
@@ -1620,27 +1620,27 @@ if (isMultiplayer && !isMyTurn && !isLoading) {
     }
 
     return (
-      <div className="min-h-screen p-4">
-        <div className="max-w-lg mx-auto">
+      <div className="min-h-screen p-2 sm:p-4 md:p-6">
+        <div className="w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-2xl mx-auto">
           <TVFrame>
             <ProgressIndicator currentPhase="crossExam" />
-            <div className="flex items-center justify-between mb-4">
-              <div className="lower-third pl-6 flex-1">
-                <div className="text-xs font-bold text-yellow-900 tracking-widest">{isClarifying ? '🔄 FOLLOW-UP' : 'CROSS-EXAMINATION'}</div>
-                <div className="text-black font-bold">{caseData.title}</div>
-                {isMultiplayer && <div className="text-xs text-yellow-900">Room: {roomCode}</div>}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0 mb-3 sm:mb-4">
+              <div className="lower-third pl-4 sm:pl-6 flex-1">
+                <div className="text-[10px] sm:text-xs font-bold text-yellow-900 tracking-widest">{isClarifying ? '🔄 FOLLOW-UP' : 'CROSS-EXAMINATION'}</div>
+                <div className="text-black font-bold text-sm sm:text-base">{caseData.title}</div>
+                {isMultiplayer && <div className="text-[10px] sm:text-xs text-yellow-900">Room: {roomCode}</div>}
               </div>
               <RoundIndicator round={examRound + 1} totalRounds={3} />
             </div>
 
-            <div className="mb-6">
-              <div className="flex gap-2">
+            <div className="mb-4 sm:mb-6">
+              <div className="flex flex-col sm:flex-row gap-2">
                 <PartyNamePlate
                   name={caseData.partyA}
                   party="A"
                   status={examTarget === 'A' ? 'active' : 'waiting'}
                 />
-                <div className="flex items-center text-yellow-500 font-black text-xl">VS</div>
+                <div className="hidden sm:flex items-center text-yellow-500 font-black text-lg sm:text-xl">VS</div>
                 <PartyNamePlate
                   name={caseData.partyB}
                   party="B"
@@ -1719,18 +1719,18 @@ if (isMultiplayer && !isMyTurn && !isLoading) {
   if (phase === 'verdict') {
     if (isLoading || !verdict) {
       return (
-        <div className="min-h-screen flex flex-col items-center justify-center p-4">
-          <div className="max-w-lg w-full">
+        <div className="min-h-screen flex flex-col items-center justify-center p-2 sm:p-4 md:p-6">
+          <div className="w-full max-w-sm sm:max-w-md md:max-w-lg">
             <TVFrame>
               <ProgressIndicator currentPhase="verdict" />
-              <div className="text-center mt-8">
-                <div className="flex justify-center gap-2 mb-4">
+              <div className="text-center mt-4 sm:mt-8">
+                <div className="flex justify-center gap-1 sm:gap-2 mb-3 sm:mb-4">
                   {['📚', '⚖️', '🤝', '📜', '🔨'].map((e, i) => (
-                    <span key={i} className="text-4xl animate-pulse" style={{ animationDelay: `${i * 0.2}s` }}>{e}</span>
+                    <span key={i} className="text-2xl sm:text-3xl md:text-4xl animate-pulse" style={{ animationDelay: `${i * 0.2}s` }}>{e}</span>
                   ))}
                 </div>
-                <div className="tv-title text-xl mb-2">The judge is deliberating...</div>
-                <div className="text-gray-400">{loadingMessage}</div>
+                <div className="tv-title text-base sm:text-lg md:text-xl mb-2">The judge is deliberating...</div>
+                <div className="text-gray-400 text-xs sm:text-sm">{loadingMessage}</div>
               </div>
               <ChannelBug text="COURT TV" />
             </TVFrame>
@@ -1740,32 +1740,32 @@ if (isMultiplayer && !isMyTurn && !isLoading) {
     }
 
     return (
-      <div className="min-h-screen p-4">
-        <div className="max-w-lg mx-auto">
+      <div className="min-h-screen p-2 sm:p-4 md:p-6">
+        <div className="w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-2xl mx-auto">
           <TVFrame>
             <ProgressIndicator currentPhase="verdict" />
-            <div className="text-center mb-6">
-              <div className="text-6xl mb-4">⚖️</div>
-              <h2 className="tv-title text-3xl mb-2">THE VERDICT</h2>
-              <p className="text-gray-400">{caseData.title}</p>
+            <div className="text-center mb-4 sm:mb-6">
+              <div className="text-4xl sm:text-5xl md:text-6xl mb-3 sm:mb-4">⚖️</div>
+              <h2 className="tv-title text-xl sm:text-2xl md:text-3xl mb-2">THE VERDICT</h2>
+              <p className="text-gray-400 text-xs sm:text-sm">{caseData.title}</p>
             </div>
 
-            <div className="tv-gradient-gold p-6 mb-6 text-center winner-glow">
-              <div className="text-yellow-900 text-xs font-bold tracking-widest mb-2">WINNER</div>
-              <div className="text-4xl font-black text-black mb-2">{verdict.winnerName} 🏆</div>
-              <div className="text-yellow-900 italic">&quot;{verdict.summary}&quot;</div>
+            <div className="tv-gradient-gold p-3 sm:p-4 md:p-6 mb-4 sm:mb-6 text-center winner-glow">
+              <div className="text-yellow-900 text-[10px] sm:text-xs font-bold tracking-widest mb-1 sm:mb-2">WINNER</div>
+              <div className="text-2xl sm:text-3xl md:text-4xl font-black text-black mb-1 sm:mb-2">{verdict.winnerName} 🏆</div>
+              <div className="text-yellow-900 italic text-xs sm:text-sm">&quot;{verdict.summary}&quot;</div>
             </div>
 
-            <div className="tv-card p-4 mb-6">
-              <div className="text-yellow-500 text-xs font-bold tracking-widest mb-2">JUDGE&apos;S REASONING</div>
-              <div className="text-white">{verdict.reasoning}</div>
+            <div className="tv-card p-2 sm:p-4 mb-4 sm:mb-6">
+              <div className="text-yellow-500 text-[10px] sm:text-xs font-bold tracking-widest mb-1 sm:mb-2">JUDGE&apos;S REASONING</div>
+              <div className="text-white text-xs sm:text-sm">{verdict.reasoning}</div>
             </div>
 
             {verdict.quotes?.length > 0 && (
-              <div className="tv-card p-4 mb-6">
-                <div className="text-yellow-500 text-xs font-bold tracking-widest mb-2">KEY QUOTES</div>
+              <div className="tv-card p-2 sm:p-4 mb-4 sm:mb-6">
+                <div className="text-yellow-500 text-[10px] sm:text-xs font-bold tracking-widest mb-1 sm:mb-2">KEY QUOTES</div>
                 {verdict.quotes.map((q: string, i: number) => (
-                  <div key={i} className="text-gray-300 italic mb-2 pl-3 border-l-2 border-yellow-600">&quot;{q}&quot;</div>
+                  <div key={i} className="text-gray-300 italic text-xs sm:text-sm mb-2 pl-2 sm:pl-3 border-l-2 border-yellow-600">&quot;{q}&quot;</div>
                 ))}
               </div>
             )}
@@ -1775,20 +1775,20 @@ if (isMultiplayer && !isMyTurn && !isLoading) {
             <StakesBadge stakes={caseData.stakes} />
 
             {verdictAccepted === null ? (
-              <div className="space-y-3">
-                <button onClick={() => setVerdictAccepted(true)} className="w-full tv-button py-4 bg-green-700 border-green-500 text-white">
+              <div className="space-y-2 sm:space-y-3 sm:flex sm:gap-3 sm:space-y-0">
+                <button onClick={() => setVerdictAccepted(true)} className="w-full tv-button py-2 sm:py-3 md:py-4 bg-green-700 border-green-500 text-white text-sm sm:text-base">
                   ✅ ACCEPT VERDICT
                 </button>
-                <button onClick={() => setVerdictAccepted(false)} className="w-full tv-button tv-button-red py-4">
+                <button onClick={() => setVerdictAccepted(false)} className="w-full tv-button tv-button-red py-2 sm:py-3 md:py-4 text-sm sm:text-base">
                   ❌ REJECT (NO APPEAL)
                 </button>
               </div>
             ) : (
               <div className="text-center">
-                <div className={`text-xl mb-4 font-bold ${verdictAccepted ? 'text-green-400' : 'text-red-400'}`}>
+                <div className={`text-base sm:text-lg md:text-xl mb-3 sm:mb-4 font-bold ${verdictAccepted ? 'text-green-400' : 'text-red-400'}`}>
                   {verdictAccepted ? '✅ VERDICT ACCEPTED' : '❌ VERDICT REJECTED'}
                 </div>
-                <button onClick={resetCase} className="tv-button">
+                <button onClick={resetCase} className="tv-button text-sm sm:text-base">
                   START NEW CASE
                 </button>
               </div>

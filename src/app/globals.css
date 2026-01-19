@@ -355,3 +355,189 @@ body {
 .party-b-bg { background: linear-gradient(180deg, #660000 0%, #330000 100%); }
 .party-b-border { border-color: #cc0000; }
 .party-b-text { color: #ff6666; }
+
+/* ===== RESPONSIVE DESIGN ===== */
+
+/* Desktop Layout (768px and up) */
+@media (min-width: 768px) {
+  /* Larger TV screen with more presence */
+  .tv-screen {
+    border-width: 12px;
+    border-radius: 12px;
+    box-shadow:
+      inset 0 0 100px rgba(0,0,0,0.5),
+      0 0 40px rgba(0,0,0,0.8),
+      0 12px 48px rgba(0,0,0,0.6);
+  }
+
+  /* Larger badges on desktop */
+  .live-badge {
+    font-size: 0.8rem;
+    padding: 4px 12px;
+    letter-spacing: 3px;
+  }
+
+  .on-air-badge {
+    padding: 6px 16px;
+    font-size: 0.9rem;
+    letter-spacing: 4px;
+  }
+
+  /* Wider lower thirds */
+  .lower-third {
+    padding: 12px 24px;
+  }
+
+  .lower-third::before {
+    width: 12px;
+  }
+
+  /* Larger buttons */
+  .tv-button {
+    padding: 16px 32px;
+    font-size: 1rem;
+    border-width: 4px;
+  }
+
+  /* Larger inputs */
+  .tv-input {
+    padding: 16px 20px;
+    font-size: 1rem;
+    border-width: 4px;
+  }
+
+  /* Bigger stat values */
+  .tv-stat-value {
+    font-size: 2.5rem;
+  }
+
+  /* Larger title shadows */
+  .tv-title {
+    text-shadow:
+      3px 3px 0px #8b5a2b,
+      6px 6px 0px rgba(0,0,0,0.5);
+    letter-spacing: 4px;
+  }
+
+  /* Channel bug larger */
+  .channel-bug {
+    padding: 6px 14px;
+    font-size: 0.75rem;
+    letter-spacing: 2px;
+  }
+}
+
+/* Large Desktop (1024px and up) */
+@media (min-width: 1024px) {
+  .tv-screen {
+    border-width: 16px;
+    border-radius: 16px;
+  }
+
+  .tv-stat-value {
+    font-size: 3rem;
+  }
+}
+
+/* Mobile Optimizations (below 768px) */
+@media (max-width: 767px) {
+  /* Smaller TV frame on mobile */
+  .tv-screen {
+    border-width: 6px;
+    border-radius: 6px;
+  }
+
+  /* Tighter lower thirds */
+  .lower-third {
+    padding: 6px 12px;
+  }
+
+  .lower-third::before {
+    width: 6px;
+  }
+
+  /* Compact buttons */
+  .tv-button {
+    padding: 10px 16px;
+    font-size: 0.875rem;
+  }
+
+  /* Compact inputs */
+  .tv-input {
+    padding: 10px 12px;
+    font-size: 0.875rem;
+  }
+
+  /* Smaller stat values */
+  .tv-stat-value {
+    font-size: 1.5rem;
+  }
+
+  /* Compact title */
+  .tv-title {
+    letter-spacing: 2px;
+    text-shadow:
+      1px 1px 0px #8b5a2b,
+      2px 2px 0px rgba(0,0,0,0.5);
+  }
+
+  /* Smaller badges */
+  .live-badge {
+    font-size: 0.6rem;
+    padding: 2px 6px;
+  }
+
+  .on-air-badge {
+    padding: 3px 8px;
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+  }
+
+  .channel-bug {
+    padding: 3px 6px;
+    font-size: 0.55rem;
+  }
+
+  /* Smaller cards padding */
+  .tv-card {
+    border-width: 2px;
+  }
+
+  .tv-stat-box {
+    padding: 6px 12px;
+  }
+}
+
+/* Desktop-only: Two-column layout helper */
+@media (min-width: 768px) {
+  .desktop-two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    align-items: start;
+  }
+
+  .desktop-sidebar {
+    position: sticky;
+    top: 1rem;
+  }
+}
+
+/* Desktop: Widescreen TV aspect ratio */
+@media (min-width: 1024px) {
+  .tv-widescreen {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+}
+
+/* Touch-friendly on mobile */
+@media (max-width: 767px) {
+  .tv-button {
+    min-height: 44px;
+  }
+
+  .tv-input {
+    min-height: 44px;
+  }
+}
