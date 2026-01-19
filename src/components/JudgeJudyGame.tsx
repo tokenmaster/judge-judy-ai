@@ -1619,23 +1619,51 @@ Settle YOUR disputes at judgejudy.ai`;
               <div className="tv-card p-3 sm:p-4 md:p-6 mb-4 sm:mb-6">
                 <div className="text-yellow-500 text-[10px] sm:text-xs font-bold tracking-widest mb-2">ROOM CODE</div>
                 <div className="tv-stat-value text-3xl sm:text-4xl md:text-5xl tracking-widest mb-3 sm:mb-4" style={{ color: '#d4af37' }}>{roomCode}</div>
-                <div className="space-y-2 sm:space-y-3 sm:flex sm:gap-3 sm:space-y-0">
+
+                {/* Share options */}
+                <div className="text-yellow-500 text-[10px] sm:text-xs font-bold tracking-widest mb-2">SHARE LINK</div>
+                <div className="grid grid-cols-3 gap-2 mb-3">
                   <button
-                    onClick={() => navigator.clipboard.writeText(roomCode)}
-                    className="tv-button bg-gray-700 border-gray-600 text-white w-full py-2 text-xs sm:text-sm"
+                    onClick={() => {
+                      const shareUrl = `${window.location.origin}?room=${roomCode}`;
+                      const text = `Join my Judge Judy AI case! ${shareUrl}`;
+                      window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+                    }}
+                    className="tv-button bg-green-700 border-green-500 text-white py-2 sm:py-3 text-xs sm:text-sm flex flex-col items-center gap-1"
                   >
-                    📋 COPY CODE
+                    <span className="text-lg sm:text-xl">💬</span>
+                    <span>WhatsApp</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      const shareUrl = `${window.location.origin}?room=${roomCode}`;
+                      const text = `Join my Judge Judy AI case! ${shareUrl}`;
+                      window.open(`sms:?body=${encodeURIComponent(text)}`, '_self');
+                    }}
+                    className="tv-button bg-blue-700 border-blue-500 text-white py-2 sm:py-3 text-xs sm:text-sm flex flex-col items-center gap-1"
+                  >
+                    <span className="text-lg sm:text-xl">📱</span>
+                    <span>Text</span>
                   </button>
                   <button
                     onClick={() => {
                       const shareUrl = `${window.location.origin}?room=${roomCode}`;
                       navigator.clipboard.writeText(shareUrl);
                     }}
-                    className="tv-button w-full py-2 text-xs sm:text-sm"
+                    className="tv-button bg-purple-700 border-purple-500 text-white py-2 sm:py-3 text-xs sm:text-sm flex flex-col items-center gap-1"
                   >
-                    🔗 COPY SHARE LINK
+                    <span className="text-lg sm:text-xl">🔗</span>
+                    <span>Copy Link</span>
                   </button>
                 </div>
+
+                {/* Copy code button */}
+                <button
+                  onClick={() => navigator.clipboard.writeText(roomCode)}
+                  className="tv-button bg-gray-700 border-gray-600 text-white w-full py-2 text-xs sm:text-sm"
+                >
+                  📋 COPY CODE ONLY
+                </button>
 
                 <div className="mt-3 sm:mt-4 text-gray-500 text-[10px] sm:text-xs break-all">
                   {typeof window !== 'undefined' && `${window.location.origin}?room=${roomCode}`}
