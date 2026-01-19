@@ -1,12 +1,12 @@
 // Judge GIFs - mapped by judge and situation
 export const JUDGE_GIFS = {
-  judy: {
-    intro: 'https://media.giphy.com/media/Rhhr8D5mKSX7O/giphy.gif', // Judge Judy "BALONEY!"
-    waiting: 'https://media.giphy.com/media/l0HlPwMAzh13pcZ20/giphy.gif', // Judge Judy impatient
-    thinking: 'https://media.giphy.com/media/26gspjl5bxzhSdJtK/giphy.gif', // Judge Judy thinking
-    winner: 'https://media.giphy.com/media/3o7TKnO6Wve6502iJ2/giphy.gif', // Judge Judy approving
-    loser: 'https://media.giphy.com/media/5xtDarmwsuR9sDRObyU/giphy.gif', // Judge Judy pointing
-    objection: 'https://media.giphy.com/media/ftdF4ZkueWGHBYc4b5/giphy.gif', // Judge Judy objection face
+  joody: {
+    intro: 'https://media.giphy.com/media/Rhhr8D5mKSX7O/giphy.gif', // Judge Joody "BALONEY!"
+    waiting: 'https://media.giphy.com/media/l0HlPwMAzh13pcZ20/giphy.gif', // Judge Joody impatient
+    thinking: 'https://media.giphy.com/media/26gspjl5bxzhSdJtK/giphy.gif', // Judge Joody thinking
+    winner: 'https://media.giphy.com/media/3o7TKnO6Wve6502iJ2/giphy.gif', // Judge Joody approving
+    loser: 'https://media.giphy.com/media/5xtDarmwsuR9sDRObyU/giphy.gif', // Judge Joody pointing
+    objection: 'https://media.giphy.com/media/ftdF4ZkueWGHBYc4b5/giphy.gif', // Judge Joody objection face
     sustained: 'https://media.giphy.com/media/WrJ8x0niiblWEoo7hE/giphy.gif', // Stern approval
     overruled: 'https://media.giphy.com/media/l4FGuhL4U2WyjdkaY/giphy.gif', // Dismissive wave
     appeal: 'https://media.giphy.com/media/3oKIPlifLxdigaD2Y8/giphy.gif', // Really? face
@@ -255,10 +255,10 @@ export const getSituationGif = (situation: keyof typeof SITUATION_GIFS): string 
 
 // Judge Personalities
 export const JUDGE_PERSONALITIES = {
-  judy: {
-    name: "Judge Judy",
+  joody: {
+    name: "Judge Joody",
     tagline: "Sharp-tongued and no-nonsense",
-    style: "You are Judge Judy - sharp, witty, and you don't suffer fools. You cut through BS immediately, use devastating one-liners, and show visible frustration at stupidity. You interrupt when you've heard enough. Your humor is biting. You say things like 'BALONEY!', 'Don't pee on my leg and tell me it's raining', and 'I'm speaking!'",
+    style: "You are Judge Joody - sharp, witty, and you don't suffer fools. You cut through BS immediately, use devastating one-liners, and show visible frustration at stupidity. You interrupt when you've heard enough. Your humor is biting. You say things like 'BALONEY!', 'Don't pee on my leg and tell me it's raining', and 'I'm speaking!'",
     reactions: {
       shocked: "EXCUSE ME?!",
       disappointed: "This is RIDICULOUS.",

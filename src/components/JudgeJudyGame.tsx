@@ -43,7 +43,7 @@ export default function JudgeJudyGame({ initialRoomCode }: { initialRoomCode?: s
   // Core state
   const [phase, setPhase] = useState('home');
   const [caseData, setCaseData] = useState({
-    title: '', category: '', judge: 'judy',
+    title: '', category: '', judge: 'joody',
     partyA: '', partyB: '',
     statementA: '', statementB: '',
     stakes: ''
@@ -1144,7 +1144,7 @@ const handleResponseSubmit = async () => {
   const resetCase = () => {
     clearSession();
     setPhase('home');
-    setCaseData({ title: '', category: '', judge: 'judy', partyA: '', partyB: '', statementA: '', statementB: '', stakes: '' });
+    setCaseData({ title: '', category: '', judge: 'joody', partyA: '', partyB: '', statementA: '', statementB: '', stakes: '' });
     setCurrentParty('A');
     setExamRound(0);
     setExamTarget('A');
@@ -1198,11 +1198,11 @@ const handleResponseSubmit = async () => {
   const generateShareText = () => {
     if (!verdict) return '';
     const judge = JUDGE_PERSONALITIES[caseData.judge as keyof typeof JUDGE_PERSONALITIES];
-    return `⚖️ JUDGE JUDY AI VERDICT ⚖️
+    return `⚖️ JUDGE JOODY AI VERDICT ⚖️
 
 📋 Case: ${caseData.title}
 👥 ${caseData.partyA} vs ${caseData.partyB}
-👨‍⚖️ Judge: ${judge?.name || 'Judge Judy'}
+👨‍⚖️ Judge: ${judge?.name || 'Judge Joody'}
 
 🏆 WINNER: ${verdict.winnerName}
 
@@ -1210,7 +1210,7 @@ const handleResponseSubmit = async () => {
 
 ${caseData.stakes ? `🎯 Stakes: ${caseData.stakes}` : ''}
 
-Settle YOUR disputes at judgejudy.ai`;
+Settle YOUR disputes at judgejoody.ai`;
   };
 
   const handleShare = async () => {
@@ -1220,7 +1220,7 @@ Settle YOUR disputes at judgejudy.ai`;
     if (navigator.share) {
       try {
         await navigator.share({
-          title: 'Judge Judy AI Verdict',
+          title: 'Judge Joody AI Verdict',
           text: shareText,
         });
         setShareStatus('shared');
@@ -1410,7 +1410,7 @@ Settle YOUR disputes at judgejudy.ai`;
               {homeTab === 'main' ? (
                 <div className="text-center">
                   <div className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl mb-3 md:mb-6">⚖️</div>
-                  <h1 className="tv-title text-xl sm:text-2xl md:text-4xl lg:text-5xl mb-2 md:mb-4">Judge Judy AI</h1>
+                  <h1 className="tv-title text-xl sm:text-2xl md:text-4xl lg:text-5xl mb-2 md:mb-4">Judge Joody AI</h1>
                   <p className="tv-subtitle text-xs sm:text-sm md:text-lg lg:text-xl mb-4 sm:mb-6 md:mb-8">Settle disputes. Real stakes. No lawyers.</p>
 
                   <div className="space-y-2 sm:space-y-3 mb-4 sm:mb-6 md:mb-8 md:flex md:gap-4 md:space-y-0">
@@ -1445,7 +1445,7 @@ Settle YOUR disputes at judgejudy.ai`;
                 <div className="text-center">
                   <div className="text-4xl sm:text-5xl md:text-6xl mb-3 md:mb-4">📊</div>
                   <h2 className="tv-title text-lg sm:text-xl md:text-2xl mb-2 md:mb-4">Court Statistics</h2>
-                  <p className="text-gray-400 text-xs sm:text-sm mb-4 sm:mb-6">All-time stats from Judge Judy AI</p>
+                  <p className="text-gray-400 text-xs sm:text-sm mb-4 sm:mb-6">All-time stats from Judge Joody AI</p>
 
                   {statsLoading ? (
                     <div className="tv-card p-4 sm:p-6">
@@ -1683,7 +1683,7 @@ Settle YOUR disputes at judgejudy.ai`;
                   <button
                     onClick={() => {
                       const shareUrl = `${window.location.origin}?room=${roomCode}`;
-                      const text = `Join my Judge Judy AI case! ${shareUrl}`;
+                      const text = `Join my Judge Joody AI case! ${shareUrl}`;
                       window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
                     }}
                     className="tv-button bg-green-700 border-green-500 text-white py-2 sm:py-3 text-xs sm:text-sm flex flex-col items-center gap-1"
@@ -1694,7 +1694,7 @@ Settle YOUR disputes at judgejudy.ai`;
                   <button
                     onClick={() => {
                       const shareUrl = `${window.location.origin}?room=${roomCode}`;
-                      const text = `Join my Judge Judy AI case! ${shareUrl}`;
+                      const text = `Join my Judge Joody AI case! ${shareUrl}`;
                       window.open(`sms:?body=${encodeURIComponent(text)}`, '_self');
                     }}
                     className="tv-button bg-blue-700 border-blue-500 text-white py-2 sm:py-3 text-xs sm:text-sm flex flex-col items-center gap-1"
@@ -1732,7 +1732,7 @@ Settle YOUR disputes at judgejudy.ai`;
                 <div className="flex flex-col items-center gap-3">
                   <div className="w-28 h-28 sm:w-36 sm:h-36 rounded-lg overflow-hidden border-2 border-yellow-600">
                     <img
-                      src={JUDGE_GIFS[caseData.judge as keyof typeof JUDGE_GIFS]?.waiting || JUDGE_GIFS.judy.waiting}
+                      src={JUDGE_GIFS[caseData.judge as keyof typeof JUDGE_GIFS]?.waiting || JUDGE_GIFS.joody.waiting}
                       alt="Judge waiting"
                       className="w-full h-full object-cover"
                     />
@@ -1817,7 +1817,7 @@ Settle YOUR disputes at judgejudy.ai`;
                     {/* Judge GIF */}
                     <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-lg overflow-hidden border-2 border-yellow-600 flex-shrink-0">
                       <img
-                        src={JUDGE_GIFS[caseData.judge as keyof typeof JUDGE_GIFS]?.intro || JUDGE_GIFS.judy.intro}
+                        src={JUDGE_GIFS[caseData.judge as keyof typeof JUDGE_GIFS]?.intro || JUDGE_GIFS.joody.intro}
                         alt={`${judge?.name || 'Judge'} reaction`}
                         className="w-full h-full object-cover"
                       />
@@ -1825,7 +1825,7 @@ Settle YOUR disputes at judgejudy.ai`;
                     {/* Judge Info */}
                     <div className="text-center sm:text-left">
                       <div className="text-[10px] sm:text-xs font-bold text-yellow-500 tracking-widest">PRESIDING</div>
-                      <div className="text-white font-bold text-base sm:text-lg">⚖️ {judge?.name || 'Judge Judy'}</div>
+                      <div className="text-white font-bold text-base sm:text-lg">⚖️ {judge?.name || 'Judge Joody'}</div>
                       <div className="text-gray-400 text-[10px] sm:text-xs italic">{judge?.tagline}</div>
                     </div>
                   </div>
@@ -2126,7 +2126,7 @@ if (isMultiplayer && !isMyTurn && !isLoading) {
 
   // VERDICT
   if (phase === 'verdict') {
-    const judgeGifs = JUDGE_GIFS[caseData.judge as keyof typeof JUDGE_GIFS] || JUDGE_GIFS.judy;
+    const judgeGifs = JUDGE_GIFS[caseData.judge as keyof typeof JUDGE_GIFS] || JUDGE_GIFS.joody;
 
     if (isLoading || !verdict) {
       return (

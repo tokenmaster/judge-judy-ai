@@ -346,7 +346,7 @@ export function ThinkingEmoji({ emoji }: { emoji: string }) {
 export function ObjectionRuling({
   ruling,
   onContinue,
-  judgeId = 'judy'
+  judgeId = 'joody'
 }: {
   ruling: {
     sustained: boolean;
@@ -357,7 +357,7 @@ export function ObjectionRuling({
   onContinue: () => void;
   judgeId?: string;
 }) {
-  const judgeGifs = JUDGE_GIFS[judgeId as keyof typeof JUDGE_GIFS] || JUDGE_GIFS.judy;
+  const judgeGifs = JUDGE_GIFS[judgeId as keyof typeof JUDGE_GIFS] || JUDGE_GIFS.joody;
   const gifUrl = ruling.sustained ? judgeGifs.sustained : judgeGifs.overruled;
 
   return (
@@ -398,7 +398,7 @@ export function ObjectionRuling({
 export function SnapJudgmentDisplay({
   judgment,
   onContinue,
-  judgeId = 'judy'
+  judgeId = 'joody'
 }: {
   judgment: {
     winner: string;
@@ -407,7 +407,7 @@ export function SnapJudgmentDisplay({
   onContinue: () => void;
   judgeId?: string;
 }) {
-  const judgeGifs = JUDGE_GIFS[judgeId as keyof typeof JUDGE_GIFS] || JUDGE_GIFS.judy;
+  const judgeGifs = JUDGE_GIFS[judgeId as keyof typeof JUDGE_GIFS] || JUDGE_GIFS.joody;
 
   return (
     <div className="fixed inset-0 bg-black/95 flex items-center justify-center p-4 z-50">

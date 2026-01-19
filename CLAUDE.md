@@ -4,7 +4,7 @@ This file provides guidance to Claude Code when working with this repository.
 
 ## Project Overview
 
-Judge Judy AI is a multiplayer AI-powered dispute resolution game using Next.js, TypeScript, Tailwind, Supabase (for real-time multiplayer), and Anthropic's Claude API for the AI judge.
+Judge Joody AI is a multiplayer AI-powered dispute resolution game using Next.js, TypeScript, Tailwind, Supabase (for real-time multiplayer), and Anthropic's Claude API for the AI judge.
 
 ## Development Commands
 

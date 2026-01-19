@@ -1,4 +1,4 @@
--- Judge Judy AI - Stats Table Setup
+-- Judge Joody AI - Stats Table Setup
 -- Run this SQL in your Supabase Dashboard > SQL Editor
 
 -- Create stats table

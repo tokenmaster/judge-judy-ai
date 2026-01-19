@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Judge Judy AI',
+  title: 'Judge Joody AI',
   description: 'Settle disputes. Real stakes. No lawyers.',
 };
 
