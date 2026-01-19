@@ -341,3 +341,83 @@ CREDIBILITY_IMPACT: [How credibility affected your decision]`;
     credibilityImpact: credImpactMatch?.[1]?.trim() || 'Credibility was a factor.'
   };
 }
+
+// Evaluate an appeal
+export async function evaluateAppeal(
+  judgeId: string,
+  caseData: any,
+  originalVerdict: any,
+  appealArgument: string,
+  responses: any[],
+  credibilityA: number,
+  credibilityB: number
+): Promise<{
+  upheld: boolean;
+  newWinner?: string;
+  newWinnerName?: string;
+  ruling: string;
+  reaction: string;
+}> {
+  const judge = JUDGE_PERSONALITIES[judgeId as keyof typeof JUDGE_PERSONALITIES];
+
+  const allTestimony = responses
+    .map((r: any) => `${r.party === 'A' ? caseData.partyA : caseData.partyB}: "${r.answer}"`)
+    .join('\n');
+
+  const prompt = `${judge.style}
+
+CASE: "${caseData.title}"
+STAKES: ${caseData.stakes}
+
+ORIGINAL VERDICT: ${originalVerdict.winnerName} won.
+ORIGINAL REASONING: ${originalVerdict.reasoning}
+
+The losing party (${originalVerdict.loserName}) has filed an APPEAL with this argument:
+"${appealArgument}"
+
+TESTIMONY REVIEW:
+${caseData.partyA}'s statement: "${caseData.statementA}"
+${caseData.partyB}'s statement: "${caseData.statementB}"
+${allTestimony}
+
+CREDIBILITY SCORES:
+${caseData.partyA}: ${credibilityA}%
+${caseData.partyB}: ${credibilityB}%
+
+Consider the appeal argument carefully. Does it:
+- Raise valid points not fully considered?
+- Point out errors in your reasoning?
+- Present a compelling reframing of the evidence?
+
+You may UPHOLD your original verdict or REVERSE it if the appeal is truly compelling.
+Stay completely in character. Be dramatic.
+
+Respond in this exact format:
+RULING: UPHELD or REVERSED
+NEW_WINNER: [only if reversed, the new winner's name]
+EXPLANATION: [2-3 sentences explaining your decision on the appeal, in character]
+REACTION: [A dramatic one-liner reaction to the appeal attempt]`;
+
+  const result = await callClaude(prompt, 400);
+
+  const rulingMatch = result.match(/RULING:\s*(UPHELD|REVERSED)/i);
+  const newWinnerMatch = result.match(/NEW_WINNER:\s*(.+)/i);
+  const explanationMatch = result.match(/EXPLANATION:\s*([^]*?)(?=REACTION:|$)/i);
+  const reactionMatch = result.match(/REACTION:\s*(.+)/i);
+
+  const upheld = rulingMatch?.[1]?.toUpperCase() !== 'REVERSED';
+
+  let newWinner, newWinnerName;
+  if (!upheld) {
+    newWinnerName = newWinnerMatch?.[1]?.trim() || originalVerdict.loserName;
+    newWinner = newWinnerName === caseData.partyA ? 'A' : 'B';
+  }
+
+  return {
+    upheld,
+    newWinner,
+    newWinnerName,
+    ruling: explanationMatch?.[1]?.trim() || (upheld ? 'The original verdict stands.' : 'The verdict has been reversed.'),
+    reaction: reactionMatch?.[1]?.trim() || (upheld ? 'Nice try.' : 'You make a compelling point.')
+  };
+}

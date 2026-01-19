@@ -15,7 +15,8 @@ import {
   evaluateCredibility,
   checkForSnapJudgment,
   ruleOnObjection,
-  generateAIVerdict
+  generateAIVerdict,
+  evaluateAppeal
 } from '@/lib/ai';
 import {
   ProgressIndicator,
@@ -69,6 +70,12 @@ export default function JudgeJudyGame({ initialRoomCode }: { initialRoomCode?: s
   const [verdict, setVerdict] = useState<any>(null);
   const [verdictAccepted, setVerdictAccepted] = useState<boolean | null>(null);
   const [transcriptOpen, setTranscriptOpen] = useState(false);
+
+  // Appeal state
+  const [showAppealForm, setShowAppealForm] = useState(false);
+  const [appealArgument, setAppealArgument] = useState('');
+  const [appealResult, setAppealResult] = useState<any>(null);
+  const [isAppealing, setIsAppealing] = useState(false);
   const [credibilityA, setCredibilityA] = useState(50);
   const [credibilityB, setCredibilityB] = useState(50);
   const [credibilityHistory, setCredibilityHistory] = useState<any[]>([]);
@@ -1142,6 +1149,10 @@ const handleResponseSubmit = async () => {
     setVerdict(null);
     setVerdictAccepted(null);
     setTranscriptOpen(false);
+    setShowAppealForm(false);
+    setAppealArgument('');
+    setAppealResult(null);
+    setIsAppealing(false);
     setCredibilityA(50);
     setCredibilityB(50);
     setClarificationCount(0);
@@ -1222,6 +1233,46 @@ Settle YOUR disputes at judgejudy.ai`;
       setTimeout(() => setShareStatus('idle'), 2000);
     } catch (err) {
       console.error('Failed to copy:', err);
+    }
+  };
+
+  // Handle appeal submission
+  const handleAppealSubmit = async () => {
+    if (!appealArgument.trim() || !verdict) return;
+
+    setIsAppealing(true);
+
+    try {
+      const result = await evaluateAppeal(
+        caseData.judge,
+        caseData,
+        verdict,
+        appealArgument,
+        responses,
+        credibilityA,
+        credibilityB
+      );
+
+      setAppealResult(result);
+
+      // If verdict was reversed, update the verdict
+      if (!result.upheld && result.newWinnerName) {
+        setVerdict({
+          ...verdict,
+          winner: result.newWinner,
+          winnerName: result.newWinnerName,
+          loserName: result.newWinner === 'A' ? caseData.partyB : caseData.partyA,
+          summary: `APPEAL GRANTED: ${result.newWinnerName} is now the winner!`,
+          reasoning: result.ruling
+        });
+      }
+
+      setShowAppealForm(false);
+      setVerdictAccepted(result.upheld ? false : true); // If upheld, they lost appeal; if reversed, they won
+    } catch (error) {
+      console.error('Appeal failed:', error);
+    } finally {
+      setIsAppealing(false);
     }
   };
 
@@ -2139,20 +2190,73 @@ if (isMultiplayer && !isMyTurn && !isLoading) {
 
             <StakesBadge stakes={caseData.stakes} />
 
-            {verdictAccepted === null ? (
+            {/* Appeal Form */}
+            {showAppealForm && (
+              <div className="tv-card p-3 sm:p-4 mb-4 sm:mb-6 border-2 border-red-500">
+                <div className="text-red-500 text-[10px] sm:text-xs font-bold tracking-widest mb-2">⚠️ FILE AN APPEAL</div>
+                <p className="text-gray-400 text-xs sm:text-sm mb-3">
+                  Make your case to the judge. Why should the verdict be reconsidered?
+                </p>
+                <textarea
+                  value={appealArgument}
+                  onChange={(e) => setAppealArgument(e.target.value)}
+                  placeholder="Your appeal argument... (Be persuasive!)"
+                  rows={4}
+                  className="w-full tv-input text-white resize-none mb-3"
+                  style={{ color: 'white' }}
+                  disabled={isAppealing}
+                />
+                <div className="flex gap-2">
+                  <button
+                    onClick={handleAppealSubmit}
+                    disabled={!appealArgument.trim() || isAppealing}
+                    className="flex-1 tv-button py-2 sm:py-3 bg-red-700 border-red-500 text-white text-sm sm:text-base"
+                  >
+                    {isAppealing ? '⏳ JUDGE IS REVIEWING...' : '📜 SUBMIT APPEAL'}
+                  </button>
+                  <button
+                    onClick={() => { setShowAppealForm(false); setAppealArgument(''); }}
+                    disabled={isAppealing}
+                    className="tv-button py-2 sm:py-3 bg-gray-700 border-gray-500 text-white text-sm sm:text-base"
+                  >
+                    CANCEL
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Appeal Result */}
+            {appealResult && (
+              <div className={`tv-card p-3 sm:p-4 mb-4 sm:mb-6 border-2 ${appealResult.upheld ? 'border-red-500' : 'border-green-500'}`}>
+                <div className={`text-[10px] sm:text-xs font-bold tracking-widest mb-2 ${appealResult.upheld ? 'text-red-500' : 'text-green-500'}`}>
+                  {appealResult.upheld ? '❌ APPEAL DENIED' : '✅ APPEAL GRANTED'}
+                </div>
+                <div className="text-yellow-500 font-bold text-sm sm:text-base mb-2 italic">
+                  &quot;{appealResult.reaction}&quot;
+                </div>
+                <div className="text-gray-300 text-xs sm:text-sm">
+                  {appealResult.ruling}
+                </div>
+              </div>
+            )}
+
+            {/* Initial buttons - Accept or Appeal */}
+            {verdictAccepted === null && !showAppealForm && !appealResult ? (
               <div className="space-y-2 sm:space-y-3 sm:flex sm:gap-3 sm:space-y-0">
                 <button onClick={() => { setVerdictAccepted(true); incrementVerdictsAccepted(); }} className="w-full tv-button py-2 sm:py-3 md:py-4 bg-green-700 border-green-500 text-white text-sm sm:text-base">
                   ✅ ACCEPT VERDICT
                 </button>
-                <button onClick={() => { setVerdictAccepted(false); incrementVerdictsRejected(); }} className="w-full tv-button tv-button-red py-2 sm:py-3 md:py-4 text-sm sm:text-base">
-                  ❌ REJECT (NO APPEAL)
+                <button onClick={() => setShowAppealForm(true)} className="w-full tv-button tv-button-red py-2 sm:py-3 md:py-4 text-sm sm:text-base">
+                  ⚠️ APPEAL VERDICT
                 </button>
               </div>
-            ) : (
+            ) : verdictAccepted !== null || appealResult ? (
               <div className="text-center">
-                <div className={`text-base sm:text-lg md:text-xl mb-3 sm:mb-4 font-bold ${verdictAccepted ? 'text-green-400' : 'text-red-400'}`}>
-                  {verdictAccepted ? '✅ VERDICT ACCEPTED' : '❌ VERDICT REJECTED'}
-                </div>
+                {!appealResult && (
+                  <div className={`text-base sm:text-lg md:text-xl mb-3 sm:mb-4 font-bold ${verdictAccepted ? 'text-green-400' : 'text-red-400'}`}>
+                    {verdictAccepted ? '✅ VERDICT ACCEPTED' : '❌ VERDICT REJECTED'}
+                  </div>
+                )}
                 <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 justify-center">
                   <button onClick={resetCase} className="tv-button text-sm sm:text-base">
                     🆕 START NEW CASE
@@ -2171,7 +2275,7 @@ if (isMultiplayer && !isMyTurn && !isLoading) {
                   </button>
                 </div>
               </div>
-            )}
+            ) : null}
 
             <Transcript caseData={caseData} responses={responses} objections={objections} isOpen={transcriptOpen} onToggle={() => setTranscriptOpen(!transcriptOpen)} />
             <ChannelBug text="COURT TV" />
