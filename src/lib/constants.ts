@@ -6,6 +6,11 @@ export const JUDGE_GIFS = {
     thinking: 'https://media.giphy.com/media/26gspjl5bxzhSdJtK/giphy.gif', // Judge Judy thinking
     winner: 'https://media.giphy.com/media/3o7TKnO6Wve6502iJ2/giphy.gif', // Judge Judy approving
     loser: 'https://media.giphy.com/media/5xtDarmwsuR9sDRObyU/giphy.gif', // Judge Judy pointing
+    objection: 'https://media.giphy.com/media/ftdF4ZkueWGHBYc4b5/giphy.gif', // Judge Judy objection face
+    sustained: 'https://media.giphy.com/media/WrJ8x0niiblWEoo7hE/giphy.gif', // Stern approval
+    overruled: 'https://media.giphy.com/media/l4FGuhL4U2WyjdkaY/giphy.gif', // Dismissive wave
+    appeal: 'https://media.giphy.com/media/3oKIPlifLxdigaD2Y8/giphy.gif', // Really? face
+    snapJudgment: 'https://media.giphy.com/media/26n6WywJyh39n1pBu/giphy.gif', // Gavel slam
   },
   fair: {
     intro: 'https://media.giphy.com/media/3o7btPCcdNniyf0ArS/giphy.gif', // Wise nod
@@ -13,6 +18,11 @@ export const JUDGE_GIFS = {
     thinking: 'https://media.giphy.com/media/d3mlE7uhX8KFgEmY/giphy.gif', // Thinking deeply
     winner: 'https://media.giphy.com/media/l0MYJnJQ4EiYLxvQ4/giphy.gif', // Approving nod
     loser: 'https://media.giphy.com/media/13d2jHlSlxklVe/giphy.gif', // Disappointed head shake
+    objection: 'https://media.giphy.com/media/3o7btT1T9qpQZWhNlK/giphy.gif', // Considering objection
+    sustained: 'https://media.giphy.com/media/UI1qLkl9hekmoJlSN4/giphy.gif', // Thoughtful agreement
+    overruled: 'https://media.giphy.com/media/3o6ZtpWvwnhf34Oj0A/giphy.gif', // Gentle denial
+    appeal: 'https://media.giphy.com/media/CaiVJuZGvR8HK/giphy.gif', // Listening carefully
+    snapJudgment: 'https://media.giphy.com/media/3o7TKF1fSIs1R19B8k/giphy.gif', // Decisive moment
   },
   chaos: {
     intro: 'https://media.giphy.com/media/l0MYGb1LuZ3n7dRnO/giphy.gif', // Dramatic gasp
@@ -20,6 +30,11 @@ export const JUDGE_GIFS = {
     thinking: 'https://media.giphy.com/media/3o7TKTDn976rzVgky4/giphy.gif', // Dramatic thinking
     winner: 'https://media.giphy.com/media/l46CyJmS9KUbokzsI/giphy.gif', // Mind blown celebration
     loser: 'https://media.giphy.com/media/l41YtZOb9EUABnuqA/giphy.gif', // Oh no drama
+    objection: 'https://media.giphy.com/media/3o7TKSxdQJIoiRXHl6/giphy.gif', // Dramatic gasp
+    sustained: 'https://media.giphy.com/media/l0MYryZTmQgvHI5kA/giphy.gif', // Yes yes yes
+    overruled: 'https://media.giphy.com/media/d10dMmzqCYqQ0/giphy.gif', // No way
+    appeal: 'https://media.giphy.com/media/l0IylOPCNkiqOgMyA/giphy.gif', // Oh really?
+    snapJudgment: 'https://media.giphy.com/media/3o7TKwmnDgQb5jemjK/giphy.gif', // Dramatic decision
   },
   bro: {
     intro: 'https://media.giphy.com/media/l4q8cJzGdR9J8w3hS/giphy.gif', // Chill bro nod
@@ -27,7 +42,215 @@ export const JUDGE_GIFS = {
     thinking: 'https://media.giphy.com/media/a5viI92PAF89q/giphy.gif', // Bro thinking
     winner: 'https://media.giphy.com/media/3oEjHV0z8S7WM4MwnK/giphy.gif', // Fist bump celebration
     loser: 'https://media.giphy.com/media/hEc4k5pN17GZq/giphy.gif', // Disappointed bro
+    objection: 'https://media.giphy.com/media/l1J9FiGxR61OcF2mI/giphy.gif', // Whoa bro
+    sustained: 'https://media.giphy.com/media/3oEjHYibHwRL7mrNyo/giphy.gif', // Respect nod
+    overruled: 'https://media.giphy.com/media/3o7TKwBctlbGwHnsek/giphy.gif', // Nah bro
+    appeal: 'https://media.giphy.com/media/6ra84Uso2hoir3YCgb/giphy.gif', // Okay let's hear it
+    snapJudgment: 'https://media.giphy.com/media/l0HlvtIPzPdt2usKs/giphy.gif', // That's it bro
   }
+};
+
+// Category-specific GIFs for different dispute types
+export const CATEGORY_GIFS = {
+  roommates: {
+    dispute: [
+      'https://media.giphy.com/media/l0MYGtCMbPHYVlsf6/giphy.gif', // Roommate drama
+      'https://media.giphy.com/media/3o7TKSx0g7RqRniGFG/giphy.gif', // Cleaning argument
+      'https://media.giphy.com/media/l378bu6ZYmzS6nBrW/giphy.gif', // Dishes fight
+      'https://media.giphy.com/media/cEYFeE4wJ6jdDVBiiIM/giphy.gif', // Passive aggressive
+    ],
+    winner: [
+      'https://media.giphy.com/media/xUPGcJ9uOAL2h5wOf6/giphy.gif', // Finally some peace
+      'https://media.giphy.com/media/l3vR16pONsV8cKkWk/giphy.gif', // Victory at home
+    ],
+    loser: [
+      'https://media.giphy.com/media/l2JhtKtDWYNKdRpoA/giphy.gif', // Time to clean
+      'https://media.giphy.com/media/NTur7XlVDUdqM/giphy.gif', // Defeated roommate
+    ]
+  },
+  friends: {
+    dispute: [
+      'https://media.giphy.com/media/3ohzdMDbNXvnWdeOZi/giphy.gif', // Friend drama
+      'https://media.giphy.com/media/xUPGcx4qh3aEPkMc1O/giphy.gif', // Betrayal
+      'https://media.giphy.com/media/xT0GqssRweIhlz209i/giphy.gif', // Friend argument
+      'https://media.giphy.com/media/l4FGni1RBAR2OWsGk/giphy.gif', // Friendship tested
+    ],
+    winner: [
+      'https://media.giphy.com/media/l1ughbsd9qXz2s9SE/giphy.gif', // Best friends win
+      'https://media.giphy.com/media/artj92V8o75VPL7AeQ/giphy.gif', // Friendship prevails
+    ],
+    loser: [
+      'https://media.giphy.com/media/3og0INyCmHlNylks9O/giphy.gif', // Apologizing friend
+      'https://media.giphy.com/media/8abAbOrQ9rvLG/giphy.gif', // Sad friendship
+    ]
+  },
+  couples: {
+    dispute: [
+      'https://media.giphy.com/media/xTiTnzT5sqaArNkI9i/giphy.gif', // Couple argument
+      'https://media.giphy.com/media/l4FGrYKtP0pBGpBAY/giphy.gif', // Relationship drama
+      'https://media.giphy.com/media/JRhS6WoswF8FxE0g2R/giphy.gif', // Silent treatment
+      'https://media.giphy.com/media/xT9DPJVjlYHwWsZRxm/giphy.gif', // Couple fight
+    ],
+    winner: [
+      'https://media.giphy.com/media/l0HlPwMAzh13pcZ20/giphy.gif', // Vindicated partner
+      'https://media.giphy.com/media/chzz1FQgqhytWRWbp3/giphy.gif', // Relationship victory
+    ],
+    loser: [
+      'https://media.giphy.com/media/2rtQMJvhzOnRe/giphy.gif', // In the doghouse
+      'https://media.giphy.com/media/xT5LMWNFkMa8M0sMaQ/giphy.gif', // Apologizing to partner
+    ]
+  },
+  money: {
+    dispute: [
+      'https://media.giphy.com/media/67ThRZlYBvibtdF9JH/giphy.gif', // Money argument
+      'https://media.giphy.com/media/l0HlNQ03J5JxX6lva/giphy.gif', // Show me the money
+      'https://media.giphy.com/media/GjB41rKHBnOkE/giphy.gif', // Money drama
+      'https://media.giphy.com/media/l3vRfNA1p0rvhMSvS/giphy.gif', // Payment dispute
+    ],
+    winner: [
+      'https://media.giphy.com/media/MFsqcBSoOKPbjtmvWz/giphy.gif', // Getting paid
+      'https://media.giphy.com/media/3o6gDWzmAzrpi5DQU8/giphy.gif', // Money victory
+    ],
+    loser: [
+      'https://media.giphy.com/media/YJjvTqoRFgZaM/giphy.gif', // Paying up
+      'https://media.giphy.com/media/l1KVaj5UcbHwrBMqI/giphy.gif', // Empty wallet
+    ]
+  },
+  family: {
+    dispute: [
+      'https://media.giphy.com/media/l0HlPystfePnAI3G8/giphy.gif', // Family drama
+      'https://media.giphy.com/media/xT5LMUnO4g3yiRNuNy/giphy.gif', // Holiday argument
+      'https://media.giphy.com/media/3o7TKF5DnsSLv4zVBu/giphy.gif', // Family tension
+      'https://media.giphy.com/media/26ybwvTX4DTkwst6U/giphy.gif', // Sibling rivalry
+    ],
+    winner: [
+      'https://media.giphy.com/media/xT9DPr4VjeCgeiLoMo/giphy.gif', // Family victory
+      'https://media.giphy.com/media/26BRDvCpnNcMJxoLC/giphy.gif', // I was right
+    ],
+    loser: [
+      'https://media.giphy.com/media/3o7TKxZzyBk4IlS7Is/giphy.gif', // Family defeat
+      'https://media.giphy.com/media/l0MYy7QpDDVGVfAAw/giphy.gif', // Apologizing to family
+    ]
+  },
+  work: {
+    dispute: [
+      'https://media.giphy.com/media/lPF1CyJXXcTZmUrP2J/giphy.gif', // Office drama
+      'https://media.giphy.com/media/l4JyOCNEfXvVYEqB2/giphy.gif', // Work argument
+      'https://media.giphy.com/media/xT5LMUPL7RWDzANr6o/giphy.gif', // Coworker conflict
+      'https://media.giphy.com/media/GfAD7Bl016Gfm/giphy.gif', // Office tension
+    ],
+    winner: [
+      'https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif', // Office victory
+      'https://media.giphy.com/media/YnBntKOgnUSBkV7bQH/giphy.gif', // Professional win
+    ],
+    loser: [
+      'https://media.giphy.com/media/14ut8PhnIwzros/giphy.gif', // Work defeat
+      'https://media.giphy.com/media/l4FGGafcOHmrlQxG0/giphy.gif', // Professional loss
+    ]
+  }
+};
+
+// Situation-specific GIFs for game moments
+export const SITUATION_GIFS = {
+  // Cross-examination moments
+  gotcha: [
+    'https://media.giphy.com/media/6ra84Uso2hoir3YCgb/giphy.gif', // Caught in a lie
+    'https://media.giphy.com/media/3o7TKnO6Wve6502iJ2/giphy.gif', // Got you
+    'https://media.giphy.com/media/l0HlvtIPzPdt2usKs/giphy.gif', // Exposed
+    'https://media.giphy.com/media/l46CyJmS9KUbokzsI/giphy.gif', // Mind blown
+  ],
+  evasive: [
+    'https://media.giphy.com/media/sRMPFaVQLGSw8/giphy.gif', // Dodging the question
+    'https://media.giphy.com/media/l0MYP6WAFfaR7Wp8Y/giphy.gif', // Not answering
+    'https://media.giphy.com/media/3oKIPCwlPndNfosMBa/giphy.gif', // Avoiding
+    'https://media.giphy.com/media/3o7ZeQBhbVGnELP4bK/giphy.gif', // Suspicious
+  ],
+  honest: [
+    'https://media.giphy.com/media/artj92V8o75VPL7AeQ/giphy.gif', // Telling the truth
+    'https://media.giphy.com/media/l4JyOCNEfXvVYEqB2/giphy.gif', // Honest moment
+    'https://media.giphy.com/media/xT9DPJVjlYHwWsZRxm/giphy.gif', // Sincere
+  ],
+  contradiction: [
+    'https://media.giphy.com/media/l3q2K5jinAlChoCLS/giphy.gif', // Wait what?
+    'https://media.giphy.com/media/l41YtZOb9EUABnuqA/giphy.gif', // That doesn't match
+    'https://media.giphy.com/media/3o7TKTDn976rzVgky4/giphy.gif', // Contradiction detected
+  ],
+
+  // Objection moments
+  objectionRaised: [
+    'https://media.giphy.com/media/2UvAUplPi4ESnKa3W0/giphy.gif', // Objection!
+    'https://media.giphy.com/media/ftdF4ZkueWGHBYc4b5/giphy.gif', // Hold it!
+    'https://media.giphy.com/media/3o7TKSxdQJIoiRXHl6/giphy.gif', // Stop right there
+  ],
+
+  // Appeal moments
+  appealFiled: [
+    'https://media.giphy.com/media/l4FGuhL4U2WyjdkaY/giphy.gif', // Trying again
+    'https://media.giphy.com/media/3oKIPlifLxdigaD2Y8/giphy.gif', // One more chance
+    'https://media.giphy.com/media/l0IylOPCNkiqOgMyA/giphy.gif', // Hear me out
+  ],
+  appealGranted: [
+    'https://media.giphy.com/media/l0MYryZTmQgvHI5kA/giphy.gif', // Reversal!
+    'https://media.giphy.com/media/26u4cqiYI30juCOGY/giphy.gif', // Comeback
+    'https://media.giphy.com/media/l0MYJnJQ4EiYLxvQ4/giphy.gif', // Victory from defeat
+  ],
+  appealDenied: [
+    'https://media.giphy.com/media/13d2jHlSlxklVe/giphy.gif', // Nice try
+    'https://media.giphy.com/media/d10dMmzqCYqQ0/giphy.gif', // Nope
+    'https://media.giphy.com/media/hEc4k5pN17GZq/giphy.gif', // Denied
+  ],
+
+  // Verdict moments
+  deliberating: [
+    'https://media.giphy.com/media/d3mlE7uhX8KFgEmY/giphy.gif', // Deep thought
+    'https://media.giphy.com/media/a5viI92PAF89q/giphy.gif', // Considering
+    'https://media.giphy.com/media/3o7TKTDn976rzVgky4/giphy.gif', // Dramatic pause
+  ],
+  verdictReady: [
+    'https://media.giphy.com/media/26n6WywJyh39n1pBu/giphy.gif', // Gavel time
+    'https://media.giphy.com/media/3o7TKF1fSIs1R19B8k/giphy.gif', // Decision made
+    'https://media.giphy.com/media/l0HlvtIPzPdt2usKs/giphy.gif', // Here it comes
+  ],
+
+  // Dramatic moments
+  dramatic: [
+    'https://media.giphy.com/media/l0MYGb1LuZ3n7dRnO/giphy.gif', // Gasp
+    'https://media.giphy.com/media/3o7TKwmnDgQb5jemjK/giphy.gif', // Drama
+    'https://media.giphy.com/media/l46CyJmS9KUbokzsI/giphy.gif', // Shock
+    'https://media.giphy.com/media/tyqcJoNjNv0Fq/giphy.gif', // Popcorn moment
+  ],
+  celebration: [
+    'https://media.giphy.com/media/3oEjHV0z8S7WM4MwnK/giphy.gif', // Fist bump
+    'https://media.giphy.com/media/l0MYJnJQ4EiYLxvQ4/giphy.gif', // Victory
+    'https://media.giphy.com/media/artj92V8o75VPL7AeQ/giphy.gif', // Celebrate
+    'https://media.giphy.com/media/xUPGcJ9uOAL2h5wOf6/giphy.gif', // Winner dance
+  ],
+  defeat: [
+    'https://media.giphy.com/media/hEc4k5pN17GZq/giphy.gif', // Sad
+    'https://media.giphy.com/media/13d2jHlSlxklVe/giphy.gif', // Disappointed
+    'https://media.giphy.com/media/NTur7XlVDUdqM/giphy.gif', // Defeated
+    'https://media.giphy.com/media/2rtQMJvhzOnRe/giphy.gif', // Loss
+  ]
+};
+
+// Helper function to get a random GIF from an array
+export const getRandomGif = (gifs: string[]): string => {
+  return gifs[Math.floor(Math.random() * gifs.length)];
+};
+
+// Helper function to get category-specific GIF
+export const getCategoryGif = (category: string, type: 'dispute' | 'winner' | 'loser'): string => {
+  const categoryGifs = CATEGORY_GIFS[category as keyof typeof CATEGORY_GIFS];
+  if (categoryGifs && categoryGifs[type]) {
+    return getRandomGif(categoryGifs[type]);
+  }
+  // Fallback to a general dramatic GIF
+  return getRandomGif(SITUATION_GIFS.dramatic);
+};
+
+// Helper function to get situation-specific GIF
+export const getSituationGif = (situation: keyof typeof SITUATION_GIFS): string => {
+  return getRandomGif(SITUATION_GIFS[situation]);
 };
 
 // Judge Personalities

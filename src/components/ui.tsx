@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { getCredibilityLabel, getCredibilityColor, OBJECTION_TYPES } from '@/lib/constants';
+import { getCredibilityLabel, getCredibilityColor, OBJECTION_TYPES, JUDGE_GIFS, SITUATION_GIFS, getSituationGif } from '@/lib/constants';
 
 // TV Frame Wrapper Component
 export function TVFrame({ children, showLive = true }: { children: React.ReactNode; showLive?: boolean }) {
@@ -345,7 +345,8 @@ export function ThinkingEmoji({ emoji }: { emoji: string }) {
 // Objection Ruling Display - Dramatic TV Reveal
 export function ObjectionRuling({
   ruling,
-  onContinue
+  onContinue,
+  judgeId = 'judy'
 }: {
   ruling: {
     sustained: boolean;
@@ -354,11 +355,22 @@ export function ObjectionRuling({
     type: string;
   };
   onContinue: () => void;
+  judgeId?: string;
 }) {
+  const judgeGifs = JUDGE_GIFS[judgeId as keyof typeof JUDGE_GIFS] || JUDGE_GIFS.judy;
+  const gifUrl = ruling.sustained ? judgeGifs.sustained : judgeGifs.overruled;
+
   return (
     <div className="fixed inset-0 bg-black/95 flex items-center justify-center p-4 z-50">
       <div className="tv-screen p-8 max-w-md w-full text-center">
-        <div className="text-6xl mb-4 gavel-animate">🔨</div>
+        {/* Judge reaction GIF */}
+        <div className="w-28 h-28 mx-auto rounded-lg overflow-hidden border-4 border-yellow-600 mb-4">
+          <img
+            src={gifUrl}
+            alt="Judge's reaction"
+            className="w-full h-full object-cover"
+          />
+        </div>
         <div className={`text-4xl font-black mb-4 tracking-wider ${ruling.sustained ? 'text-green-400' : 'text-red-500'}`}
              style={{ textShadow: ruling.sustained ? '0 0 20px rgba(74,222,128,0.5)' : '0 0 20px rgba(239,68,68,0.5)' }}>
           {ruling.sustained ? 'SUSTAINED!' : 'OVERRULED!'}
@@ -385,19 +397,30 @@ export function ObjectionRuling({
 // Snap Judgment Display - Maximum Drama
 export function SnapJudgmentDisplay({
   judgment,
-  onContinue
+  onContinue,
+  judgeId = 'judy'
 }: {
   judgment: {
     winner: string;
     reason: string;
   };
   onContinue: () => void;
+  judgeId?: string;
 }) {
+  const judgeGifs = JUDGE_GIFS[judgeId as keyof typeof JUDGE_GIFS] || JUDGE_GIFS.judy;
+
   return (
     <div className="fixed inset-0 bg-black/95 flex items-center justify-center p-4 z-50">
       <div className="tv-screen p-8 max-w-md w-full text-center">
         <div className="breaking-banner text-xl mb-4">🚨 BREAKING 🚨</div>
-        <div className="text-6xl mb-4 gavel-animate">🔨</div>
+        {/* Judge snap judgment GIF */}
+        <div className="w-32 h-32 mx-auto rounded-lg overflow-hidden border-4 border-red-500 mb-4">
+          <img
+            src={judgeGifs.snapJudgment}
+            alt="Judge's snap judgment"
+            className="w-full h-full object-cover"
+          />
+        </div>
         <div className="text-red-500 text-3xl font-black mb-2 tracking-wider"
              style={{ textShadow: '0 0 20px rgba(239,68,68,0.5)' }}>
           SNAP JUDGMENT!

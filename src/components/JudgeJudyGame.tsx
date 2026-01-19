@@ -7,7 +7,12 @@ import {
   JUDGE_GIFS,
   CATEGORIES,
   SUGGESTED_STAKES,
-  getRandomLoadingState
+  getRandomLoadingState,
+  CATEGORY_GIFS,
+  SITUATION_GIFS,
+  getRandomGif,
+  getCategoryGif,
+  getSituationGif
 } from '@/lib/constants';
 import {
   generateMainQuestion,
@@ -1299,7 +1304,7 @@ Settle YOUR disputes at judgejudy.ai`;
   // OBJECTION RULING - Show immediately when there's a ruling
   if (currentObjectionRuling) {
     return (
-      <ObjectionRuling ruling={currentObjectionRuling} onContinue={handleObjectionRulingContinue} />
+      <ObjectionRuling ruling={currentObjectionRuling} onContinue={handleObjectionRulingContinue} judgeId={caseData.judge} />
     );
   }
 
@@ -1308,6 +1313,7 @@ Settle YOUR disputes at judgejudy.ai`;
     return (
       <SnapJudgmentDisplay
         judgment={snapJudgment}
+        judgeId={caseData.judge}
         onContinue={async () => {
           setShowSnapJudgment(false);
           setIsLoading(true);
@@ -1778,8 +1784,18 @@ Settle YOUR disputes at judgejudy.ai`;
                   <h2 className="tv-title text-lg sm:text-xl md:text-2xl">{caseData.title}</h2>
                 </div>
 
-                {/* VS Matchup Display */}
+                {/* VS Matchup Display with Category GIF */}
                 <div className="tv-card p-3 sm:p-4 mb-4 sm:mb-6">
+                  {/* Category-specific dispute GIF */}
+                  <div className="flex justify-center mb-3 sm:mb-4">
+                    <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-lg overflow-hidden border-2 border-red-500">
+                      <img
+                        src={getCategoryGif(caseData.category, 'dispute')}
+                        alt="Case dispute"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  </div>
                   <div className="flex items-center justify-center gap-2 sm:gap-4">
                     <div className="text-center flex-1">
                       <div className="text-blue-400 font-black text-base sm:text-lg md:text-xl">{caseData.partyA}</div>
@@ -2172,6 +2188,32 @@ if (isMultiplayer && !isMyTurn && !isLoading) {
               </div>
             </div>
 
+            {/* Winner/Loser category-specific GIFs */}
+            <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-6">
+              <div className="tv-card p-2 sm:p-3 text-center">
+                <div className="text-green-400 text-[10px] sm:text-xs font-bold tracking-widest mb-2">🏆 WINNER</div>
+                <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto rounded-lg overflow-hidden border-2 border-green-500 mb-2">
+                  <img
+                    src={getCategoryGif(caseData.category, 'winner')}
+                    alt="Winner reaction"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="text-white font-bold text-xs sm:text-sm">{verdict.winnerName}</div>
+              </div>
+              <div className="tv-card p-2 sm:p-3 text-center">
+                <div className="text-red-400 text-[10px] sm:text-xs font-bold tracking-widest mb-2">😢 LOSER</div>
+                <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto rounded-lg overflow-hidden border-2 border-red-500 mb-2">
+                  <img
+                    src={getCategoryGif(caseData.category, 'loser')}
+                    alt="Loser reaction"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="text-white font-bold text-xs sm:text-sm">{verdict.loserName}</div>
+              </div>
+            </div>
+
             <div className="tv-card p-2 sm:p-4 mb-4 sm:mb-6">
               <div className="text-yellow-500 text-[10px] sm:text-xs font-bold tracking-widest mb-1 sm:mb-2">JUDGE&apos;S REASONING</div>
               <div className="text-white text-xs sm:text-sm">{verdict.reasoning}</div>
@@ -2229,14 +2271,31 @@ if (isMultiplayer && !isMyTurn && !isLoading) {
             {appealResult && (
               <div className={`tv-card p-3 sm:p-4 mb-4 sm:mb-6 border-2 ${appealResult.upheld ? 'border-red-500' : 'border-green-500'}`}>
                 <div className={`text-[10px] sm:text-xs font-bold tracking-widest mb-2 ${appealResult.upheld ? 'text-red-500' : 'text-green-500'}`}>
-                  {appealResult.upheld ? '❌ APPEAL DENIED' : '✅ APPEAL GRANTED'}
+                  {appealResult.upheld ? '❌ APPEAL DENIED' : '✅ APPEAL GRANTED - VERDICT REVERSED!'}
                 </div>
-                <div className="text-yellow-500 font-bold text-sm sm:text-base mb-2 italic">
+                {/* Appeal GIF */}
+                <div className="flex justify-center mb-3">
+                  <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-lg overflow-hidden border-2 border-yellow-600">
+                    <img
+                      src={appealResult.upheld ? getSituationGif('appealDenied') : getSituationGif('appealGranted')}
+                      alt={appealResult.upheld ? 'Appeal denied' : 'Appeal granted'}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                </div>
+                <div className="text-yellow-500 font-bold text-sm sm:text-base mb-2 italic text-center">
                   &quot;{appealResult.reaction}&quot;
                 </div>
                 <div className="text-gray-300 text-xs sm:text-sm">
                   {appealResult.ruling}
                 </div>
+                {!appealResult.upheld && appealResult.newWinnerName && (
+                  <div className="mt-3 p-2 bg-green-900/30 rounded border border-green-500 text-center">
+                    <div className="text-green-400 text-xs sm:text-sm font-bold">
+                      NEW WINNER: {appealResult.newWinnerName} 🏆
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
@@ -2304,12 +2363,13 @@ if (isMultiplayer && !isMyTurn && !isLoading) {
       )}
 
       {currentObjectionRuling && (
-        <ObjectionRuling ruling={currentObjectionRuling} onContinue={handleObjectionRulingContinue} />
+        <ObjectionRuling ruling={currentObjectionRuling} onContinue={handleObjectionRulingContinue} judgeId={caseData.judge} />
       )}
 
       {showSnapJudgment && snapJudgment && (
         <SnapJudgmentDisplay
           judgment={snapJudgment}
+          judgeId={caseData.judge}
           onContinue={() => {
             setShowSnapJudgment(false);
             setPhase('verdict');
