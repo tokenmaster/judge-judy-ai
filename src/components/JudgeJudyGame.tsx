@@ -1436,16 +1436,16 @@ Settle YOUR disputes at judgejoody.ai`;
                   <h1 className="tv-title text-xl sm:text-2xl md:text-4xl lg:text-5xl mb-2 md:mb-4">Judge Joody AI</h1>
                   <p className="tv-subtitle text-xs sm:text-sm md:text-lg lg:text-xl mb-4 sm:mb-6 md:mb-8">Settle disputes. Real stakes. No lawyers.</p>
 
-                  <div className="space-y-2 sm:space-y-3 mb-4 sm:mb-6 md:mb-8 md:flex md:gap-4 md:space-y-0">
+                  <div className="space-y-2 sm:space-y-3 mb-4 sm:mb-6 md:mb-8">
                     <button
                       onClick={() => setPhase('create')}
-                      className="w-full tv-button text-sm sm:text-base md:text-lg py-2 sm:py-3 md:py-4"
+                      className="w-full tv-button text-sm sm:text-base md:text-lg py-3 sm:py-4 md:py-5"
                     >
                       🆕 CREATE NEW CASE
                     </button>
                     <button
                       onClick={() => setPhase('join')}
-                      className="w-full tv-button bg-gray-700 border-gray-600 text-white text-sm sm:text-base md:text-lg py-2 sm:py-3 md:py-4"
+                      className="w-full tv-button bg-gray-700 border-gray-600 text-white text-sm sm:text-base md:text-lg py-2 sm:py-3"
                     >
                       🔗 JOIN EXISTING CASE
                     </button>
