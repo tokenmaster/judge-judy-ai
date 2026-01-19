@@ -71,11 +71,55 @@ export const generateRoomCode = (): string => {
 
 export const getSessionId = (): string => {
   if (typeof window === 'undefined') return '';
-  
+
   let sessionId = sessionStorage.getItem('judge_judy_session');
   if (!sessionId) {
     sessionId = 'session_' + Math.random().toString(36).substring(2, 15);
     sessionStorage.setItem('judge_judy_session', sessionId);
   }
   return sessionId;
+};
+
+// Stats tracking
+export interface Stats {
+  id: string;
+  cases_filed: number;
+  verdicts_accepted: number;
+  verdicts_rejected: number;
+  updated_at: string;
+}
+
+export const getStats = async (): Promise<Stats | null> => {
+  const { data, error } = await supabase
+    .from('stats')
+    .select('*')
+    .eq('id', 'global')
+    .single();
+
+  if (error) {
+    console.error('Error fetching stats:', error);
+    return null;
+  }
+  return data;
+};
+
+export const incrementCasesFiled = async (): Promise<void> => {
+  const { error } = await supabase.rpc('increment_cases_filed');
+  if (error) {
+    console.error('Error incrementing cases filed:', error);
+  }
+};
+
+export const incrementVerdictsAccepted = async (): Promise<void> => {
+  const { error } = await supabase.rpc('increment_verdicts_accepted');
+  if (error) {
+    console.error('Error incrementing verdicts accepted:', error);
+  }
+};
+
+export const incrementVerdictsRejected = async (): Promise<void> => {
+  const { error } = await supabase.rpc('increment_verdicts_rejected');
+  if (error) {
+    console.error('Error incrementing verdicts rejected:', error);
+  }
 };

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { supabase, generateRoomCode, getSessionId } from '@/lib/supabase';
+import { supabase, generateRoomCode, getSessionId, getStats, incrementCasesFiled, incrementVerdictsAccepted, incrementVerdictsRejected, Stats } from '@/lib/supabase';
 import {
   JUDGE_PERSONALITIES,
   JUDGE_GIFS,
@@ -87,6 +87,11 @@ export default function JudgeJudyGame({ initialRoomCode }: { initialRoomCode?: s
   const [snapJudgment, setSnapJudgment] = useState<any>(null);
   const [showSnapJudgment, setShowSnapJudgment] = useState(false);
 
+  // Stats state
+  const [homeTab, setHomeTab] = useState<'main' | 'stats'>('main');
+  const [stats, setStats] = useState<Stats | null>(null);
+  const [statsLoading, setStatsLoading] = useState(false);
+
   // Track response IDs to prevent duplicates
   const processedResponseIds = useRef<Set<string>>(new Set());
 
@@ -117,6 +122,17 @@ export default function JudgeJudyGame({ initialRoomCode }: { initialRoomCode?: s
 useEffect(() => {
   myRoleRef.current = myRole;
 }, [myRole]);
+
+// Fetch stats when on stats tab
+useEffect(() => {
+  if (homeTab === 'stats' && !stats && !statsLoading) {
+    setStatsLoading(true);
+    getStats().then((data) => {
+      setStats(data);
+      setStatsLoading(false);
+    });
+  }
+}, [homeTab, stats, statsLoading]);
 
 // Save session to sessionStorage when case changes
 const saveSession = (caseIdToSave: string, role: string) => {
@@ -353,6 +369,9 @@ useEffect(() => {
       console.error('Error creating case:', error);
       return null;
     }
+
+    // Increment stats
+    incrementCasesFiled();
 
     return data;
   };
@@ -1201,38 +1220,126 @@ const handleResponseSubmit = async () => {
       <div className="min-h-screen flex items-center justify-center p-2 sm:p-4 md:p-6 lg:p-8">
         <div className="w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl">
           <TVFrame>
-            <div className="text-center p-1 sm:p-2 md:p-4 lg:p-6">
-              <div className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl mb-3 md:mb-6">⚖️</div>
-              <h1 className="tv-title text-xl sm:text-2xl md:text-4xl lg:text-5xl mb-2 md:mb-4">Judge Judy AI</h1>
-              <p className="tv-subtitle text-xs sm:text-sm md:text-lg lg:text-xl mb-4 sm:mb-6 md:mb-8">Settle disputes. Real stakes. No lawyers.</p>
-
-              <div className="space-y-2 sm:space-y-3 mb-4 sm:mb-6 md:mb-8 md:flex md:gap-4 md:space-y-0">
+            <div className="p-1 sm:p-2 md:p-4 lg:p-6">
+              {/* Tab Navigation */}
+              <div className="flex mb-4 sm:mb-6 border-b-2 border-yellow-600">
                 <button
-                  onClick={() => setPhase('create')}
-                  className="w-full tv-button text-sm sm:text-base md:text-lg py-2 sm:py-3 md:py-4"
+                  onClick={() => setHomeTab('main')}
+                  className={`flex-1 py-2 sm:py-3 text-xs sm:text-sm md:text-base font-bold tracking-wider transition-colors ${
+                    homeTab === 'main'
+                      ? 'text-yellow-500 border-b-2 border-yellow-500 -mb-[2px]'
+                      : 'text-gray-500 hover:text-gray-300'
+                  }`}
                 >
-                  🆕 CREATE NEW CASE
+                  ⚖️ PLAY
                 </button>
                 <button
-                  onClick={() => setPhase('join')}
-                  className="w-full tv-button bg-gray-700 border-gray-600 text-white text-sm sm:text-base md:text-lg py-2 sm:py-3 md:py-4"
+                  onClick={() => setHomeTab('stats')}
+                  className={`flex-1 py-2 sm:py-3 text-xs sm:text-sm md:text-base font-bold tracking-wider transition-colors ${
+                    homeTab === 'stats'
+                      ? 'text-yellow-500 border-b-2 border-yellow-500 -mb-[2px]'
+                      : 'text-gray-500 hover:text-gray-300'
+                  }`}
                 >
-                  🔗 JOIN EXISTING CASE
+                  📊 STATS
                 </button>
               </div>
 
-              <div className="tv-card p-2 sm:p-3 md:p-4 mb-4 sm:mb-6 md:mb-8">
-                <div className="text-gray-300 text-xs sm:text-sm">
-                  <span className="text-yellow-500 font-bold">✨ MULTIPLAYER:</span> Create a case and share the room code!
+              {homeTab === 'main' ? (
+                <div className="text-center">
+                  <div className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl mb-3 md:mb-6">⚖️</div>
+                  <h1 className="tv-title text-xl sm:text-2xl md:text-4xl lg:text-5xl mb-2 md:mb-4">Judge Judy AI</h1>
+                  <p className="tv-subtitle text-xs sm:text-sm md:text-lg lg:text-xl mb-4 sm:mb-6 md:mb-8">Settle disputes. Real stakes. No lawyers.</p>
+
+                  <div className="space-y-2 sm:space-y-3 mb-4 sm:mb-6 md:mb-8 md:flex md:gap-4 md:space-y-0">
+                    <button
+                      onClick={() => setPhase('create')}
+                      className="w-full tv-button text-sm sm:text-base md:text-lg py-2 sm:py-3 md:py-4"
+                    >
+                      🆕 CREATE NEW CASE
+                    </button>
+                    <button
+                      onClick={() => setPhase('join')}
+                      className="w-full tv-button bg-gray-700 border-gray-600 text-white text-sm sm:text-base md:text-lg py-2 sm:py-3 md:py-4"
+                    >
+                      🔗 JOIN EXISTING CASE
+                    </button>
+                  </div>
+
+                  <div className="tv-card p-2 sm:p-3 md:p-4 mb-4 sm:mb-6 md:mb-8">
+                    <div className="text-gray-300 text-xs sm:text-sm">
+                      <span className="text-yellow-500 font-bold">✨ MULTIPLAYER:</span> Create a case and share the room code!
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-4 gap-1 sm:gap-2 md:gap-3">
+                    <div className="tv-card p-1.5 sm:p-2 md:p-4 text-center"><div className="text-lg sm:text-xl md:text-3xl mb-1">📝</div><div className="text-yellow-500 text-[8px] sm:text-[10px] md:text-xs font-bold">PRESENT</div></div>
+                    <div className="tv-card p-1.5 sm:p-2 md:p-4 text-center"><div className="text-lg sm:text-xl md:text-3xl mb-1">🔥</div><div className="text-yellow-500 text-[8px] sm:text-[10px] md:text-xs font-bold">GRILLED</div></div>
+                    <div className="tv-card p-1.5 sm:p-2 md:p-4 text-center"><div className="text-lg sm:text-xl md:text-3xl mb-1">⚠️</div><div className="text-yellow-500 text-[8px] sm:text-[10px] md:text-xs font-bold">OBJECT</div></div>
+                    <div className="tv-card p-1.5 sm:p-2 md:p-4 text-center"><div className="text-lg sm:text-xl md:text-3xl mb-1">🏆</div><div className="text-yellow-500 text-[8px] sm:text-[10px] md:text-xs font-bold">WIN</div></div>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div className="text-center">
+                  <div className="text-4xl sm:text-5xl md:text-6xl mb-3 md:mb-4">📊</div>
+                  <h2 className="tv-title text-lg sm:text-xl md:text-2xl mb-2 md:mb-4">Court Statistics</h2>
+                  <p className="text-gray-400 text-xs sm:text-sm mb-4 sm:mb-6">All-time stats from Judge Judy AI</p>
 
-              <div className="grid grid-cols-4 gap-1 sm:gap-2 md:gap-3">
-                <div className="tv-card p-1.5 sm:p-2 md:p-4 text-center"><div className="text-lg sm:text-xl md:text-3xl mb-1">📝</div><div className="text-yellow-500 text-[8px] sm:text-[10px] md:text-xs font-bold">PRESENT</div></div>
-                <div className="tv-card p-1.5 sm:p-2 md:p-4 text-center"><div className="text-lg sm:text-xl md:text-3xl mb-1">🔥</div><div className="text-yellow-500 text-[8px] sm:text-[10px] md:text-xs font-bold">GRILLED</div></div>
-                <div className="tv-card p-1.5 sm:p-2 md:p-4 text-center"><div className="text-lg sm:text-xl md:text-3xl mb-1">⚠️</div><div className="text-yellow-500 text-[8px] sm:text-[10px] md:text-xs font-bold">OBJECT</div></div>
-                <div className="tv-card p-1.5 sm:p-2 md:p-4 text-center"><div className="text-lg sm:text-xl md:text-3xl mb-1">🏆</div><div className="text-yellow-500 text-[8px] sm:text-[10px] md:text-xs font-bold">WIN</div></div>
-              </div>
+                  {statsLoading ? (
+                    <div className="tv-card p-4 sm:p-6">
+                      <div className="animate-pulse text-yellow-500 text-sm">Loading stats...</div>
+                    </div>
+                  ) : stats ? (
+                    <div className="space-y-3 sm:space-y-4">
+                      <div className="tv-card p-3 sm:p-4 md:p-6">
+                        <div className="text-yellow-500 text-[10px] sm:text-xs font-bold tracking-widest mb-2">CASES FILED</div>
+                        <div className="tv-stat-value text-3xl sm:text-4xl md:text-5xl" style={{ color: '#d4af37' }}>
+                          {stats.cases_filed.toLocaleString()}
+                        </div>
+                        <div className="text-gray-500 text-[10px] sm:text-xs mt-1">Total disputes brought to court</div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2 sm:gap-3">
+                        <div className="tv-card p-3 sm:p-4">
+                          <div className="text-green-500 text-[10px] sm:text-xs font-bold tracking-widest mb-1">VERDICTS ACCEPTED</div>
+                          <div className="text-2xl sm:text-3xl font-black text-green-400">
+                            {stats.verdicts_accepted.toLocaleString()}
+                          </div>
+                          <div className="text-gray-500 text-[8px] sm:text-[10px] mt-1">Justice served</div>
+                        </div>
+
+                        <div className="tv-card p-3 sm:p-4">
+                          <div className="text-red-500 text-[10px] sm:text-xs font-bold tracking-widest mb-1">VERDICTS REJECTED</div>
+                          <div className="text-2xl sm:text-3xl font-black text-red-400">
+                            {stats.verdicts_rejected.toLocaleString()}
+                          </div>
+                          <div className="text-gray-500 text-[8px] sm:text-[10px] mt-1">Contested rulings</div>
+                        </div>
+                      </div>
+
+                      {stats.cases_filed > 0 && (
+                        <div className="tv-card p-3 sm:p-4">
+                          <div className="text-yellow-500 text-[10px] sm:text-xs font-bold tracking-widest mb-2">ACCEPTANCE RATE</div>
+                          <div className="w-full bg-gray-700 rounded-full h-3 sm:h-4 overflow-hidden">
+                            <div
+                              className="h-full bg-gradient-to-r from-green-600 to-green-400 transition-all duration-500"
+                              style={{ width: `${((stats.verdicts_accepted / (stats.verdicts_accepted + stats.verdicts_rejected)) * 100) || 0}%` }}
+                            />
+                          </div>
+                          <div className="text-gray-400 text-xs sm:text-sm mt-2">
+                            {((stats.verdicts_accepted / (stats.verdicts_accepted + stats.verdicts_rejected)) * 100 || 0).toFixed(1)}% of verdicts accepted
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="tv-card p-4 sm:p-6">
+                      <div className="text-gray-500 text-sm">No stats available yet</div>
+                      <div className="text-gray-600 text-xs mt-2">Be the first to file a case!</div>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
             <ChannelBug text="COURT TV" />
           </TVFrame>
@@ -1888,10 +1995,10 @@ if (isMultiplayer && !isMyTurn && !isLoading) {
 
             {verdictAccepted === null ? (
               <div className="space-y-2 sm:space-y-3 sm:flex sm:gap-3 sm:space-y-0">
-                <button onClick={() => setVerdictAccepted(true)} className="w-full tv-button py-2 sm:py-3 md:py-4 bg-green-700 border-green-500 text-white text-sm sm:text-base">
+                <button onClick={() => { setVerdictAccepted(true); incrementVerdictsAccepted(); }} className="w-full tv-button py-2 sm:py-3 md:py-4 bg-green-700 border-green-500 text-white text-sm sm:text-base">
                   ✅ ACCEPT VERDICT
                 </button>
-                <button onClick={() => setVerdictAccepted(false)} className="w-full tv-button tv-button-red py-2 sm:py-3 md:py-4 text-sm sm:text-base">
+                <button onClick={() => { setVerdictAccepted(false); incrementVerdictsRejected(); }} className="w-full tv-button tv-button-red py-2 sm:py-3 md:py-4 text-sm sm:text-base">
                   ❌ REJECT (NO APPEAL)
                 </button>
               </div>
