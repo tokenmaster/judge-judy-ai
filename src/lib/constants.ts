@@ -1,3 +1,35 @@
+// Judge GIFs - mapped by judge and situation
+export const JUDGE_GIFS = {
+  judy: {
+    intro: 'https://media.giphy.com/media/Rhhr8D5mKSX7O/giphy.gif', // Judge Judy "BALONEY!"
+    waiting: 'https://media.giphy.com/media/l0HlPwMAzh13pcZ20/giphy.gif', // Judge Judy impatient
+    thinking: 'https://media.giphy.com/media/26gspjl5bxzhSdJtK/giphy.gif', // Judge Judy thinking
+    winner: 'https://media.giphy.com/media/3o7TKnO6Wve6502iJ2/giphy.gif', // Judge Judy approving
+    loser: 'https://media.giphy.com/media/5xtDarmwsuR9sDRObyU/giphy.gif', // Judge Judy pointing
+  },
+  fair: {
+    intro: 'https://media.giphy.com/media/3o7btPCcdNniyf0ArS/giphy.gif', // Wise nod
+    waiting: 'https://media.giphy.com/media/QBd2kLB5qDmysEXre9/giphy.gif', // Patient waiting
+    thinking: 'https://media.giphy.com/media/d3mlE7uhX8KFgEmY/giphy.gif', // Thinking deeply
+    winner: 'https://media.giphy.com/media/l0MYJnJQ4EiYLxvQ4/giphy.gif', // Approving nod
+    loser: 'https://media.giphy.com/media/13d2jHlSlxklVe/giphy.gif', // Disappointed head shake
+  },
+  chaos: {
+    intro: 'https://media.giphy.com/media/l0MYGb1LuZ3n7dRnO/giphy.gif', // Dramatic gasp
+    waiting: 'https://media.giphy.com/media/tyqcJoNjNv0Fq/giphy.gif', // Popcorn eating
+    thinking: 'https://media.giphy.com/media/3o7TKTDn976rzVgky4/giphy.gif', // Dramatic thinking
+    winner: 'https://media.giphy.com/media/l46CyJmS9KUbokzsI/giphy.gif', // Mind blown celebration
+    loser: 'https://media.giphy.com/media/l41YtZOb9EUABnuqA/giphy.gif', // Oh no drama
+  },
+  bro: {
+    intro: 'https://media.giphy.com/media/l4q8cJzGdR9J8w3hS/giphy.gif', // Chill bro nod
+    waiting: 'https://media.giphy.com/media/QMHoU66sBXqqLqYvGO/giphy.gif', // Waiting chill
+    thinking: 'https://media.giphy.com/media/a5viI92PAF89q/giphy.gif', // Bro thinking
+    winner: 'https://media.giphy.com/media/3oEjHV0z8S7WM4MwnK/giphy.gif', // Fist bump celebration
+    loser: 'https://media.giphy.com/media/hEc4k5pN17GZq/giphy.gif', // Disappointed bro
+  }
+};
+
 // Judge Personalities
 export const JUDGE_PERSONALITIES = {
   judy: {

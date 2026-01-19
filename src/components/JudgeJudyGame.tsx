@@ -2,11 +2,12 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { supabase, generateRoomCode, getSessionId } from '@/lib/supabase';
-import { 
-  JUDGE_PERSONALITIES, 
-  CATEGORIES, 
+import {
+  JUDGE_PERSONALITIES,
+  JUDGE_GIFS,
+  CATEGORIES,
   SUGGESTED_STAKES,
-  getRandomLoadingState 
+  getRandomLoadingState
 } from '@/lib/constants';
 import {
   generateMainQuestion,
@@ -1416,10 +1417,19 @@ const handleResponseSubmit = async () => {
                 </div>
               </div>
 
+              {/* Judge waiting GIF */}
               <div className="tv-card p-3 sm:p-4 mb-4 sm:mb-6">
-                <div className="flex items-center justify-center gap-2 sm:gap-3">
-                  <div className="animate-pulse text-2xl sm:text-3xl">⏳</div>
-                  <div className="text-yellow-500 font-bold text-xs sm:text-sm md:text-base">Waiting for {caseData.partyB} to join...</div>
+                <div className="flex flex-col items-center gap-3">
+                  <div className="w-28 h-28 sm:w-36 sm:h-36 rounded-lg overflow-hidden border-2 border-yellow-600">
+                    <img
+                      src={JUDGE_GIFS[caseData.judge as keyof typeof JUDGE_GIFS]?.waiting || JUDGE_GIFS.judy.waiting}
+                      alt="Judge waiting"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="text-yellow-500 font-bold text-xs sm:text-sm md:text-base">
+                    Waiting for {caseData.partyB} to join...
+                  </div>
                 </div>
               </div>
 
@@ -1481,11 +1491,24 @@ const handleResponseSubmit = async () => {
                   </div>
                 </div>
 
-                {/* Judge Introduction */}
-                <div className="lower-third mb-4 sm:mb-6 pl-4 sm:pl-6">
-                  <div className="text-[10px] sm:text-xs font-bold text-yellow-900 tracking-widest">PRESIDING</div>
-                  <div className="text-black font-bold text-sm sm:text-lg">⚖️ {judge?.name || 'Judge Judy'}</div>
-                  <div className="text-[10px] sm:text-xs text-yellow-900 italic">{judge?.tagline}</div>
+                {/* Judge Introduction with GIF */}
+                <div className="tv-card p-3 sm:p-4 mb-4 sm:mb-6">
+                  <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4">
+                    {/* Judge GIF */}
+                    <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-lg overflow-hidden border-2 border-yellow-600 flex-shrink-0">
+                      <img
+                        src={JUDGE_GIFS[caseData.judge as keyof typeof JUDGE_GIFS]?.intro || JUDGE_GIFS.judy.intro}
+                        alt={`${judge?.name || 'Judge'} reaction`}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    {/* Judge Info */}
+                    <div className="text-center sm:text-left">
+                      <div className="text-[10px] sm:text-xs font-bold text-yellow-500 tracking-widest">PRESIDING</div>
+                      <div className="text-white font-bold text-base sm:text-lg">⚖️ {judge?.name || 'Judge Judy'}</div>
+                      <div className="text-gray-400 text-[10px] sm:text-xs italic">{judge?.tagline}</div>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Stakes */}
@@ -1783,6 +1806,8 @@ if (isMultiplayer && !isMyTurn && !isLoading) {
 
   // VERDICT
   if (phase === 'verdict') {
+    const judgeGifs = JUDGE_GIFS[caseData.judge as keyof typeof JUDGE_GIFS] || JUDGE_GIFS.judy;
+
     if (isLoading || !verdict) {
       return (
         <div className="min-h-screen flex flex-col items-center justify-center p-2 sm:p-4 md:p-6">
@@ -1790,13 +1815,21 @@ if (isMultiplayer && !isMyTurn && !isLoading) {
             <TVFrame>
               <ProgressIndicator currentPhase="verdict" />
               <div className="text-center mt-4 sm:mt-8">
-                <div className="flex justify-center gap-1 sm:gap-2 mb-3 sm:mb-4">
-                  {['📚', '⚖️', '🤝', '📜', '🔨'].map((e, i) => (
-                    <span key={i} className="text-2xl sm:text-3xl md:text-4xl animate-pulse" style={{ animationDelay: `${i * 0.2}s` }}>{e}</span>
-                  ))}
+                {/* Judge thinking GIF */}
+                <div className="w-32 h-32 sm:w-40 sm:h-40 mx-auto rounded-lg overflow-hidden border-4 border-yellow-600 mb-4">
+                  <img
+                    src={judgeGifs.thinking}
+                    alt="Judge deliberating"
+                    className="w-full h-full object-cover"
+                  />
                 </div>
                 <div className="tv-title text-base sm:text-lg md:text-xl mb-2">The judge is deliberating...</div>
                 <div className="text-gray-400 text-xs sm:text-sm">{loadingMessage}</div>
+                <div className="flex justify-center gap-1 sm:gap-2 mt-4">
+                  {['📚', '⚖️', '🤝', '📜', '🔨'].map((e, i) => (
+                    <span key={i} className="text-lg sm:text-xl md:text-2xl animate-pulse" style={{ animationDelay: `${i * 0.2}s` }}>{e}</span>
+                  ))}
+                </div>
               </div>
               <ChannelBug text="COURT TV" />
             </TVFrame>
@@ -1816,10 +1849,23 @@ if (isMultiplayer && !isMyTurn && !isLoading) {
               <p className="text-gray-400 text-xs sm:text-sm">{caseData.title}</p>
             </div>
 
+            {/* Winner announcement with Judge GIF */}
             <div className="tv-gradient-gold p-3 sm:p-4 md:p-6 mb-4 sm:mb-6 text-center winner-glow">
-              <div className="text-yellow-900 text-[10px] sm:text-xs font-bold tracking-widest mb-1 sm:mb-2">WINNER</div>
-              <div className="text-2xl sm:text-3xl md:text-4xl font-black text-black mb-1 sm:mb-2">{verdict.winnerName} 🏆</div>
-              <div className="text-yellow-900 italic text-xs sm:text-sm">&quot;{verdict.summary}&quot;</div>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                {/* Judge reaction GIF */}
+                <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-lg overflow-hidden border-3 border-yellow-700 flex-shrink-0">
+                  <img
+                    src={judgeGifs.winner}
+                    alt="Judge's reaction"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div>
+                  <div className="text-yellow-900 text-[10px] sm:text-xs font-bold tracking-widest mb-1 sm:mb-2">WINNER</div>
+                  <div className="text-2xl sm:text-3xl md:text-4xl font-black text-black mb-1 sm:mb-2">{verdict.winnerName} 🏆</div>
+                  <div className="text-yellow-900 italic text-xs sm:text-sm">&quot;{verdict.summary}&quot;</div>
+                </div>
+              </div>
             </div>
 
             <div className="tv-card p-2 sm:p-4 mb-4 sm:mb-6">
