@@ -1120,6 +1120,55 @@ const handleResponseSubmit = async () => {
     }
   };
 
+  // Share verdict function
+  const [shareStatus, setShareStatus] = useState<'idle' | 'copied' | 'shared'>('idle');
+
+  const generateShareText = () => {
+    if (!verdict) return '';
+    const judge = JUDGE_PERSONALITIES[caseData.judge as keyof typeof JUDGE_PERSONALITIES];
+    return `⚖️ JUDGE JUDY AI VERDICT ⚖️
+
+📋 Case: ${caseData.title}
+👥 ${caseData.partyA} vs ${caseData.partyB}
+👨‍⚖️ Judge: ${judge?.name || 'Judge Judy'}
+
+🏆 WINNER: ${verdict.winnerName}
+
+"${verdict.summary}"
+
+${caseData.stakes ? `🎯 Stakes: ${caseData.stakes}` : ''}
+
+Settle YOUR disputes at judgejudy.ai`;
+  };
+
+  const handleShare = async () => {
+    const shareText = generateShareText();
+
+    // Try native share first (mobile)
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Judge Judy AI Verdict',
+          text: shareText,
+        });
+        setShareStatus('shared');
+        setTimeout(() => setShareStatus('idle'), 2000);
+        return;
+      } catch (err) {
+        // User cancelled or share failed, fall through to clipboard
+      }
+    }
+
+    // Fallback to clipboard
+    try {
+      await navigator.clipboard.writeText(shareText);
+      setShareStatus('copied');
+      setTimeout(() => setShareStatus('idle'), 2000);
+    } catch (err) {
+      console.error('Failed to copy:', err);
+    }
+  };
+
   // ========== RENDER ==========
 
   // OBJECTION MODAL - Show immediately when triggered, regardless of phase
@@ -2007,9 +2056,23 @@ if (isMultiplayer && !isMyTurn && !isLoading) {
                 <div className={`text-base sm:text-lg md:text-xl mb-3 sm:mb-4 font-bold ${verdictAccepted ? 'text-green-400' : 'text-red-400'}`}>
                   {verdictAccepted ? '✅ VERDICT ACCEPTED' : '❌ VERDICT REJECTED'}
                 </div>
-                <button onClick={resetCase} className="tv-button text-sm sm:text-base">
-                  START NEW CASE
-                </button>
+                <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 justify-center">
+                  <button onClick={resetCase} className="tv-button text-sm sm:text-base">
+                    🆕 START NEW CASE
+                  </button>
+                  <button
+                    onClick={handleShare}
+                    className={`tv-button text-sm sm:text-base ${
+                      shareStatus === 'copied' ? 'bg-green-700 border-green-500' :
+                      shareStatus === 'shared' ? 'bg-blue-700 border-blue-500' :
+                      'bg-purple-700 border-purple-500'
+                    } text-white`}
+                  >
+                    {shareStatus === 'copied' ? '✅ COPIED!' :
+                     shareStatus === 'shared' ? '✅ SHARED!' :
+                     '📤 SHARE VERDICT'}
+                  </button>
+                </div>
               </div>
             )}
 
