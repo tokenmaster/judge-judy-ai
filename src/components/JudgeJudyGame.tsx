@@ -251,14 +251,62 @@ useEffect(() => {
 
 // Auto-join if room code is in URL (but not if we have a saved session)
 useEffect(() => {
-  if (initialRoomCode && !isMultiplayer && phase === 'home') {
-    // Check if we already have a session being restored
-    const savedSession = typeof window !== 'undefined' ? sessionStorage.getItem('judge_judy_case') : null;
-    if (!savedSession) {
+  const checkRoomCode = async () => {
+    if (initialRoomCode && !isMultiplayer && phase === 'home') {
+      // Check if we already have a session being restored
+      const savedSession = typeof window !== 'undefined' ? sessionStorage.getItem('judge_judy_case') : null;
+      if (savedSession) return;
+
+      // Fetch the case to check if it has a verdict
+      const { data: caseRecord, error } = await supabase
+        .from('cases')
+        .select('*')
+        .eq('room_code', initialRoomCode)
+        .single();
+
+      if (error || !caseRecord) {
+        // Case not found, go to join screen to show error
+        setJoinCode(initialRoomCode);
+        setPhase('join');
+        return;
+      }
+
+      // If case has a verdict, show verdict screen directly (read-only)
+      if (caseRecord.verdict) {
+        // Fetch responses for transcript
+        const { data: caseResponses } = await supabase
+          .from('responses')
+          .select('*')
+          .eq('case_id', caseRecord.id)
+          .order('created_at', { ascending: true });
+
+        setCaseData({
+          title: caseRecord.title,
+          category: caseRecord.category,
+          judge: caseRecord.judge,
+          stakes: caseRecord.stakes,
+          partyA: caseRecord.party_a_name,
+          partyB: caseRecord.party_b_name,
+          statementA: caseRecord.statement_a || '',
+          statementB: caseRecord.statement_b || ''
+        });
+        setCredibilityA(caseRecord.credibility_a || 50);
+        setCredibilityB(caseRecord.credibility_b || 50);
+        setVerdict(caseRecord.verdict);
+        setVerdictAccepted(true); // Show as already accepted for shared view
+        setRoomCode(caseRecord.room_code);
+        if (caseResponses) setResponses(caseResponses);
+        setPhase('verdict');
+        return;
+      }
+
+      // Otherwise, go to join screen
       setJoinCode(initialRoomCode);
       setPhase('join');
     }
-  }
+  };
+
+  checkRoomCode();
 }, [initialRoomCode]);
 
 // Fetch case preview when join code is complete
