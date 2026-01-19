@@ -502,3 +502,50 @@ export function RoundIndicator({ round, totalRounds }: { round: number; totalRou
     </div>
   );
 }
+
+// Typewriter Text Component - Types out text word by word at 180 WPM
+export function TypewriterText({
+  text,
+  className = '',
+  onComplete
+}: {
+  text: string;
+  className?: string;
+  onComplete?: () => void;
+}) {
+  const [displayedWords, setDisplayedWords] = React.useState<string[]>([]);
+  const [isComplete, setIsComplete] = React.useState(false);
+  const words = React.useMemo(() => text.split(' '), [text]);
+
+  // 180 WPM = 3 words per second = ~333ms per word
+  const msPerWord = 333;
+
+  React.useEffect(() => {
+    // Reset when text changes
+    setDisplayedWords([]);
+    setIsComplete(false);
+
+    if (!text) return;
+
+    let currentIndex = 0;
+    const interval = setInterval(() => {
+      if (currentIndex < words.length) {
+        setDisplayedWords(prev => [...prev, words[currentIndex]]);
+        currentIndex++;
+      } else {
+        clearInterval(interval);
+        setIsComplete(true);
+        onComplete?.();
+      }
+    }, msPerWord);
+
+    return () => clearInterval(interval);
+  }, [text, words, onComplete]);
+
+  return (
+    <span className={className}>
+      {displayedWords.join(' ')}
+      {!isComplete && <span className="animate-pulse">▊</span>}
+    </span>
+  );
+}

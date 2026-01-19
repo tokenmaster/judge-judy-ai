@@ -36,7 +36,8 @@ import {
   TVFrame,
   ChannelBug,
   PartyNamePlate,
-  RoundIndicator
+  RoundIndicator,
+  TypewriterText
 } from './ui';
 
 export default function JudgeJudyGame({ initialRoomCode }: { initialRoomCode?: string | null }) {
@@ -2162,8 +2163,8 @@ if (isMultiplayer && !isMyTurn && !isLoading) {
 
               {currentQuestion && (
                 <div className="tv-card p-4 mb-4 mt-4 border-2 border-yellow-600">
-                  <div className="text-yellow-500 text-sm font-bold mb-1">JUDGE&apos;S QUESTION:</div>
-                  <div className="text-white">{currentQuestion}</div>
+                  <div className="text-yellow-500 text-sm font-bold mb-1">JUDGE {JUDGE_PERSONALITIES[caseData.judge as keyof typeof JUDGE_PERSONALITIES]?.name?.toUpperCase().replace('JUDGE ', '') || 'JOODY'}:</div>
+                  <div className="text-white"><TypewriterText text={currentQuestion} /></div>
                 </div>
               )}
 
@@ -2242,9 +2243,9 @@ if (isMultiplayer && !isMyTurn && !isLoading) {
 
                 <div className="tv-card p-4 border-2 border-yellow-600">
                   <div className="text-yellow-500 text-sm font-bold mb-1 uppercase">
-                    {JUDGE_PERSONALITIES[caseData.judge as keyof typeof JUDGE_PERSONALITIES]?.name || 'Judge'}:
+                    {JUDGE_PERSONALITIES[caseData.judge as keyof typeof JUDGE_PERSONALITIES]?.name || 'Judge Joody'}:
                   </div>
-                  <div className="text-white">{currentQuestion}</div>
+                  <div className="text-white"><TypewriterText text={currentQuestion} /></div>
                 </div>
 
                 {canObjectToQuestion && !objectionsUsed[examTarget as 'A' | 'B'] && (
