@@ -124,15 +124,23 @@ useEffect(() => {
 }, [myRole]);
 
 // Fetch stats when on stats tab
+const [statsError, setStatsError] = useState(false);
+
 useEffect(() => {
-  if (homeTab === 'stats' && !stats && !statsLoading) {
+  if (homeTab === 'stats' && !stats && !statsLoading && !statsError) {
     setStatsLoading(true);
-    getStats().then((data) => {
-      setStats(data);
-      setStatsLoading(false);
-    });
+    getStats()
+      .then((data) => {
+        setStats(data);
+        setStatsLoading(false);
+        if (!data) setStatsError(true);
+      })
+      .catch(() => {
+        setStatsLoading(false);
+        setStatsError(true);
+      });
   }
-}, [homeTab, stats, statsLoading]);
+}, [homeTab, stats, statsLoading, statsError]);
 
 // Save session to sessionStorage when case changes
 const saveSession = (caseIdToSave: string, role: string) => {
@@ -1380,6 +1388,19 @@ Settle YOUR disputes at judgejudy.ai`;
                           </div>
                         </div>
                       )}
+                    </div>
+                  ) : statsError ? (
+                    <div className="tv-card p-4 sm:p-6">
+                      <div className="text-yellow-500 text-sm mb-2">📊 Stats table not configured</div>
+                      <div className="text-gray-500 text-xs">
+                        Run the SQL setup in your Supabase dashboard to enable stats tracking.
+                      </div>
+                      <button
+                        onClick={() => { setStatsError(false); setStatsLoading(false); }}
+                        className="mt-3 text-yellow-500 hover:text-yellow-300 text-xs font-bold"
+                      >
+                        🔄 RETRY
+                      </button>
                     </div>
                   ) : (
                     <div className="tv-card p-4 sm:p-6">
