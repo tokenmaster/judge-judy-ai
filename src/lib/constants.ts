@@ -264,7 +264,8 @@ export const JUDGE_PERSONALITIES = {
       disappointed: "This is RIDICULOUS.",
       impressed: "Finally, some sense.",
       skeptical: "Do I look stupid to you?"
-    }
+    },
+    dismissive: "Cry about it"
   },
   fair: {
     name: "The Fair Arbiter",
@@ -275,7 +276,8 @@ export const JUDGE_PERSONALITIES = {
       disappointed: "I was hoping for more honesty here.",
       impressed: "Thank you for that candor.",
       skeptical: "I'd like to understand that better."
-    }
+    },
+    dismissive: "I understand, but the ruling stands"
   },
   chaos: {
     name: "Chaotic Neutral",
@@ -286,7 +288,8 @@ export const JUDGE_PERSONALITIES = {
       disappointed: "Ugh, boring. Give me DRAMA!",
       impressed: "Okay okay OKAY I see you! 👀",
       skeptical: "Mmmmm... something's not adding up bestie"
-    }
+    },
+    dismissive: "Stay mad bestie 💅"
   },
   bro: {
     name: "The Bro",
@@ -297,7 +300,8 @@ export const JUDGE_PERSONALITIES = {
       disappointed: "Brother... come on, man.",
       impressed: "BROTHER. Okay, respect.",
       skeptical: "Brother... that doesn't add up."
-    }
+    },
+    dismissive: "It is what it is, bro"
   }
 };
 

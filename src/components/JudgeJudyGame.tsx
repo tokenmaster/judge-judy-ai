@@ -82,6 +82,7 @@ export default function JudgeJudyGame({ initialRoomCode }: { initialRoomCode?: s
   const [appealArgument, setAppealArgument] = useState('');
   const [appealResult, setAppealResult] = useState<any>(null);
   const [isAppealing, setIsAppealing] = useState(false);
+  const [appealAcknowledged, setAppealAcknowledged] = useState(false);
   const [credibilityA, setCredibilityA] = useState(50);
   const [credibilityB, setCredibilityB] = useState(50);
   const [credibilityHistory, setCredibilityHistory] = useState<any[]>([]);
@@ -1179,6 +1180,7 @@ const handleResponseSubmit = async () => {
     setAppealArgument('');
     setAppealResult(null);
     setIsAppealing(false);
+    setAppealAcknowledged(false);
     setCredibilityA(50);
     setCredibilityB(50);
     setClarificationCount(0);
@@ -2482,11 +2484,40 @@ if (isMultiplayer && !isMyTurn && !isLoading) {
                   ⚠️ APPEAL VERDICT
                 </button>
               </div>
-            ) : verdictAccepted !== null || appealResult ? (
+            ) : appealResult && !appealAcknowledged ? (
+              /* After appeal - show accept/dismiss buttons */
+              <div className="space-y-2 sm:space-y-3 sm:flex sm:gap-3 sm:space-y-0">
+                <button
+                  onClick={() => {
+                    setVerdictAccepted(true);
+                    setAppealAcknowledged(true);
+                    incrementVerdictsAccepted();
+                  }}
+                  className="w-full tv-button py-2 sm:py-3 md:py-4 bg-green-700 border-green-500 text-white text-sm sm:text-base"
+                >
+                  ✅ ACCEPT VERDICT
+                </button>
+                <button
+                  onClick={() => {
+                    setVerdictAccepted(false);
+                    setAppealAcknowledged(true);
+                    incrementVerdictsRejected();
+                  }}
+                  className="w-full tv-button py-2 sm:py-3 md:py-4 bg-gray-700 border-gray-500 text-white text-sm sm:text-base"
+                >
+                  😤 {(JUDGE_PERSONALITIES[caseData.judge as keyof typeof JUDGE_PERSONALITIES] as any)?.dismissive || 'Whatever'}
+                </button>
+              </div>
+            ) : verdictAccepted !== null || appealAcknowledged ? (
               <div className="text-center">
                 {!appealResult && (
                   <div className={`text-base sm:text-lg md:text-xl mb-3 sm:mb-4 font-bold ${verdictAccepted ? 'text-green-400' : 'text-red-400'}`}>
                     {verdictAccepted ? '✅ VERDICT ACCEPTED' : '❌ VERDICT REJECTED'}
+                  </div>
+                )}
+                {appealAcknowledged && (
+                  <div className={`text-base sm:text-lg md:text-xl mb-3 sm:mb-4 font-bold ${verdictAccepted ? 'text-green-400' : 'text-gray-400'}`}>
+                    {verdictAccepted ? '✅ VERDICT ACCEPTED' : '😤 CASE CLOSED'}
                   </div>
                 )}
                 <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 justify-center">
