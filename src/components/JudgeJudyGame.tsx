@@ -1445,40 +1445,106 @@ const handleResponseSubmit = async () => {
 
     if (isMultiplayer && !isMyTurn) {
       const waitingForName = currentParty === 'A' ? caseData.partyA : caseData.partyB;
+      const judge = JUDGE_PERSONALITIES[caseData.judge as keyof typeof JUDGE_PERSONALITIES];
       return (
         <div className="min-h-screen flex items-center justify-center p-2 sm:p-4 md:p-6">
           <div className="w-full max-w-sm sm:max-w-md md:max-w-lg">
             <TVFrame>
-              <div className="text-center p-1 sm:p-2">
+              <div className="p-1 sm:p-2">
                 <ProgressIndicator currentPhase="statements" />
-                <div className="lower-third mb-4 sm:mb-6 pl-4 sm:pl-6 text-left">
-                  <div className="text-[10px] sm:text-xs font-bold text-yellow-900 tracking-widest">OPENING STATEMENTS</div>
-                  <div className="text-black font-bold text-sm sm:text-lg">{caseData.title}</div>
-                  <div className="text-[10px] sm:text-xs text-yellow-900 mt-1">Room: {roomCode}</div>
+
+                {/* COMING UP NEXT Banner */}
+                <div className="breaking-banner text-center py-2 sm:py-3 mb-4 sm:mb-6">
+                  <span className="text-xs sm:text-sm md:text-base">📺 COMING UP NEXT ON COURT TV 📺</span>
                 </div>
 
-                {isOtherTyping ? (
-                  <>
-                    <div className="text-4xl sm:text-5xl mb-3 sm:mb-4">✍️</div>
-                    <h2 className="tv-title text-lg sm:text-xl mb-2">{waitingForName} is typing...</h2>
-                    <div className="flex justify-center gap-1 mb-4 sm:mb-6">
-                      <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-yellow-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
-                      <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-yellow-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
-                      <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-yellow-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+                {/* Case Title */}
+                <div className="text-center mb-4 sm:mb-6">
+                  <div className="text-yellow-500 text-[10px] sm:text-xs font-bold tracking-widest mb-1">TODAY&apos;S CASE</div>
+                  <h2 className="tv-title text-lg sm:text-xl md:text-2xl">{caseData.title}</h2>
+                </div>
+
+                {/* VS Matchup Display */}
+                <div className="tv-card p-3 sm:p-4 mb-4 sm:mb-6">
+                  <div className="flex items-center justify-center gap-2 sm:gap-4">
+                    <div className="text-center flex-1">
+                      <div className="text-blue-400 font-black text-base sm:text-lg md:text-xl">{caseData.partyA}</div>
+                      <div className="text-[10px] sm:text-xs text-gray-500 uppercase tracking-wider">Plaintiff</div>
                     </div>
-                  </>
-                ) : (
-                  <>
-                    <div className="text-4xl sm:text-5xl mb-3 sm:mb-4 animate-pulse">⏳</div>
-                    <h2 className="tv-title text-lg sm:text-xl mb-2">Waiting for {waitingForName}</h2>
-                    <p className="text-gray-400 text-xs sm:text-sm mb-4 sm:mb-6">They&apos;re writing their opening statement...</p>
-                  </>
+                    <div className="tv-gradient-red px-3 sm:px-4 py-1 sm:py-2 rounded">
+                      <span className="text-white font-black text-lg sm:text-xl md:text-2xl">VS</span>
+                    </div>
+                    <div className="text-center flex-1">
+                      <div className="text-red-400 font-black text-base sm:text-lg md:text-xl">{caseData.partyB}</div>
+                      <div className="text-[10px] sm:text-xs text-gray-500 uppercase tracking-wider">Defendant</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Judge Introduction */}
+                <div className="lower-third mb-4 sm:mb-6 pl-4 sm:pl-6">
+                  <div className="text-[10px] sm:text-xs font-bold text-yellow-900 tracking-widest">PRESIDING</div>
+                  <div className="text-black font-bold text-sm sm:text-lg">⚖️ {judge?.name || 'Judge Judy'}</div>
+                  <div className="text-[10px] sm:text-xs text-yellow-900 italic">{judge?.tagline}</div>
+                </div>
+
+                {/* Stakes */}
+                {caseData.stakes && (
+                  <div className="tv-gradient-gold p-2 sm:p-3 mb-4 sm:mb-6 text-center">
+                    <div className="text-yellow-900 text-[10px] sm:text-xs font-bold tracking-widest">🏆 WHAT&apos;S AT STAKE</div>
+                    <div className="text-black font-bold text-sm sm:text-base">{caseData.stakes}</div>
+                  </div>
                 )}
 
-                <div className="tv-card p-3 sm:p-4">
-                  <div className="text-gray-400 text-xs sm:text-sm">
-                    You are: <span className={`font-bold ${myRole === 'A' ? 'text-blue-400' : 'text-red-400'}`}>{myRole === 'A' ? caseData.partyA : caseData.partyB}</span>
-                  </div>
+                {/* Rules of Court */}
+                <div className="tv-card p-2 sm:p-4 mb-4 sm:mb-6">
+                  <div className="text-yellow-500 text-[10px] sm:text-xs font-bold tracking-widest mb-2">📋 RULES OF THE COURT</div>
+                  <ul className="text-gray-400 text-[10px] sm:text-xs space-y-1">
+                    <li className="flex items-start gap-1 sm:gap-2">
+                      <span className="text-yellow-500">1.</span>
+                      <span>Both parties will present opening statements</span>
+                    </li>
+                    <li className="flex items-start gap-1 sm:gap-2">
+                      <span className="text-yellow-500">2.</span>
+                      <span>The judge will cross-examine each party</span>
+                    </li>
+                    <li className="flex items-start gap-1 sm:gap-2">
+                      <span className="text-yellow-500">3.</span>
+                      <span>Credibility scores affect the final verdict</span>
+                    </li>
+                    <li className="flex items-start gap-1 sm:gap-2">
+                      <span className="text-yellow-500">4.</span>
+                      <span>The judge&apos;s decision is FINAL</span>
+                    </li>
+                  </ul>
+                </div>
+
+                {/* Status Indicator */}
+                <div className="tv-card p-3 sm:p-4 border-2 border-yellow-600">
+                  {isOtherTyping ? (
+                    <div className="flex items-center justify-center gap-2">
+                      <span className="text-xl sm:text-2xl">✍️</span>
+                      <div>
+                        <div className="text-yellow-500 font-bold text-xs sm:text-sm">{waitingForName} is preparing their statement...</div>
+                        <div className="flex justify-center gap-1 mt-1">
+                          <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-yellow-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                          <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-yellow-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
+                          <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-yellow-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-center gap-2">
+                      <span className="text-xl sm:text-2xl animate-pulse">⏳</span>
+                      <div className="text-gray-400 text-xs sm:text-sm">Waiting for {waitingForName} to begin...</div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Your role reminder */}
+                <div className="text-center mt-3 sm:mt-4 text-gray-500 text-[10px] sm:text-xs">
+                  You are: <span className={`font-bold ${myRole === 'A' ? 'text-blue-400' : 'text-red-400'}`}>{myRole === 'A' ? caseData.partyA : caseData.partyB}</span>
+                  <span className="text-gray-600"> • Room: {roomCode}</span>
                 </div>
               </div>
               <ChannelBug text="COURT TV" />
