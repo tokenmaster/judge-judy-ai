@@ -25,7 +25,11 @@ import {
   ObjectionRuling,
   SnapJudgmentDisplay,
   LoadingOverlay,
-  ThinkingEmoji
+  ThinkingEmoji,
+  TVFrame,
+  ChannelBug,
+  PartyNamePlate,
+  RoundIndicator
 } from './ui';
 
 export default function JudgeJudyGame({ initialRoomCode }: { initialRoomCode?: string | null }) {
@@ -1193,39 +1197,44 @@ const handleResponseSubmit = async () => {
   // HOME
   if (phase === 'home') {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4">
-        <div className="max-w-md w-full text-center">
-          <div className="text-6xl mb-4">⚖️</div>
-          <h1 className="text-4xl font-bold text-white mb-2">Judge Judy AI</h1>
-          <p className="text-slate-400 mb-8">Settle disputes. Real stakes. No lawyers.</p>
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <div className="max-w-md w-full">
+          <TVFrame>
+            <div className="text-center">
+              <div className="text-7xl mb-4">⚖️</div>
+              <h1 className="tv-title text-4xl mb-2">Judge Judy AI</h1>
+              <p className="tv-subtitle text-lg mb-8">Settle disputes. Real stakes. No lawyers.</p>
 
-          <div className="space-y-3 mb-6">
-            <button
-              onClick={() => setPhase('create')}
-              className="w-full bg-amber-500 hover:bg-amber-400 text-black font-bold py-4 px-8 rounded-lg text-lg"
-            >
-              🆕 Create New Case
-            </button>
-            <button
-              onClick={() => setPhase('join')}
-              className="w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-4 px-8 rounded-lg text-lg"
-            >
-              🔗 Join Existing Case
-            </button>
-          </div>
+              <div className="space-y-3 mb-6">
+                <button
+                  onClick={() => setPhase('create')}
+                  className="w-full tv-button text-lg py-4"
+                >
+                  🆕 CREATE NEW CASE
+                </button>
+                <button
+                  onClick={() => setPhase('join')}
+                  className="w-full tv-button bg-gray-700 border-gray-600 text-white text-lg py-4"
+                >
+                  🔗 JOIN EXISTING CASE
+                </button>
+              </div>
 
-          <div className="bg-slate-800/50 rounded-lg p-4 mb-6">
-            <div className="text-slate-400 text-sm">
-              <span className="text-amber-400">✨ Multiplayer:</span> Create a case and share the room code with the other party!
+              <div className="tv-card p-4 mb-6">
+                <div className="text-gray-300 text-sm">
+                  <span className="text-yellow-500 font-bold">✨ MULTIPLAYER:</span> Create a case and share the room code!
+                </div>
+              </div>
+
+              <div className="grid grid-cols-4 gap-2">
+                <div className="tv-card p-3 text-center"><div className="text-2xl mb-1">📝</div><div className="text-yellow-500 text-xs font-bold">PRESENT</div></div>
+                <div className="tv-card p-3 text-center"><div className="text-2xl mb-1">🔥</div><div className="text-yellow-500 text-xs font-bold">GRILLED</div></div>
+                <div className="tv-card p-3 text-center"><div className="text-2xl mb-1">⚠️</div><div className="text-yellow-500 text-xs font-bold">OBJECT</div></div>
+                <div className="tv-card p-3 text-center"><div className="text-2xl mb-1">🏆</div><div className="text-yellow-500 text-xs font-bold">WIN</div></div>
+              </div>
             </div>
-          </div>
-
-          <div className="grid grid-cols-4 gap-3">
-            <div className="bg-slate-800 rounded-lg p-3"><div className="text-xl mb-1">📝</div><div className="text-slate-400 text-xs">Present</div></div>
-            <div className="bg-slate-800 rounded-lg p-3"><div className="text-xl mb-1">🔥</div><div className="text-slate-400 text-xs">Grilled</div></div>
-            <div className="bg-slate-800 rounded-lg p-3"><div className="text-xl mb-1">⚠️</div><div className="text-slate-400 text-xs">Object</div></div>
-            <div className="bg-slate-800 rounded-lg p-3"><div className="text-xl mb-1">🏆</div><div className="text-slate-400 text-xs">Win</div></div>
-          </div>
+            <ChannelBug text="COURT TV" />
+          </TVFrame>
         </div>
       </div>
     );
@@ -1234,67 +1243,70 @@ const handleResponseSubmit = async () => {
   // JOIN
   if (phase === 'join') {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4">
+      <div className="min-h-screen flex items-center justify-center p-4">
         <div className="max-w-md w-full">
-          <button onClick={() => setPhase('home')} className="text-slate-400 hover:text-white mb-6">← Back</button>
+          <TVFrame>
+            <button onClick={() => setPhase('home')} className="text-yellow-500 hover:text-yellow-300 mb-6 font-bold">← BACK</button>
 
-          <div className="text-center mb-6">
-            <div className="text-5xl mb-4">🔗</div>
-            <h2 className="text-2xl font-bold text-white mb-2">Join a Case</h2>
-            <p className="text-slate-400">Enter the room code shared by the other party</p>
-          </div>
-
-          <div className="mb-4">
-            <label className="block text-slate-300 mb-2 text-center">Room Code</label>
-            <input
-              type="text"
-              placeholder="e.g., JUDY7X"
-              value={joinCode}
-              onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
-              maxLength={6}
-              className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-4 text-white text-center text-2xl tracking-widest uppercase"
-            />
-          </div>
-
-          {/* Loading preview */}
-          {isLoadingPreview && (
-            <div className="bg-slate-800/50 rounded-lg p-4 mb-4 text-center">
-              <div className="text-slate-400 text-sm">Looking up case...</div>
+            <div className="text-center mb-6">
+              <div className="text-5xl mb-4">🔗</div>
+              <h2 className="tv-title text-2xl mb-2">Join a Case</h2>
+              <p className="text-gray-400">Enter the room code shared by the other party</p>
             </div>
-          )}
 
-          {/* Case preview */}
-          {joinPreview && !isLoadingPreview && (
-            <div className="bg-slate-800 rounded-lg p-4 mb-4 border border-green-500/30">
-              <div className="text-green-400 text-xs font-medium mb-2 text-center">✓ CASE FOUND</div>
-              <div className="text-center">
-                <div className="text-amber-400 text-xs mb-1">⚖️ DISPUTE</div>
-                <div className="text-white font-bold text-lg mb-2">{joinPreview.title}</div>
-                <div className="text-slate-400 text-sm">
-                  <span className="text-blue-400">{joinPreview.partyA}</span>
-                  <span className="text-slate-500 mx-2">vs</span>
-                  <span className="text-red-400">{joinPreview.partyB}</span>
-                </div>
-                {joinPreview.stakes && (
-                  <div className="text-amber-300 text-xs mt-2">🏆 {joinPreview.stakes}</div>
-                )}
+            <div className="mb-4">
+              <label className="block text-yellow-500 mb-2 text-center font-bold text-xs tracking-widest">ROOM CODE</label>
+              <input
+                type="text"
+                placeholder="e.g., JUDY7X"
+                value={joinCode}
+                onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
+                maxLength={6}
+                className="w-full tv-input text-center text-3xl tracking-widest uppercase"
+              />
+            </div>
+
+            {/* Loading preview */}
+            {isLoadingPreview && (
+              <div className="tv-card p-4 mb-4 text-center">
+                <div className="text-yellow-500 text-sm font-bold">Looking up case...</div>
               </div>
-            </div>
-          )}
+            )}
 
-          {joinError && (
-            <div className="bg-red-500/20 border border-red-500 rounded-lg p-3 mb-4 text-center text-red-400">
-              {joinError}
-            </div>
-          )}
+            {/* Case preview */}
+            {joinPreview && !isLoadingPreview && (
+              <div className="tv-card p-4 mb-4 border-2 border-green-500">
+                <div className="text-green-400 text-xs font-bold mb-2 text-center tracking-widest">✓ CASE FOUND</div>
+                <div className="text-center">
+                  <div className="text-yellow-500 text-xs mb-1 font-bold">⚖️ DISPUTE</div>
+                  <div className="text-white font-bold text-lg mb-2">{joinPreview.title}</div>
+                  <div className="text-sm">
+                    <span className="text-blue-400 font-bold">{joinPreview.partyA}</span>
+                    <span className="text-gray-500 mx-2 font-bold">VS</span>
+                    <span className="text-red-400 font-bold">{joinPreview.partyB}</span>
+                  </div>
+                  {joinPreview.stakes && (
+                    <div className="text-yellow-400 text-xs mt-2 font-bold">🏆 {joinPreview.stakes}</div>
+                  )}
+                </div>
+              </div>
+            )}
 
-          <button
-            onClick={handleJoinCase}
-            disabled={joinCode.length !== 6 || isLoading || !joinPreview}
-            className="w-full bg-amber-500 hover:bg-amber-400 disabled:bg-slate-700 disabled:text-slate-500 text-black font-bold py-4 rounded-lg text-lg"
-          >
-            {isLoading ? 'Joining...' : joinPreview ? `Join as ${joinPreview.partyB} →` : 'Join Case →'}
-          </button>
+            {joinError && (
+              <div className="tv-gradient-red p-3 mb-4 text-center text-white font-bold">
+                {joinError}
+              </div>
+            )}
+
+            <button
+              onClick={handleJoinCase}
+              disabled={joinCode.length !== 6 || isLoading || !joinPreview}
+              className="w-full tv-button text-lg py-4"
+            >
+              {isLoading ? 'JOINING...' : joinPreview ? `JOIN AS ${joinPreview.partyB.toUpperCase()} →` : 'JOIN CASE →'}
+            </button>
+            <ChannelBug text="COURT TV" />
+          </TVFrame>
         </div>
       </div>
     );
@@ -1303,52 +1315,54 @@ const handleResponseSubmit = async () => {
   // CREATE
   if (phase === 'create') {
     return (
-      <div className="min-h-screen bg-slate-900 p-4">
+      <div className="min-h-screen p-4">
         <div className="max-w-lg mx-auto">
-          <button onClick={() => setPhase('home')} className="text-slate-400 hover:text-white mb-6">← Back</button>
-          <h2 className="text-2xl font-bold text-white mb-6">File a New Case</h2>
+          <TVFrame showLive={false}>
+            <button onClick={() => setPhase('home')} className="text-yellow-500 hover:text-yellow-300 mb-6 font-bold">← BACK</button>
+            <h2 className="tv-title text-2xl mb-6 text-center">File a New Case</h2>
 
-          <div className="mb-4">
-            <label className="block text-slate-300 mb-2">What's the dispute?</label>
-            <input type="text" placeholder="e.g., Who ate my leftover pizza" value={caseData.title} onChange={(e) => setCaseData({...caseData, title: e.target.value})} className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 text-white" />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4 mb-4">
-            <div><label className="block text-slate-300 mb-2">Party A (You)</label><input type="text" placeholder="Your name" value={caseData.partyA} onChange={(e) => setCaseData({...caseData, partyA: e.target.value})} className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 text-white" /></div>
-            <div><label className="block text-slate-300 mb-2">Party B (Opponent)</label><input type="text" placeholder="Their name" value={caseData.partyB} onChange={(e) => setCaseData({...caseData, partyB: e.target.value})} className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 text-white" /></div>
-          </div>
-
-          <div className="mb-4">
-            <label className="block text-slate-300 mb-2">🏆 What's at stake?</label>
-            <input type="text" placeholder="e.g., Loser buys dinner" value={caseData.stakes} onChange={(e) => setCaseData({...caseData, stakes: e.target.value})} className="w-full bg-slate-800 border border-amber-500/50 rounded-lg px-4 py-3 text-white" />
-            <div className="flex flex-wrap gap-2 mt-3">
-              {SUGGESTED_STAKES.map((stake, i) => (
-                <button key={i} onClick={() => setCaseData({...caseData, stakes: stake})} className="text-xs bg-slate-800 hover:bg-slate-700 text-slate-400 px-3 py-1 rounded-full border border-slate-700">{stake}</button>
-              ))}
+            <div className="mb-4">
+              <label className="block text-yellow-500 mb-2 font-bold text-xs tracking-widest">WHAT&apos;S THE DISPUTE?</label>
+              <input type="text" placeholder="e.g., Who ate my leftover pizza" value={caseData.title} onChange={(e) => setCaseData({...caseData, title: e.target.value})} className="w-full tv-input text-white" style={{ color: 'white' }} />
             </div>
-          </div>
 
-          <div className="mb-4">
-            <label className="block text-slate-300 mb-2">Category</label>
-            <div className="grid grid-cols-2 gap-2">
-              {CATEGORIES.map(cat => (<button key={cat.id} onClick={() => setCaseData({...caseData, category: cat.id})} className={`p-3 rounded-lg border text-left ${caseData.category === cat.id ? 'bg-amber-500/20 border-amber-500 text-white' : 'bg-slate-800 border-slate-700 text-slate-300'}`}>{cat.label}</button>))}
+            <div className="grid grid-cols-2 gap-4 mb-4">
+              <div><label className="block text-yellow-500 mb-2 font-bold text-xs tracking-widest">PARTY A (YOU)</label><input type="text" placeholder="Your name" value={caseData.partyA} onChange={(e) => setCaseData({...caseData, partyA: e.target.value})} className="w-full tv-input text-white" style={{ color: 'white' }} /></div>
+              <div><label className="block text-yellow-500 mb-2 font-bold text-xs tracking-widest">PARTY B (OPPONENT)</label><input type="text" placeholder="Their name" value={caseData.partyB} onChange={(e) => setCaseData({...caseData, partyB: e.target.value})} className="w-full tv-input text-white" style={{ color: 'white' }} /></div>
             </div>
-          </div>
 
-          <div className="mb-6">
-            <label className="block text-slate-300 mb-2">Choose Your Judge</label>
-            <div className="space-y-2">
-              {Object.entries(JUDGE_PERSONALITIES).map(([id, judge]) => (<button key={id} onClick={() => setCaseData({...caseData, judge: id})} className={`w-full p-4 rounded-lg border text-left ${caseData.judge === id ? 'bg-amber-500/20 border-amber-500 text-white' : 'bg-slate-800 border-slate-700 text-slate-300'}`}><div className="font-bold">{judge.name}</div><div className="text-sm text-slate-400">{judge.tagline}</div></button>))}
+            <div className="mb-4">
+              <label className="block text-yellow-500 mb-2 font-bold text-xs tracking-widest">🏆 WHAT&apos;S AT STAKE?</label>
+              <input type="text" placeholder="e.g., Loser buys dinner" value={caseData.stakes} onChange={(e) => setCaseData({...caseData, stakes: e.target.value})} className="w-full tv-input border-yellow-600 text-white" style={{ color: 'white' }} />
+              <div className="flex flex-wrap gap-2 mt-3">
+                {SUGGESTED_STAKES.map((stake, i) => (
+                  <button key={i} onClick={() => setCaseData({...caseData, stakes: stake})} className="text-xs tv-card hover:border-yellow-500 text-gray-300 px-3 py-1">{stake}</button>
+                ))}
+              </div>
             </div>
-          </div>
 
-          <button
-            onClick={handleCreateCase}
-            disabled={!caseData.title || !caseData.category || !caseData.partyA || !caseData.partyB || !caseData.stakes || isLoading}
-            className="w-full bg-amber-500 hover:bg-amber-400 disabled:bg-slate-700 disabled:text-slate-500 text-black font-bold py-4 rounded-lg"
-          >
-            {isLoading ? 'Creating...' : 'Create Case & Get Room Code →'}
-          </button>
+            <div className="mb-4">
+              <label className="block text-yellow-500 mb-2 font-bold text-xs tracking-widest">CATEGORY</label>
+              <div className="grid grid-cols-2 gap-2">
+                {CATEGORIES.map(cat => (<button key={cat.id} onClick={() => setCaseData({...caseData, category: cat.id})} className={`p-3 border-2 text-left font-bold ${caseData.category === cat.id ? 'tv-gradient-gold text-black border-yellow-300' : 'tv-card border-gray-600 text-gray-300 hover:border-gray-500'}`}>{cat.label}</button>))}
+              </div>
+            </div>
+
+            <div className="mb-6">
+              <label className="block text-yellow-500 mb-2 font-bold text-xs tracking-widest">CHOOSE YOUR JUDGE</label>
+              <div className="space-y-2">
+                {Object.entries(JUDGE_PERSONALITIES).map(([id, judge]) => (<button key={id} onClick={() => setCaseData({...caseData, judge: id})} className={`w-full p-4 border-2 text-left ${caseData.judge === id ? 'tv-gradient-gold text-black border-yellow-300' : 'tv-card border-gray-600 text-gray-300 hover:border-gray-500'}`}><div className="font-bold uppercase">{judge.name}</div><div className={`text-sm ${caseData.judge === id ? 'text-yellow-900' : 'text-gray-500'}`}>{judge.tagline}</div></button>))}
+              </div>
+            </div>
+
+            <button
+              onClick={handleCreateCase}
+              disabled={!caseData.title || !caseData.category || !caseData.partyA || !caseData.partyB || !caseData.stakes || isLoading}
+              className="w-full tv-button text-lg py-4"
+            >
+              {isLoading ? 'CREATING...' : 'CREATE CASE & GET ROOM CODE →'}
+            </button>
+          </TVFrame>
         </div>
       </div>
     );
@@ -1357,57 +1371,62 @@ const handleResponseSubmit = async () => {
   // WAITING ROOM
   if (phase === 'waiting-room') {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4">
-        <div className="max-w-md w-full text-center">
-          {/* Case Title - Prominent */}
-          <div className="bg-slate-800 rounded-lg p-4 mb-6">
-            <div className="text-amber-500 text-xs font-medium mb-1">⚖️ DISPUTE</div>
-            <div className="text-white font-bold text-xl">{caseData.title}</div>
-            <div className="text-slate-400 text-sm mt-2">
-              <span className="text-blue-400">{caseData.partyA}</span>
-              <span className="text-slate-500 mx-2">vs</span>
-              <span className="text-red-400">{caseData.partyB}</span>
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <div className="max-w-md w-full">
+          <TVFrame>
+            <div className="text-center">
+              {/* Case Title - Prominent */}
+              <div className="lower-third mb-6 pl-6 text-left">
+                <div className="text-xs font-bold text-yellow-900 tracking-widest">⚖️ DISPUTE</div>
+                <div className="text-black font-bold text-lg">{caseData.title}</div>
+                <div className="text-sm mt-1">
+                  <span className="text-blue-800 font-bold">{caseData.partyA}</span>
+                  <span className="text-yellow-900 mx-2 font-bold">VS</span>
+                  <span className="text-red-800 font-bold">{caseData.partyB}</span>
+                </div>
+              </div>
+
+              <div className="on-air-badge inline-block mb-4">ON AIR</div>
+              <h2 className="tv-title text-xl mb-2">Share This Room</h2>
+              <p className="text-gray-400 mb-4 text-sm">Send this code to {caseData.partyB} so they can join</p>
+
+              <div className="tv-card p-6 mb-6">
+                <div className="text-yellow-500 text-xs font-bold tracking-widest mb-2">ROOM CODE</div>
+                <div className="tv-stat-value text-5xl tracking-widest mb-4" style={{ color: '#d4af37' }}>{roomCode}</div>
+                <div className="space-y-3">
+                  <button
+                    onClick={() => navigator.clipboard.writeText(roomCode)}
+                    className="tv-button bg-gray-700 border-gray-600 text-white w-full py-2"
+                  >
+                    📋 COPY CODE
+                  </button>
+                  <button
+                    onClick={() => {
+                      const shareUrl = `${window.location.origin}?room=${roomCode}`;
+                      navigator.clipboard.writeText(shareUrl);
+                    }}
+                    className="tv-button w-full py-2"
+                  >
+                    🔗 COPY SHARE LINK
+                  </button>
+                </div>
+
+                <div className="mt-4 text-gray-500 text-xs break-all">
+                  {typeof window !== 'undefined' && `${window.location.origin}?room=${roomCode}`}
+                </div>
+              </div>
+
+              <div className="tv-card p-4 mb-6">
+                <div className="flex items-center justify-center gap-3">
+                  <div className="animate-pulse text-3xl">⏳</div>
+                  <div className="text-yellow-500 font-bold">Waiting for {caseData.partyB} to join...</div>
+                </div>
+              </div>
+
+              <button onClick={resetCase} className="text-gray-500 hover:text-gray-300 text-sm font-bold">CANCEL</button>
             </div>
-          </div>
-
-          <div className="text-4xl mb-3">🔗</div>
-          <h2 className="text-xl font-bold text-white mb-2">Share This Room</h2>
-          <p className="text-slate-400 mb-4 text-sm">Send this code to {caseData.partyB} so they can join</p>
-
-          <div className="bg-slate-800 rounded-lg p-6 mb-6">
-            <div className="text-slate-400 text-sm mb-2">ROOM CODE</div>
-            <div className="text-5xl font-bold text-amber-400 tracking-widest mb-4">{roomCode}</div>
-            <div className="space-y-3">
-              <button
-                onClick={() => navigator.clipboard.writeText(roomCode)}
-                className="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg text-sm w-full"
-              >
-                📋 Copy Code
-              </button>
-              <button
-                onClick={() => {
-                  const shareUrl = `${window.location.origin}?room=${roomCode}`;
-                  navigator.clipboard.writeText(shareUrl);
-                }}
-                className="bg-amber-500 hover:bg-amber-400 text-black px-4 py-2 rounded-lg text-sm font-bold w-full"
-              >
-                🔗 Copy Share Link
-              </button>
-            </div>
-
-            <div className="mt-4 text-slate-500 text-xs break-all">
-              {typeof window !== 'undefined' && `${window.location.origin}?room=${roomCode}`}
-            </div>
-          </div>
-
-          <div className="bg-slate-800/50 rounded-lg p-4 mb-6">
-            <div className="flex items-center justify-center gap-3">
-              <div className="animate-pulse text-2xl">⏳</div>
-              <div className="text-slate-300">Waiting for {caseData.partyB} to join...</div>
-            </div>
-          </div>
-
-          <button onClick={resetCase} className="text-slate-500 hover:text-slate-300 text-sm">Cancel</button>
+            <ChannelBug text="COURT TV" />
+          </TVFrame>
         </div>
       </div>
     );
@@ -1427,105 +1446,112 @@ const handleResponseSubmit = async () => {
     if (isMultiplayer && !isMyTurn) {
       const waitingForName = currentParty === 'A' ? caseData.partyA : caseData.partyB;
       return (
-        <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4">
-          <div className="max-w-md w-full text-center">
-            <ProgressIndicator currentPhase="statements" />
-            <div className="bg-slate-800 rounded-lg p-4 mb-6">
-              <div className="text-amber-500 text-sm font-medium">OPENING STATEMENTS</div>
-              <div className="text-white font-bold text-lg">{caseData.title}</div>
-              <div className="text-slate-500 text-xs mt-1">Room: {roomCode}</div>
-            </div>
-
-            {isOtherTyping ? (
-              <>
-                <div className="text-5xl mb-4">✍️</div>
-                <h2 className="text-xl font-bold text-white mb-2">{waitingForName} is typing...</h2>
-                <div className="flex justify-center gap-1 mb-6">
-                  <span className="w-2 h-2 bg-amber-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
-                  <span className="w-2 h-2 bg-amber-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
-                  <span className="w-2 h-2 bg-amber-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+        <div className="min-h-screen flex items-center justify-center p-4">
+          <div className="max-w-md w-full">
+            <TVFrame>
+              <div className="text-center">
+                <ProgressIndicator currentPhase="statements" />
+                <div className="lower-third mb-6 pl-6 text-left">
+                  <div className="text-xs font-bold text-yellow-900 tracking-widest">OPENING STATEMENTS</div>
+                  <div className="text-black font-bold text-lg">{caseData.title}</div>
+                  <div className="text-xs text-yellow-900 mt-1">Room: {roomCode}</div>
                 </div>
-              </>
-            ) : (
-              <>
-                <div className="text-5xl mb-4 animate-pulse">⏳</div>
-                <h2 className="text-xl font-bold text-white mb-2">Waiting for {waitingForName}</h2>
-                <p className="text-slate-400 mb-6">They're writing their opening statement...</p>
-              </>
-            )}
 
-            <div className="bg-slate-800/50 rounded-lg p-4">
-              <div className="text-slate-400 text-sm">
-                You are: <span className={myRole === 'A' ? 'text-blue-400' : 'text-red-400'}>{myRole === 'A' ? caseData.partyA : caseData.partyB}</span>
+                {isOtherTyping ? (
+                  <>
+                    <div className="text-5xl mb-4">✍️</div>
+                    <h2 className="tv-title text-xl mb-2">{waitingForName} is typing...</h2>
+                    <div className="flex justify-center gap-1 mb-6">
+                      <span className="w-2 h-2 bg-yellow-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                      <span className="w-2 h-2 bg-yellow-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
+                      <span className="w-2 h-2 bg-yellow-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="text-5xl mb-4 animate-pulse">⏳</div>
+                    <h2 className="tv-title text-xl mb-2">Waiting for {waitingForName}</h2>
+                    <p className="text-gray-400 mb-6">They&apos;re writing their opening statement...</p>
+                  </>
+                )}
+
+                <div className="tv-card p-4">
+                  <div className="text-gray-400 text-sm">
+                    You are: <span className={`font-bold ${myRole === 'A' ? 'text-blue-400' : 'text-red-400'}`}>{myRole === 'A' ? caseData.partyA : caseData.partyB}</span>
+                  </div>
+                </div>
               </div>
-            </div>
+              <ChannelBug text="COURT TV" />
+            </TVFrame>
           </div>
         </div>
       );
     }
 
     return (
-      <div className="min-h-screen bg-slate-900 p-4">
+      <div className="min-h-screen p-4">
         <div className="max-w-lg mx-auto">
-          <ProgressIndicator currentPhase="statements" />
-          <div className="bg-slate-800 rounded-lg p-4 mb-6">
-            <div className="text-amber-500 text-sm font-medium">OPENING STATEMENTS</div>
-            <div className="text-white font-bold text-lg">{caseData.title}</div>
-            {isMultiplayer && <div className="text-slate-500 text-xs mt-1">Room: {roomCode}</div>}
-          </div>
+          <TVFrame>
+            <ProgressIndicator currentPhase="statements" />
+            <div className="lower-third mb-6 pl-6">
+              <div className="text-xs font-bold text-yellow-900 tracking-widest">OPENING STATEMENTS</div>
+              <div className="text-black font-bold text-lg">{caseData.title}</div>
+              {isMultiplayer && <div className="text-xs text-yellow-900 mt-1">Room: {roomCode}</div>}
+            </div>
 
-          <StakesBadge stakes={caseData.stakes} />
+            <StakesBadge stakes={caseData.stakes} />
 
-          <div className="mb-6">
-            <div className="flex gap-2">
-              <div className={`flex-1 p-4 rounded-lg text-center transition-all ${isPartyA ? 'bg-blue-500/20 border-2 border-blue-500 scale-105' : caseData.statementA ? 'bg-green-500/10 border border-green-500/30' : 'bg-slate-800/50 border border-slate-700 opacity-50'}`}>
-                <div className={`text-xs mb-1 ${isPartyA ? 'text-blue-400' : caseData.statementA ? 'text-green-400' : 'text-slate-500'}`}>
-                  {isPartyA ? '✍️ WRITING' : caseData.statementA ? '✓ DONE' : 'WAITING'}
-                </div>
-                <div className={`font-bold text-lg ${isPartyA ? 'text-blue-400' : caseData.statementA ? 'text-green-400' : 'text-slate-500'}`}>{caseData.partyA}</div>
+            <div className="mb-6">
+              <div className="flex gap-2">
+                <PartyNamePlate
+                  name={caseData.partyA}
+                  party="A"
+                  status={isPartyA ? 'active' : caseData.statementA ? 'done' : 'waiting'}
+                />
+                <div className="flex items-center text-yellow-500 font-black text-xl">VS</div>
+                <PartyNamePlate
+                  name={caseData.partyB}
+                  party="B"
+                  status={!isPartyA ? 'active' : caseData.statementB ? 'done' : 'waiting'}
+                />
               </div>
-              <div className="flex items-center text-slate-600 font-bold">vs</div>
-              <div className={`flex-1 p-4 rounded-lg text-center transition-all ${!isPartyA ? 'bg-red-500/20 border-2 border-red-500 scale-105' : caseData.statementB ? 'bg-green-500/10 border border-green-500/30' : 'bg-slate-800/50 border border-slate-700 opacity-50'}`}>
-                <div className={`text-xs mb-1 ${!isPartyA ? 'text-red-400' : caseData.statementB ? 'text-green-400' : 'text-slate-500'}`}>
-                  {!isPartyA ? '✍️ WRITING' : caseData.statementB ? '✓ DONE' : 'WAITING'}
-                </div>
-                <div className={`font-bold text-lg ${!isPartyA ? 'text-red-400' : caseData.statementB ? 'text-green-400' : 'text-slate-500'}`}>{caseData.partyB}</div>
+            </div>
+
+            {/* Guidance box */}
+            <div className="tv-card p-4 mb-4">
+              <div className="text-yellow-500 text-sm font-bold mb-2">💡 WHAT TO WRITE:</div>
+              <ul className="text-gray-400 text-sm space-y-1">
+                <li>• <span className="text-gray-300">What happened?</span> Describe the situation from your perspective</li>
+                <li>• <span className="text-gray-300">Why are you right?</span> Explain why you deserve to win</li>
+                <li>• <span className="text-gray-300">Be specific!</span> Include details, dates, or evidence</li>
+              </ul>
+            </div>
+
+            <div className={`tv-card p-4 mb-4 border-2 ${isPartyA ? 'border-blue-600' : 'border-red-600'}`}>
+              <div className="flex items-center gap-2 mb-2">
+                <span className={`font-bold text-lg ${isPartyA ? 'text-blue-400' : 'text-red-400'}`}>{currentName}</span>
+                <span className="text-gray-400 text-sm">— your opening statement</span>
+              </div>
+              <div className="text-gray-500 text-xs mb-3">The judge will read this and question you about it</div>
+              <textarea
+                placeholder={`Example: "On Tuesday, ${isPartyA ? caseData.partyB || 'they' : caseData.partyA || 'they'} did [X] and I believe I'm right because [Y]. I have [evidence/witnesses] that prove..."`}
+                value={currentStatement}
+                onChange={(e) => handleStatementChange(e.target.value)}
+                rows={6}
+                className={`w-full tv-input text-white placeholder-gray-600 resize-none ${isPartyA ? 'border-blue-600' : 'border-red-600'}`}
+                style={{ color: 'white' }}
+              />
+              <div className="flex justify-between mt-2 text-xs text-gray-500">
+                <span>{currentStatement.length} characters</span>
+                <span className="text-yellow-500">{currentStatement.length < 50 ? '📝 Add more detail for a stronger case' : currentStatement.length > 500 ? '✂️ Consider being more concise' : '✓ Good length'}</span>
               </div>
             </div>
-          </div>
 
-          {/* Guidance box */}
-          <div className="bg-slate-800/50 rounded-lg p-4 mb-4">
-            <div className="text-amber-400 text-sm font-medium mb-2">💡 What to write:</div>
-            <ul className="text-slate-400 text-sm space-y-1">
-              <li>• <span className="text-slate-300">What happened?</span> Describe the situation from your perspective</li>
-              <li>• <span className="text-slate-300">Why are you right?</span> Explain why you deserve to win</li>
-              <li>• <span className="text-slate-300">Be specific!</span> Include details, dates, or evidence</li>
-            </ul>
-          </div>
-
-          <div className={`rounded-lg border-2 p-4 mb-4 ${isPartyA ? 'border-blue-500/50 bg-blue-500/5' : 'border-red-500/50 bg-red-500/5'}`}>
-            <div className="flex items-center gap-2 mb-2">
-              <span className={`font-bold text-lg ${isPartyA ? 'text-blue-400' : 'text-red-400'}`}>{currentName}</span>
-              <span className="text-slate-400 text-sm">— your opening statement</span>
-            </div>
-            <div className="text-slate-500 text-xs mb-3">The judge will read this and question you about it</div>
-            <textarea
-              placeholder={`Example: "On Tuesday, ${isPartyA ? caseData.partyB || 'they' : caseData.partyA || 'they'} did [X] and I believe I'm right because [Y]. I have [evidence/witnesses] that prove..."`}
-              value={currentStatement}
-              onChange={(e) => handleStatementChange(e.target.value)}
-              rows={6}
-              className={`w-full bg-slate-800 border rounded-lg px-4 py-3 text-white placeholder-slate-500 resize-none ${isPartyA ? 'border-blue-500/30 focus:border-blue-500' : 'border-red-500/30 focus:border-red-500'}`}
-            />
-            <div className="flex justify-between mt-2 text-xs text-slate-500">
-              <span>{currentStatement.length} characters</span>
-              <span>{currentStatement.length < 50 ? '📝 Add more detail for a stronger case' : currentStatement.length > 500 ? '✂️ Consider being more concise' : '✓ Good length'}</span>
-            </div>
-          </div>
-
-          <button onClick={handleStatementSubmit} disabled={!currentStatement} className="w-full bg-amber-500 hover:bg-amber-400 disabled:bg-slate-700 disabled:text-slate-500 text-black font-bold py-4 rounded-lg">
-            {isPartyA ? `Submit ${caseData.partyA}'s Statement → ${caseData.partyB}'s Turn` : `Submit ${caseData.partyB}'s Statement → Cross-Examination`}
-          </button>
+            <button onClick={handleStatementSubmit} disabled={!currentStatement} className="w-full tv-button text-lg py-4">
+              {isPartyA ? `SUBMIT ${caseData.partyA.toUpperCase()}'S STATEMENT →` : `SUBMIT → CROSS-EXAMINATION`}
+            </button>
+            <ChannelBug text="COURT TV" />
+          </TVFrame>
         </div>
       </div>
     );
@@ -1537,139 +1563,153 @@ const handleResponseSubmit = async () => {
 
 if (isMultiplayer && !isMyTurn && !isLoading) {
       return (
-        <div className="min-h-screen bg-slate-900 p-4">
+        <div className="min-h-screen p-4">
           <div className="max-w-lg mx-auto">
-            <ProgressIndicator currentPhase="crossExam" />
-            <div className="bg-slate-800 rounded-lg p-4 mb-4">
-              <div className="text-amber-500 text-sm font-medium">{isClarifying ? '🔄 FOLLOW-UP' : `⚖️ ROUND ${examRound + 1} OF 3`}</div>
-              <div className="text-white font-bold text-lg">{caseData.title}</div>
-              <div className="text-slate-500 text-xs mt-1">Room: {roomCode}</div>
-            </div>
-
-            <CredibilityBar partyA={caseData.partyA} partyB={caseData.partyB} credibilityA={credibilityA} credibilityB={credibilityB} history={credibilityHistory} />
-
-            <Transcript caseData={caseData} responses={responses} objections={objections} isOpen={transcriptOpen} onToggle={() => setTranscriptOpen(!transcriptOpen)} />
-
-            {currentQuestion && (
-              <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-4 text-left mb-4 mt-4">
-                <div className="text-amber-500 text-sm font-medium mb-1">Judge's Question:</div>
-                <div className="text-white">{currentQuestion}</div>
-              </div>
-            )}
-
-            {/* Typing indicator below the question */}
-            <div className="bg-slate-800/50 rounded-lg p-4 mb-4">
-              {isOtherTyping ? (
-                <div className="flex items-center justify-center gap-2">
-                  <span className="text-lg">✍️</span>
-                  <span className="text-white font-medium">{targetName} is typing</span>
-                  <div className="flex gap-1">
-                    <span className="w-1.5 h-1.5 bg-amber-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
-                    <span className="w-1.5 h-1.5 bg-amber-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
-                    <span className="w-1.5 h-1.5 bg-amber-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
-                  </div>
+            <TVFrame>
+              <ProgressIndicator currentPhase="crossExam" />
+              <div className="flex items-center justify-between mb-4">
+                <div className="lower-third pl-6 flex-1">
+                  <div className="text-xs font-bold text-yellow-900 tracking-widest">{isClarifying ? '🔄 FOLLOW-UP' : 'CROSS-EXAMINATION'}</div>
+                  <div className="text-black font-bold">{caseData.title}</div>
                 </div>
-              ) : (
-                <div className="flex items-center justify-center gap-2">
-                  <span className="text-lg">⏳</span>
-                  <span className="text-slate-400">Waiting for {targetName} to answer...</span>
+                <RoundIndicator round={examRound + 1} totalRounds={3} />
+              </div>
+
+              <CredibilityBar partyA={caseData.partyA} partyB={caseData.partyB} credibilityA={credibilityA} credibilityB={credibilityB} history={credibilityHistory} />
+
+              <Transcript caseData={caseData} responses={responses} objections={objections} isOpen={transcriptOpen} onToggle={() => setTranscriptOpen(!transcriptOpen)} />
+
+              {currentQuestion && (
+                <div className="tv-card p-4 mb-4 mt-4 border-2 border-yellow-600">
+                  <div className="text-yellow-500 text-sm font-bold mb-1">JUDGE&apos;S QUESTION:</div>
+                  <div className="text-white">{currentQuestion}</div>
                 </div>
               )}
-            </div>
 
-            <div className="bg-slate-800/50 rounded-lg p-4">
-              <div className="text-slate-400 text-sm text-center">
-                You are: <span className={myRole === 'A' ? 'text-blue-400' : 'text-red-400'}>{myRole === 'A' ? caseData.partyA : caseData.partyB}</span>
-                <span className="text-slate-500"> (watching)</span>
+              {/* Typing indicator below the question */}
+              <div className="tv-card p-4 mb-4">
+                {isOtherTyping ? (
+                  <div className="flex items-center justify-center gap-2">
+                    <span className="text-lg">✍️</span>
+                    <span className="text-yellow-500 font-bold">{targetName} is typing</span>
+                    <div className="flex gap-1">
+                      <span className="w-1.5 h-1.5 bg-yellow-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                      <span className="w-1.5 h-1.5 bg-yellow-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
+                      <span className="w-1.5 h-1.5 bg-yellow-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-center gap-2">
+                    <span className="text-lg">⏳</span>
+                    <span className="text-gray-400">Waiting for {targetName} to answer...</span>
+                  </div>
+                )}
               </div>
-            </div>
+
+              <div className="tv-card p-4">
+                <div className="text-gray-400 text-sm text-center">
+                  You are: <span className={`font-bold ${myRole === 'A' ? 'text-blue-400' : 'text-red-400'}`}>{myRole === 'A' ? caseData.partyA : caseData.partyB}</span>
+                  <span className="text-gray-500"> (watching)</span>
+                </div>
+              </div>
+              <ChannelBug text="COURT TV" />
+            </TVFrame>
           </div>
         </div>
       );
     }
 
     return (
-      <div className="min-h-screen bg-slate-900 p-4">
+      <div className="min-h-screen p-4">
         <div className="max-w-lg mx-auto">
-          <ProgressIndicator currentPhase="crossExam" />
-          <div className="bg-slate-800 rounded-lg p-4 mb-4">
-            <div className="text-amber-500 text-sm font-medium">{isClarifying ? '🔄 FOLLOW-UP' : `⚖️ ROUND ${examRound + 1} OF 3`}</div>
-            <div className="text-white font-bold text-lg">{caseData.title}</div>
-            {isMultiplayer && <div className="text-slate-500 text-xs mt-1">Room: {roomCode}</div>}
-          </div>
-
-          <div className="mb-6">
-            <div className="flex gap-2">
-              <div className={`flex-1 p-4 rounded-lg text-center transition-all ${examTarget === 'A' ? 'bg-blue-500/20 border-2 border-blue-500 scale-105' : 'bg-slate-800/50 border border-slate-700 opacity-50'}`}>
-                <div className={`text-xs mb-1 ${examTarget === 'A' ? 'text-blue-400' : 'text-slate-500'}`}>{examTarget === 'A' ? '🎤 ON THE STAND' : 'WAITING'}</div>
-                <div className={`font-bold text-lg ${examTarget === 'A' ? 'text-blue-400' : 'text-slate-500'}`}>{caseData.partyA}</div>
+          <TVFrame>
+            <ProgressIndicator currentPhase="crossExam" />
+            <div className="flex items-center justify-between mb-4">
+              <div className="lower-third pl-6 flex-1">
+                <div className="text-xs font-bold text-yellow-900 tracking-widest">{isClarifying ? '🔄 FOLLOW-UP' : 'CROSS-EXAMINATION'}</div>
+                <div className="text-black font-bold">{caseData.title}</div>
+                {isMultiplayer && <div className="text-xs text-yellow-900">Room: {roomCode}</div>}
               </div>
-              <div className="flex items-center text-slate-600 font-bold">vs</div>
-              <div className={`flex-1 p-4 rounded-lg text-center transition-all ${examTarget === 'B' ? 'bg-red-500/20 border-2 border-red-500 scale-105' : 'bg-slate-800/50 border border-slate-700 opacity-50'}`}>
-                <div className={`text-xs mb-1 ${examTarget === 'B' ? 'text-red-400' : 'text-slate-500'}`}>{examTarget === 'B' ? '🎤 ON THE STAND' : 'WAITING'}</div>
-                <div className={`font-bold text-lg ${examTarget === 'B' ? 'text-red-400' : 'text-slate-500'}`}>{caseData.partyB}</div>
-              </div>
+              <RoundIndicator round={examRound + 1} totalRounds={3} />
             </div>
-          </div>
 
-          <StakesBadge stakes={caseData.stakes} />
-          <CredibilityBar partyA={caseData.partyA} partyB={caseData.partyB} credibilityA={credibilityA} credibilityB={credibilityB} history={credibilityHistory} />
-
-          {isLoading ? (
-            <LoadingOverlay emoji={loadingEmoji} message={loadingMessage} />
-          ) : currentQuestion ? (
-            <div className="space-y-4 mt-4">
-              {/* Transcript above question */}
-               <Transcript caseData={caseData} responses={responses} objections={objections} isOpen={transcriptOpen} onToggle={() => setTranscriptOpen(!transcriptOpen)} />
-              
-              <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-4">
-                <div className="text-amber-500 text-sm font-medium mb-1">
-                  {JUDGE_PERSONALITIES[caseData.judge as keyof typeof JUDGE_PERSONALITIES]?.name || 'Judge'}:
-                </div>
-                <div className="text-white">{currentQuestion}</div>
-              </div>
-
-              {canObjectToQuestion && !objectionsUsed[examTarget as 'A' | 'B'] && (
-                <button
-                  onClick={() => {
-                    console.log('[Objection] Button clicked');
-                    setObjectionWindow({ type: 'question', content: currentQuestion });
-                    setShowObjectionModal(true);
-                  }}
-                  className="w-full bg-red-500/10 border border-red-500/30 text-red-400 py-2 rounded-lg text-sm hover:bg-red-500/20"
-                >
-                  ⚠️ {targetName}: Object to this question
-                </button>
-              )}
-
-              <div className={`rounded-lg border-2 p-4 ${examTarget === 'A' ? 'border-blue-500/50 bg-blue-500/5' : 'border-red-500/50 bg-red-500/5'}`}>
-                <div className="flex items-center gap-2 mb-3">
-                  <span className={`font-bold ${examTarget === 'A' ? 'text-blue-400' : 'text-red-400'}`}>{targetName}</span>
-                  <span className="text-slate-400 text-sm">— your response</span>
-                </div>
-                <textarea
-                  placeholder="Type your answer..."
-                  value={currentResponse}
-                  onChange={(e) => {
-                    setCurrentResponse(e.target.value);
-                    broadcastTyping();
-                  }}
-                  rows={4}
-                  className="w-full bg-slate-800 border border-slate-600 rounded-lg px-4 py-3 text-white resize-none"
+            <div className="mb-6">
+              <div className="flex gap-2">
+                <PartyNamePlate
+                  name={caseData.partyA}
+                  party="A"
+                  status={examTarget === 'A' ? 'active' : 'waiting'}
+                />
+                <div className="flex items-center text-yellow-500 font-black text-xl">VS</div>
+                <PartyNamePlate
+                  name={caseData.partyB}
+                  party="B"
+                  status={examTarget === 'B' ? 'active' : 'waiting'}
                 />
               </div>
-
-              <button
-                onClick={handleResponseSubmit}
-                disabled={!currentResponse}
-                className="w-full bg-amber-500 hover:bg-amber-400 disabled:bg-slate-700 disabled:text-slate-500 text-black font-bold py-4 rounded-lg"
-              >
-                Submit Response
-              </button>
             </div>
-          ) : (
-            <LoadingOverlay emoji="📝" message="Preparing question..." />
-          )}
+
+            <StakesBadge stakes={caseData.stakes} />
+            <CredibilityBar partyA={caseData.partyA} partyB={caseData.partyB} credibilityA={credibilityA} credibilityB={credibilityB} history={credibilityHistory} />
+
+            {isLoading ? (
+              <LoadingOverlay emoji={loadingEmoji} message={loadingMessage} />
+            ) : currentQuestion ? (
+              <div className="space-y-4 mt-4">
+                {/* Transcript above question */}
+                <Transcript caseData={caseData} responses={responses} objections={objections} isOpen={transcriptOpen} onToggle={() => setTranscriptOpen(!transcriptOpen)} />
+
+                <div className="tv-card p-4 border-2 border-yellow-600">
+                  <div className="text-yellow-500 text-sm font-bold mb-1 uppercase">
+                    {JUDGE_PERSONALITIES[caseData.judge as keyof typeof JUDGE_PERSONALITIES]?.name || 'Judge'}:
+                  </div>
+                  <div className="text-white">{currentQuestion}</div>
+                </div>
+
+                {canObjectToQuestion && !objectionsUsed[examTarget as 'A' | 'B'] && (
+                  <button
+                    onClick={() => {
+                      console.log('[Objection] Button clicked');
+                      setObjectionWindow({ type: 'question', content: currentQuestion });
+                      setShowObjectionModal(true);
+                    }}
+                    className="w-full tv-button tv-button-red py-2 text-sm"
+                  >
+                    ⚠️ {targetName}: OBJECT TO THIS QUESTION
+                  </button>
+                )}
+
+                <div className={`tv-card p-4 border-2 ${examTarget === 'A' ? 'border-blue-600' : 'border-red-600'}`}>
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className={`font-bold ${examTarget === 'A' ? 'text-blue-400' : 'text-red-400'}`}>{targetName}</span>
+                    <span className="text-gray-400 text-sm">— your response</span>
+                  </div>
+                  <textarea
+                    placeholder="Type your answer..."
+                    value={currentResponse}
+                    onChange={(e) => {
+                      setCurrentResponse(e.target.value);
+                      broadcastTyping();
+                    }}
+                    rows={4}
+                    className="w-full tv-input text-white resize-none"
+                    style={{ color: 'white' }}
+                  />
+                </div>
+
+                <button
+                  onClick={handleResponseSubmit}
+                  disabled={!currentResponse}
+                  className="w-full tv-button text-lg py-4"
+                >
+                  SUBMIT RESPONSE
+                </button>
+              </div>
+            ) : (
+              <LoadingOverlay emoji="📝" message="Preparing question..." />
+            )}
+            <ChannelBug text="COURT TV" />
+          </TVFrame>
         </div>
       </div>
     );
@@ -1679,78 +1719,84 @@ if (isMultiplayer && !isMyTurn && !isLoading) {
   if (phase === 'verdict') {
     if (isLoading || !verdict) {
       return (
-        <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center p-4">
-          <div className="w-full max-w-lg">
-            <ProgressIndicator currentPhase="verdict" />
-          </div>
-          <div className="text-center mt-8">
-            <div className="flex justify-center gap-2 mb-4">
-              {['📚', '⚖️', '🤝', '📜', '🔨'].map((e, i) => (
-                <span key={i} className="text-3xl animate-pulse" style={{ animationDelay: `${i * 0.2}s` }}>{e}</span>
-              ))}
-            </div>
-            <div className="text-white text-xl mb-2">The judge is deliberating...</div>
-            <div className="text-slate-400">{loadingMessage}</div>
+        <div className="min-h-screen flex flex-col items-center justify-center p-4">
+          <div className="max-w-lg w-full">
+            <TVFrame>
+              <ProgressIndicator currentPhase="verdict" />
+              <div className="text-center mt-8">
+                <div className="flex justify-center gap-2 mb-4">
+                  {['📚', '⚖️', '🤝', '📜', '🔨'].map((e, i) => (
+                    <span key={i} className="text-4xl animate-pulse" style={{ animationDelay: `${i * 0.2}s` }}>{e}</span>
+                  ))}
+                </div>
+                <div className="tv-title text-xl mb-2">The judge is deliberating...</div>
+                <div className="text-gray-400">{loadingMessage}</div>
+              </div>
+              <ChannelBug text="COURT TV" />
+            </TVFrame>
           </div>
         </div>
       );
     }
 
     return (
-      <div className="min-h-screen bg-slate-900 p-4">
+      <div className="min-h-screen p-4">
         <div className="max-w-lg mx-auto">
-          <ProgressIndicator currentPhase="verdict" />
-          <div className="text-center mb-6">
-            <div className="text-5xl mb-4">⚖️</div>
-            <h2 className="text-2xl font-bold text-white mb-2">THE VERDICT</h2>
-            <p className="text-slate-400">{caseData.title}</p>
-          </div>
-
-          <div className="bg-gradient-to-b from-amber-500/20 to-transparent border border-amber-500/30 rounded-lg p-6 mb-6 text-center">
-            <div className="text-amber-500 text-sm mb-2">WINNER</div>
-            <div className="text-4xl font-bold text-white mb-2">{verdict.winnerName} 🏆</div>
-            <div className="text-slate-300 italic">"{verdict.summary}"</div>
-          </div>
-
-          <div className="bg-slate-800 rounded-lg p-4 mb-6">
-            <div className="text-slate-400 text-sm mb-2">JUDGE'S REASONING</div>
-            <div className="text-white">{verdict.reasoning}</div>
-          </div>
-
-          {verdict.quotes?.length > 0 && (
-            <div className="bg-slate-800/50 rounded-lg p-4 mb-6">
-              <div className="text-slate-400 text-sm mb-2">KEY QUOTES</div>
-              {verdict.quotes.map((q: string, i: number) => (
-                <div key={i} className="text-slate-300 italic mb-2">"{q}"</div>
-              ))}
+          <TVFrame>
+            <ProgressIndicator currentPhase="verdict" />
+            <div className="text-center mb-6">
+              <div className="text-6xl mb-4">⚖️</div>
+              <h2 className="tv-title text-3xl mb-2">THE VERDICT</h2>
+              <p className="text-gray-400">{caseData.title}</p>
             </div>
-          )}
 
-          <CredibilityBar partyA={caseData.partyA} partyB={caseData.partyB} credibilityA={credibilityA} credibilityB={credibilityB} history={credibilityHistory} />
-
-          <StakesBadge stakes={caseData.stakes} />
-
-          {verdictAccepted === null ? (
-            <div className="space-y-3">
-              <button onClick={() => setVerdictAccepted(true)} className="w-full bg-green-500 hover:bg-green-400 text-white font-bold py-4 rounded-lg">
-                ✅ Accept Verdict
-              </button>
-              <button onClick={() => setVerdictAccepted(false)} className="w-full bg-red-500/20 border border-red-500 text-red-400 font-bold py-4 rounded-lg">
-                ❌ Reject (No Appeal Available)
-              </button>
+            <div className="tv-gradient-gold p-6 mb-6 text-center winner-glow">
+              <div className="text-yellow-900 text-xs font-bold tracking-widest mb-2">WINNER</div>
+              <div className="text-4xl font-black text-black mb-2">{verdict.winnerName} 🏆</div>
+              <div className="text-yellow-900 italic">&quot;{verdict.summary}&quot;</div>
             </div>
-          ) : (
-            <div className="text-center">
-              <div className={`text-xl mb-4 ${verdictAccepted ? 'text-green-400' : 'text-red-400'}`}>
-                {verdictAccepted ? '✅ Verdict Accepted' : '❌ Verdict Rejected'}
+
+            <div className="tv-card p-4 mb-6">
+              <div className="text-yellow-500 text-xs font-bold tracking-widest mb-2">JUDGE&apos;S REASONING</div>
+              <div className="text-white">{verdict.reasoning}</div>
+            </div>
+
+            {verdict.quotes?.length > 0 && (
+              <div className="tv-card p-4 mb-6">
+                <div className="text-yellow-500 text-xs font-bold tracking-widest mb-2">KEY QUOTES</div>
+                {verdict.quotes.map((q: string, i: number) => (
+                  <div key={i} className="text-gray-300 italic mb-2 pl-3 border-l-2 border-yellow-600">&quot;{q}&quot;</div>
+                ))}
               </div>
-              <button onClick={resetCase} className="bg-slate-700 hover:bg-slate-600 text-white px-8 py-3 rounded-lg">
-                Start New Case
-              </button>
-            </div>
-          )}
+            )}
 
-          <Transcript caseData={caseData} responses={responses} objections={objections} isOpen={transcriptOpen} onToggle={() => setTranscriptOpen(!transcriptOpen)} />
+            <CredibilityBar partyA={caseData.partyA} partyB={caseData.partyB} credibilityA={credibilityA} credibilityB={credibilityB} history={credibilityHistory} />
+
+            <StakesBadge stakes={caseData.stakes} />
+
+            {verdictAccepted === null ? (
+              <div className="space-y-3">
+                <button onClick={() => setVerdictAccepted(true)} className="w-full tv-button py-4 bg-green-700 border-green-500 text-white">
+                  ✅ ACCEPT VERDICT
+                </button>
+                <button onClick={() => setVerdictAccepted(false)} className="w-full tv-button tv-button-red py-4">
+                  ❌ REJECT (NO APPEAL)
+                </button>
+              </div>
+            ) : (
+              <div className="text-center">
+                <div className={`text-xl mb-4 font-bold ${verdictAccepted ? 'text-green-400' : 'text-red-400'}`}>
+                  {verdictAccepted ? '✅ VERDICT ACCEPTED' : '❌ VERDICT REJECTED'}
+                </div>
+                <button onClick={resetCase} className="tv-button">
+                  START NEW CASE
+                </button>
+              </div>
+            )}
+
+            <Transcript caseData={caseData} responses={responses} objections={objections} isOpen={transcriptOpen} onToggle={() => setTranscriptOpen(!transcriptOpen)} />
+            <ChannelBug text="COURT TV" />
+          </TVFrame>
         </div>
       </div>
     );
@@ -1788,8 +1834,13 @@ if (isMultiplayer && !isMyTurn && !isLoading) {
         />
       )}
 
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
-        <div className="text-white">Loading...</div>
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <TVFrame>
+          <div className="text-center">
+            <div className="text-4xl mb-4 animate-pulse">⚖️</div>
+            <div className="tv-title text-xl">Loading...</div>
+          </div>
+        </TVFrame>
       </div>
     </>
   );
