@@ -1551,18 +1551,21 @@ Settle YOUR disputes at judgejoody.ai`;
                           <button
                             key={pastCase.id}
                             onClick={() => setSelectedPastCase(pastCase)}
-                            className="w-full tv-card p-3 text-left hover:border-yellow-500 transition-all"
+                            className="w-full tv-card p-3 text-left hover:border-yellow-500 hover:bg-yellow-500/10 transition-all cursor-pointer group"
                           >
                             <div className="flex items-center justify-between">
                               <div className="flex-1 min-w-0">
-                                <div className="text-white font-bold text-xs sm:text-sm truncate">{pastCase.title}</div>
+                                <div className="text-white font-bold text-xs sm:text-sm truncate group-hover:text-yellow-300">{pastCase.title}</div>
                                 <div className="text-gray-400 text-[10px] sm:text-xs">
                                   {pastCase.party_a_name} vs {pastCase.party_b_name}
                                 </div>
                               </div>
-                              <div className="flex-shrink-0 ml-2">
+                              <div className="flex-shrink-0 ml-2 flex items-center gap-2">
                                 <div className="text-yellow-500 text-[10px] sm:text-xs font-bold">
                                   🏆 {pastCase.verdict?.winnerName}
+                                </div>
+                                <div className="text-gray-500 group-hover:text-yellow-500 text-[10px] transition-colors">
+                                  →
                                 </div>
                               </div>
                             </div>
