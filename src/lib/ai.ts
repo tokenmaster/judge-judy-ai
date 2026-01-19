@@ -54,8 +54,14 @@ export async function generateMainQuestion(
   const targetStatement = examTarget === 'A' ? caseData.statementA : caseData.statementB;
   const otherStatement = examTarget === 'A' ? caseData.statementB : caseData.statementA;
   
-  const previousResponses = responses
+  const targetResponses = responses
     .filter((r: any) => r.party === examTarget)
+    .map((r: any) => `Q: ${r.question}\nA: ${r.answer}`)
+    .join('\n\n');
+
+  const otherParty = examTarget === 'A' ? 'B' : 'A';
+  const opponentResponses = responses
+    .filter((r: any) => r.party === otherParty)
     .map((r: any) => `Q: ${r.question}\nA: ${r.answer}`)
     .join('\n\n');
 
@@ -66,15 +72,19 @@ You are judging a dispute: "${caseData.title}"
 ${targetName}'s opening statement: "${targetStatement}"
 ${otherName}'s opening statement: "${otherStatement}"
 
-${previousResponses ? `Previous testimony from ${targetName}:\n${previousResponses}\n` : ''}
+${opponentResponses ? `${otherName}'s testimony so far:\n${opponentResponses}\n` : ''}
+${targetResponses ? `${targetName}'s previous testimony:\n${targetResponses}\n` : ''}
 
 This is Round ${examRound + 1} of cross-examination. You're questioning ${targetName}.
 
 Generate ONE pointed question that:
-- Probes inconsistencies or gaps in their story
-- References specific claims they or the other party made
+- DIRECTLY CONFRONTS ${targetName} with what ${otherName} claimed or said
+- References specific contradictions between the two parties
+- Demands they respond to the opponent's version of events
 - Stays in character with your judicial style
 - Is direct and requires a real answer
+
+IMPORTANT: Your question MUST reference something specific that ${otherName} said (either in their opening statement or testimony) and ask ${targetName} to respond to it.
 
 Just output the question, nothing else.`;
 
