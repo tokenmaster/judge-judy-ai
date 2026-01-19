@@ -123,3 +123,35 @@ export const incrementVerdictsRejected = async (): Promise<void> => {
     console.error('Error incrementing verdicts rejected:', error);
   }
 };
+
+// Fetch completed cases with verdicts
+export const getCompletedCases = async (limit: number = 20): Promise<Case[]> => {
+  const { data, error } = await supabase
+    .from('cases')
+    .select('*')
+    .eq('phase', 'verdict')
+    .not('verdict', 'is', null)
+    .order('created_at', { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    console.error('Error fetching completed cases:', error);
+    return [];
+  }
+  return data || [];
+};
+
+// Fetch a single case by room code
+export const getCaseByRoomCode = async (roomCode: string): Promise<Case | null> => {
+  const { data, error } = await supabase
+    .from('cases')
+    .select('*')
+    .eq('room_code', roomCode)
+    .single();
+
+  if (error) {
+    console.error('Error fetching case:', error);
+    return null;
+  }
+  return data;
+};
