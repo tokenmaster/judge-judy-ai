@@ -503,7 +503,7 @@ export function RoundIndicator({ round, totalRounds }: { round: number; totalRou
   );
 }
 
-// Typewriter Text Component - Types out text word by word at 180 WPM
+// Typewriter Text Component - Types out text word by word rapidly
 export function TypewriterText({
   text,
   className = '',
@@ -517,8 +517,8 @@ export function TypewriterText({
   const [isComplete, setIsComplete] = React.useState(false);
   const words = React.useMemo(() => text.split(' '), [text]);
 
-  // 180 WPM = 3 words per second = ~333ms per word
-  const msPerWord = 333;
+  // Fast typing - 50ms per word
+  const msPerWord = 50;
 
   React.useEffect(() => {
     // Reset when text changes
