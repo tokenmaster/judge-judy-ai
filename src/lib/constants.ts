@@ -314,10 +314,7 @@ export const CATEGORIES = [
 // Suggested stakes
 export const SUGGESTED_STAKES = [
   "Loser buys dinner",
-  "Loser does dishes for a week", 
-  "Loser admits they were wrong publicly",
   "Loser owes a favor",
-  "Loser pays $20",
   "Bragging rights"
 ];
 
