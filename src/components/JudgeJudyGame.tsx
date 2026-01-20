@@ -2287,29 +2287,30 @@ if (isMultiplayer && !isMyTurn && !isLoading) {
               activeParty={examTarget as 'A' | 'B'}
             />
 
-            {isLoading ? (
-              <LoadingOverlay emoji={loadingEmoji} message={loadingMessage} />
-            ) : currentQuestion ? (
-              <div className="space-y-4 mt-4">
-                {/* Chat Thread - active responder mode */}
-                <ChatThread
-                  caseData={caseData}
-                  responses={responses}
-                  currentQuestion={currentQuestion}
-                  examTarget={examTarget as 'A' | 'B'}
-                  isOtherTyping={isOtherTyping}
-                  typingPlayerName={targetName}
-                  onObjectionClick={() => {
-                    console.log('[Objection] Button clicked');
-                    setObjectionWindow({ type: 'question', content: currentQuestion });
-                    setShowObjectionModal(true);
-                  }}
-                  canObject={canObjectToQuestion && !objectionsUsed[examTarget as 'A' | 'B']}
-                  myRole={myRole}
-                  isWaiting={false}
-                />
+            <div className="space-y-3 mt-4">
+              {/* Chat Thread - active responder mode with loading inside */}
+              <ChatThread
+                caseData={caseData}
+                responses={responses}
+                currentQuestion={currentQuestion}
+                examTarget={examTarget as 'A' | 'B'}
+                isOtherTyping={isOtherTyping}
+                typingPlayerName={targetName}
+                onObjectionClick={() => {
+                  console.log('[Objection] Button clicked');
+                  setObjectionWindow({ type: 'question', content: currentQuestion || '' });
+                  setShowObjectionModal(true);
+                }}
+                canObject={canObjectToQuestion && !objectionsUsed[examTarget as 'A' | 'B']}
+                myRole={myRole}
+                isWaiting={false}
+                isLoading={isLoading || !currentQuestion}
+                loadingMessage={loadingMessage || 'Preparing question...'}
+                loadingEmoji={loadingEmoji || '📝'}
+              />
 
-                {/* Chat Input */}
+              {/* Chat Input - only show when question is ready */}
+              {currentQuestion && !isLoading && (
                 <ChatInput
                   value={currentResponse}
                   onChange={(value) => {
@@ -2322,10 +2323,8 @@ if (isMultiplayer && !isMyTurn && !isLoading) {
                   partyName={targetName}
                   disabled={!currentQuestion}
                 />
-              </div>
-            ) : (
-              <LoadingOverlay emoji="📝" message="Preparing question..." />
-            )}
+              )}
+            </div>
             <ChannelBug text="COURT TV" />
           </TVFrame>
         </div>

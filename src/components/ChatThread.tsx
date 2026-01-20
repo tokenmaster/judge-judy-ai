@@ -36,6 +36,9 @@ interface ChatThreadProps {
   canObject?: boolean;
   myRole?: string | null;
   isWaiting?: boolean;
+  isLoading?: boolean;
+  loadingMessage?: string;
+  loadingEmoji?: string;
 }
 
 function getJudgeName(judgeKey: string): string {
@@ -137,7 +140,10 @@ export function ChatThread({
   onObjectionClick,
   canObject,
   myRole,
-  isWaiting
+  isWaiting,
+  isLoading,
+  loadingMessage,
+  loadingEmoji
 }: ChatThreadProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -174,8 +180,23 @@ export function ChatThread({
         />
       ))}
 
+      {/* Loading indicator - inside chat thread */}
+      {isLoading && (
+        <div className="chat-typing-indicator">
+          <div className="flex items-center gap-2 text-yellow-500">
+            <span className="text-lg">{loadingEmoji || '📝'}</span>
+            <span className="text-xs pixel-text-sm">{loadingMessage || 'Loading...'}</span>
+            <div className="chat-typing-dots ml-1">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Typing indicator */}
-      {isOtherTyping && (
+      {isOtherTyping && !isLoading && (
         <div className="chat-typing-indicator">
           <div className="flex items-center gap-2">
             <span className="text-yellow-500 text-xs">{typingPlayerName}</span>
@@ -189,7 +210,7 @@ export function ChatThread({
       )}
 
       {/* Waiting state for multiplayer when opponent needs to respond */}
-      {isWaiting && !isOtherTyping && currentQuestion && (
+      {isWaiting && !isOtherTyping && !isLoading && currentQuestion && (
         <div className="chat-typing-indicator">
           <div className="flex items-center gap-2 text-gray-400 text-xs">
             <span>&#8987;</span>

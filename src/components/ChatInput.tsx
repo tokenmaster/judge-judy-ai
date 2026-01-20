@@ -34,10 +34,10 @@ export function ChatInput({
   };
 
   return (
-    <div className={`tv-card p-3 sm:p-4 border-2 ${borderClass}`}>
-      <div className="flex items-center gap-2 mb-2 sm:mb-3">
-        <span className={`font-bold text-sm sm:text-base ${textClass}`}>{partyName}</span>
-        <span className="text-gray-400 text-xs sm:text-sm">— your response</span>
+    <div className={`tv-card p-2 sm:p-3 border-2 ${borderClass}`}>
+      <div className="flex items-center gap-2 mb-1 sm:mb-2">
+        <span className={`font-bold text-xs sm:text-sm ${textClass}`}>{partyName}</span>
+        <span className="text-gray-400 text-[10px] sm:text-xs">— respond</span>
       </div>
 
       <textarea
@@ -45,32 +45,23 @@ export function ChatInput({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         onKeyDown={handleKeyDown}
-        rows={3}
+        rows={2}
         disabled={disabled || isLoading}
-        className={`w-full tv-input text-white resize-none text-sm sm:text-base ${borderClass}`}
+        className={`w-full tv-input text-white resize-none text-xs sm:text-sm p-2 ${borderClass}`}
         style={{ color: 'white' }}
       />
 
-      <div className="flex justify-between items-center mt-2 sm:mt-3">
-        <div className="text-[10px] sm:text-xs text-gray-500">
+      <div className="flex justify-between items-center mt-1 sm:mt-2">
+        <div className="text-[8px] sm:text-[10px] text-gray-500">
           {value.length} chars
-          {value.length > 0 && value.length < 20 && (
-            <span className="text-yellow-500 ml-2">Add more detail</span>
-          )}
         </div>
 
         <button
           onClick={onSubmit}
           disabled={!value.trim() || disabled || isLoading}
-          className="tv-button py-2 px-4 sm:px-6 text-sm sm:text-base"
+          className="tv-button py-1 px-3 sm:px-4 text-xs sm:text-sm"
         >
-          {isLoading ? (
-            <span className="flex items-center gap-2">
-              <span className="animate-spin">&#8987;</span> SENDING...
-            </span>
-          ) : (
-            'SUBMIT'
-          )}
+          {isLoading ? 'SENDING...' : 'SUBMIT'}
         </button>
       </div>
     </div>

@@ -67,13 +67,13 @@ export function ChatMessage({
         </div>
       )}
 
-      {/* Inline objection button for active judge questions */}
+      {/* Inline objection button for active judge questions - small tag style */}
       {canObject && message.isActive && isJudge && onObjectionClick && (
         <button
           onClick={onObjectionClick}
-          className="mt-3 tv-button tv-button-red py-1 px-3 text-xs"
+          className="mt-2 px-2 py-0.5 text-[8px] sm:text-[10px] bg-red-800 hover:bg-red-700 border border-red-600 text-red-200 uppercase tracking-wider"
         >
-          &#9888; OBJECT
+          &#9888; Object
         </button>
       )}
     </div>
