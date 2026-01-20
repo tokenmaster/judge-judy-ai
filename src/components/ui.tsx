@@ -298,6 +298,208 @@ export function CredibilityBar({
   );
 }
 
+// Tilt Bar - Visual credibility indicator without numbers
+function getTiltLabel(credA: number, credB: number): string {
+  const diff = Math.abs(credA - credB);
+  if (diff <= 10) return 'Leaning Neutral';
+  if (diff <= 25) return 'Judge Skeptical';
+  return 'Shifting';
+}
+
+export function TiltBar({
+  partyA,
+  partyB,
+  credibilityA,
+  credibilityB,
+  activeParty
+}: {
+  partyA: string;
+  partyB: string;
+  credibilityA: number;
+  credibilityB: number;
+  activeParty?: 'A' | 'B' | null;
+}) {
+  const label = getTiltLabel(credibilityA, credibilityB);
+  const isAActive = activeParty === 'A';
+  const isBActive = activeParty === 'B';
+
+  // Calculate tilt: positive = toward A, negative = toward B
+  const diff = credibilityA - credibilityB;
+  // Map to 0-100 scale where 50 is center
+  const indicatorPosition = 50 + (diff / 4); // Divide by 4 to moderate the swing
+  const clampedPosition = Math.max(10, Math.min(90, indicatorPosition));
+
+  return (
+    <div className="mb-4 pixel-card p-3">
+      {/* Party names row */}
+      <div className="flex justify-between mb-2">
+        <div className={`flex items-center gap-2 ${isAActive ? 'text-[#4a7ab0]' : 'text-gray-500'}`}>
+          {isAActive && <span className="pixel-badge pixel-badge-live text-[6px]">ON AIR</span>}
+          <span className="pixel-text-sm truncate max-w-[100px]">{partyA}</span>
+        </div>
+        <div className={`flex items-center gap-2 ${isBActive ? 'text-[#b22222]' : 'text-gray-500'}`}>
+          <span className="pixel-text-sm truncate max-w-[100px]">{partyB}</span>
+          {isBActive && <span className="pixel-badge pixel-badge-live text-[6px]">ON AIR</span>}
+        </div>
+      </div>
+
+      {/* Tilt bar */}
+      <div className="relative h-6 bg-gradient-to-r from-[#1e3a5f] via-[#2a2a2a] to-[#4a1515] border-2 border-[#4a4a4a]">
+        {/* Center line */}
+        <div className="absolute left-1/2 top-0 bottom-0 w-0.5 bg-[#daa520] opacity-50"></div>
+
+        {/* Tilt indicator */}
+        <div
+          className="absolute top-0 bottom-0 w-3 bg-[#daa520] transition-all duration-500"
+          style={{ left: `calc(${clampedPosition}% - 6px)` }}
+        >
+          <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-[6px] border-r-[6px] border-b-[6px] border-transparent border-b-[#daa520]"></div>
+        </div>
+      </div>
+
+      {/* Status label */}
+      <div className="text-center mt-2">
+        <span className="pixel-text-sm text-[#daa520]">{label}</span>
+      </div>
+    </div>
+  );
+}
+
+// Collapsible Opening Statements
+export function CollapsibleOpeningStatements({
+  partyA,
+  partyB,
+  statementA,
+  statementB,
+  isExpanded,
+  onToggle
+}: {
+  partyA: string;
+  partyB: string;
+  statementA: string;
+  statementB: string;
+  isExpanded: boolean;
+  onToggle: () => void;
+}) {
+  return (
+    <div className="pixel-card p-2 mb-2">
+      <button
+        onClick={onToggle}
+        className="w-full text-left flex items-center justify-between"
+      >
+        <div className="flex items-center gap-2">
+          <span className="text-yellow-500">📜</span>
+          <span className="pixel-text-sm text-gray-400">OPENING STATEMENTS</span>
+        </div>
+        <span className="text-gray-500 text-xs">{isExpanded ? '▼' : '▶'}</span>
+      </button>
+
+      {isExpanded && (
+        <div className="mt-3 space-y-2 text-xs">
+          <div className="pl-3 border-l-2 border-blue-500">
+            <span className="text-blue-400 font-bold">{partyA}:</span>
+            <span className="text-gray-300 ml-1">&quot;{statementA}&quot;</span>
+          </div>
+          <div className="pl-3 border-l-2 border-red-500">
+            <span className="text-red-400 font-bold">{partyB}:</span>
+            <span className="text-gray-300 ml-1">&quot;{statementB}&quot;</span>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Collapsible Stakes
+export function CollapsibleStakes({
+  stakes,
+  isExpanded,
+  onToggle
+}: {
+  stakes: string;
+  isExpanded: boolean;
+  onToggle: () => void;
+}) {
+  if (!stakes) return null;
+
+  return (
+    <button
+      onClick={onToggle}
+      className="w-full pixel-card p-2 mb-2 text-left flex items-center gap-2"
+    >
+      <span>🏆</span>
+      <span className="pixel-text-sm text-[#daa520] flex-1 truncate">
+        {isExpanded ? stakes : 'Stakes'}
+      </span>
+      <span className="text-gray-500 text-xs">{isExpanded ? '▼' : '▶'}</span>
+    </button>
+  );
+}
+
+// Hold to Confirm Button for objections
+export function HoldToConfirmButton({
+  label,
+  holdDuration = 700,
+  onConfirm,
+  className = ''
+}: {
+  label: string;
+  holdDuration?: number;
+  onConfirm: () => void;
+  className?: string;
+}) {
+  const [isHolding, setIsHolding] = React.useState(false);
+  const [progress, setProgress] = React.useState(0);
+  const intervalRef = React.useRef<NodeJS.Timeout | null>(null);
+  const startTimeRef = React.useRef<number>(0);
+
+  const startHold = () => {
+    setIsHolding(true);
+    startTimeRef.current = Date.now();
+
+    intervalRef.current = setInterval(() => {
+      const elapsed = Date.now() - startTimeRef.current;
+      const newProgress = Math.min(100, (elapsed / holdDuration) * 100);
+      setProgress(newProgress);
+
+      if (elapsed >= holdDuration) {
+        if (intervalRef.current) clearInterval(intervalRef.current);
+        onConfirm();
+        setIsHolding(false);
+        setProgress(0);
+      }
+    }, 16);
+  };
+
+  const cancelHold = () => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
+    setIsHolding(false);
+    setProgress(0);
+  };
+
+  return (
+    <button
+      onMouseDown={startHold}
+      onMouseUp={cancelHold}
+      onMouseLeave={cancelHold}
+      onTouchStart={startHold}
+      onTouchEnd={cancelHold}
+      className={`relative overflow-hidden px-2 py-1 text-[8px] sm:text-[10px]
+        bg-red-900/50 hover:bg-red-800/50 border border-red-700 text-red-300
+        uppercase tracking-wider select-none ${className}`}
+    >
+      {/* Progress fill */}
+      <div
+        className="absolute inset-0 bg-red-600/50 transition-none"
+        style={{ width: `${progress}%` }}
+      />
+      <span className="relative z-10">{label}</span>
+    </button>
+  );
+}
+
 // Transcript Component - TV Teleprompter Style
 export function Transcript({
   caseData,
@@ -619,8 +821,8 @@ export function PartyNamePlate({
 
 // Round purposes for display
 const ROUND_NAMES: { [key: number]: { name: string; goal: string } } = {
-  1: { name: 'Clarification', goal: 'Defining claims & assumptions' },
-  2: { name: 'Justification', goal: 'Testing evidence & reasoning' },
+  1: { name: 'Fact Lock', goal: 'Defining claims & assumptions' },
+  2: { name: 'Rule Test', goal: 'Testing evidence & reasoning' },
   3: { name: 'Stress Test', goal: 'Exposing weaknesses & tradeoffs' }
 };
 

@@ -1086,6 +1086,60 @@ body {
   background: rgba(178, 34, 34, 0.2);
 }
 
+/* Question Card - Focal Element */
+.chat-question-wrapper {
+  align-self: flex-start;
+  max-width: 95%;
+}
+
+.chat-question-card {
+  background: linear-gradient(180deg, #3d2f10 0%, #2a2010 100%);
+  border: 4px solid var(--pixel-gold);
+  padding: 16px;
+  margin-top: 4px;
+  box-shadow:
+    4px 4px 0 var(--pixel-black),
+    0 0 20px rgba(218, 165, 32, 0.3);
+}
+
+.chat-question-card .chat-content {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--pixel-gold);
+}
+
+/* Judge Flavor - Collapsible Commentary */
+.chat-flavor {
+  color: #c9a86c;
+  font-size: 11px;
+  line-height: 1.4;
+  opacity: 0.85;
+  cursor: pointer;
+  margin-top: 8px;
+  padding: 8px;
+  background: rgba(0,0,0,0.2);
+  border-left: 2px solid var(--pixel-gold);
+}
+
+.chat-flavor-collapsed {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.chat-flavor-toggle {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  color: var(--pixel-gold);
+  margin-top: 4px;
+  opacity: 0.7;
+}
+
+.chat-flavor:hover .chat-flavor-toggle {
+  opacity: 1;
+}
+
 /* Typing Indicator */
 .chat-typing-indicator {
   align-self: flex-start;

@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useMemo } from 'react';
-import { TypewriterText } from './ui';
+import React, { useMemo, useState } from 'react';
+import { TypewriterText, HoldToConfirmButton } from './ui';
 
 export interface ChatMessageData {
   id: string;
@@ -21,12 +21,61 @@ interface ChatMessageProps {
   canObject?: boolean;
 }
 
+// Split judge message into flavor (commentary) and actual question
+function splitJudgeMessage(content: string): { flavor: string | null; question: string } {
+  // Find sentences - split on sentence endings
+  const sentences = content.split(/(?<=[.!?])\s+/);
+
+  if (sentences.length <= 1) {
+    return { flavor: null, question: content };
+  }
+
+  // Find question sentences (contain "?")
+  const questionSentences: string[] = [];
+  const flavorSentences: string[] = [];
+
+  let foundQuestion = false;
+
+  // Work backwards to find question sentences
+  for (let i = sentences.length - 1; i >= 0; i--) {
+    const sentence = sentences[i].trim();
+    if (sentence.includes('?')) {
+      questionSentences.unshift(sentence);
+      foundQuestion = true;
+    } else if (foundQuestion) {
+      // Stop once we hit a non-question sentence after finding questions
+      flavorSentences.push(...sentences.slice(0, i + 1));
+      break;
+    } else {
+      // Trailing non-question goes with question (like "Tell me!")
+      questionSentences.unshift(sentence);
+    }
+  }
+
+  // If all sentences have questions or only questions found
+  if (flavorSentences.length === 0 && questionSentences.length > 1) {
+    // Split: first half is flavor, rest is question
+    const splitPoint = Math.max(1, Math.floor(sentences.length / 2));
+    return {
+      flavor: sentences.slice(0, splitPoint).join(' '),
+      question: sentences.slice(splitPoint).join(' ')
+    };
+  }
+
+  return {
+    flavor: flavorSentences.length > 0 ? flavorSentences.join(' ') : null,
+    question: questionSentences.join(' ') || content
+  };
+}
+
 export function ChatMessage({
   message,
   showCredibilityChange,
   onObjectionClick,
   canObject
 }: ChatMessageProps) {
+  const [flavorExpanded, setFlavorExpanded] = useState(false);
+
   const bubbleClass = useMemo(() => {
     if (message.party === 'judge') return 'chat-bubble-judge';
     if (message.party === 'A') return 'chat-bubble-party-a';
@@ -34,7 +83,66 @@ export function ChatMessage({
   }, [message.party]);
 
   const isJudge = message.party === 'judge';
+  const isActiveQuestion = message.isActive && isJudge;
 
+  // Split judge messages for active questions
+  const { flavor, question } = useMemo(() => {
+    if (isActiveQuestion) {
+      return splitJudgeMessage(message.content);
+    }
+    return { flavor: null, question: message.content };
+  }, [message.content, isActiveQuestion]);
+
+  // For active judge questions, use special question card layout
+  if (isActiveQuestion) {
+    return (
+      <div className="chat-question-wrapper">
+        {/* Name header */}
+        <div className="chat-bubble chat-bubble-judge mb-1">
+          <div className="chat-name">
+            <span className="mr-1">&#9878;</span>
+            <span>{message.partyName}</span>
+            {message.round !== undefined && (
+              <span className="chat-round-badge">R{message.round + 1}</span>
+            )}
+          </div>
+
+          {/* Flavor text (collapsible) */}
+          {flavor && (
+            <div
+              className={`chat-flavor ${!flavorExpanded ? 'chat-flavor-collapsed' : ''}`}
+              onClick={() => setFlavorExpanded(!flavorExpanded)}
+            >
+              <span>&ldquo;{flavor}&rdquo;</span>
+              <div className="chat-flavor-toggle">
+                {flavorExpanded ? '▲ less' : '▼ more'}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Question Card - focal element */}
+        <div className="chat-question-card">
+          <div className="chat-content font-bold">
+            <TypewriterText text={question} />
+          </div>
+
+          {/* Objection button - small, hold to confirm */}
+          {canObject && onObjectionClick && (
+            <div className="mt-3">
+              <HoldToConfirmButton
+                label="⚠ OBJECT (1)"
+                holdDuration={700}
+                onConfirm={onObjectionClick}
+              />
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // Standard message layout for non-active messages
   return (
     <div className={`chat-bubble ${bubbleClass} ${message.isActive ? 'chat-bubble-active' : ''}`}>
       {/* Opening statement badge */}
@@ -53,11 +161,7 @@ export function ChatMessage({
 
       {/* Content */}
       <div className="chat-content">
-        {message.isActive && isJudge ? (
-          <TypewriterText text={message.content} />
-        ) : (
-          <span>&ldquo;{message.content}&rdquo;</span>
-        )}
+        <span>&ldquo;{message.content}&rdquo;</span>
       </div>
 
       {/* Credibility change badge */}
@@ -65,16 +169,6 @@ export function ChatMessage({
         <div className={`chat-cred-change ${message.credibilityChange > 0 ? 'chat-cred-positive' : 'chat-cred-negative'}`}>
           {message.credibilityChange > 0 ? '+' : ''}{message.credibilityChange} CRED
         </div>
-      )}
-
-      {/* Inline objection button for active judge questions - small tag style */}
-      {canObject && message.isActive && isJudge && onObjectionClick && (
-        <button
-          onClick={onObjectionClick}
-          className="mt-2 px-2 py-0.5 text-[8px] sm:text-[10px] bg-red-800 hover:bg-red-700 border border-red-600 text-red-200 uppercase tracking-wider"
-        >
-          &#9888; Object
-        </button>
       )}
     </div>
   );

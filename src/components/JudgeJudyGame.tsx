@@ -27,6 +27,9 @@ import {
   ProgressIndicator,
   StakesBadge,
   CredibilityBar,
+  TiltBar,
+  CollapsibleOpeningStatements,
+  CollapsibleStakes,
   Transcript,
   ObjectionModal,
   ObjectionRuling,
@@ -78,6 +81,8 @@ export default function JudgeJudyGame({ initialRoomCode }: { initialRoomCode?: s
   const [verdict, setVerdict] = useState<any>(null);
   const [verdictAccepted, setVerdictAccepted] = useState<boolean | null>(null);
   const [transcriptOpen, setTranscriptOpen] = useState(false);
+  const [openingStatementsExpanded, setOpeningStatementsExpanded] = useState(false);
+  const [stakesExpanded, setStakesExpanded] = useState(false);
 
   // Appeal state
   const [showAppealForm, setShowAppealForm] = useState(false);
@@ -2222,22 +2227,35 @@ if (isMultiplayer && !isMyTurn) {
             <TVFrame>
               <div className="flex items-center justify-between mb-3">
                 <ProgressIndicator currentPhase="crossExam" />
-                <div className="pixel-badge pixel-badge-gold text-[8px] sm:text-[10px]">
-                  ROUND {examRound + 1}/3
-                </div>
+                <RoundIndicator round={examRound + 1} totalRounds={3} />
               </div>
 
-              <CredibilityBar
+              {/* Collapsible panels */}
+              <CollapsibleOpeningStatements
+                partyA={caseData.partyA}
+                partyB={caseData.partyB}
+                statementA={caseData.statementA}
+                statementB={caseData.statementB}
+                isExpanded={openingStatementsExpanded}
+                onToggle={() => setOpeningStatementsExpanded(!openingStatementsExpanded)}
+              />
+              <CollapsibleStakes
+                stakes={caseData.stakes}
+                isExpanded={stakesExpanded}
+                onToggle={() => setStakesExpanded(!stakesExpanded)}
+              />
+
+              {/* TiltBar - no percentages */}
+              <TiltBar
                 partyA={caseData.partyA}
                 partyB={caseData.partyB}
                 credibilityA={credibilityA}
                 credibilityB={credibilityB}
-                history={credibilityHistory}
                 activeParty={examTarget as 'A' | 'B'}
               />
 
               {/* Chat Thread - watching mode */}
-              <div className="mt-4">
+              <div className="mt-2">
                 <ChatThread
                   caseData={caseData}
                   responses={responses}
@@ -2253,8 +2271,8 @@ if (isMultiplayer && !isMyTurn) {
                 />
               </div>
 
-              <div className="tv-card p-3 sm:p-4 mt-4">
-                <div className="text-gray-400 text-xs sm:text-sm text-center">
+              <div className="tv-card p-2 mt-3">
+                <div className="text-gray-400 text-[10px] sm:text-xs text-center">
                   You are: <span className={`font-bold ${myRole === 'A' ? 'text-blue-400' : 'text-red-400'}`}>{myRole === 'A' ? caseData.partyA : caseData.partyB}</span>
                   <span className="text-gray-500"> (watching)</span>
                 </div>
@@ -2272,21 +2290,34 @@ if (isMultiplayer && !isMyTurn) {
           <TVFrame>
             <div className="flex items-center justify-between mb-3">
               <ProgressIndicator currentPhase="crossExam" compact />
-              <div className="pixel-badge pixel-badge-gold text-[8px] sm:text-[10px]">
-                ROUND {examRound + 1}/3
-              </div>
+              <RoundIndicator round={examRound + 1} totalRounds={3} />
             </div>
 
-            <CredibilityBar
+            {/* Collapsible panels */}
+            <CollapsibleOpeningStatements
+              partyA={caseData.partyA}
+              partyB={caseData.partyB}
+              statementA={caseData.statementA}
+              statementB={caseData.statementB}
+              isExpanded={openingStatementsExpanded}
+              onToggle={() => setOpeningStatementsExpanded(!openingStatementsExpanded)}
+            />
+            <CollapsibleStakes
+              stakes={caseData.stakes}
+              isExpanded={stakesExpanded}
+              onToggle={() => setStakesExpanded(!stakesExpanded)}
+            />
+
+            {/* TiltBar - no percentages */}
+            <TiltBar
               partyA={caseData.partyA}
               partyB={caseData.partyB}
               credibilityA={credibilityA}
               credibilityB={credibilityB}
-              history={credibilityHistory}
               activeParty={examTarget as 'A' | 'B'}
             />
 
-            <div className="space-y-3 mt-4">
+            <div className="space-y-3 mt-2">
               {/* Chat Thread - active responder mode with loading inside */}
               <ChatThread
                 caseData={caseData}
@@ -2308,7 +2339,7 @@ if (isMultiplayer && !isMyTurn) {
                 loadingEmoji={loadingEmoji || '📝'}
               />
 
-              {/* Chat Input - only show when question is ready */}
+              {/* Chat Input with answer scaffolding - only show when question is ready */}
               {currentQuestion && !isLoading && (
                 <ChatInput
                   value={currentResponse}
@@ -2321,6 +2352,7 @@ if (isMultiplayer && !isMyTurn) {
                   partyColor={examTarget === 'A' ? 'blue' : 'red'}
                   partyName={targetName}
                   disabled={!currentQuestion}
+                  showScaffolding={true}
                 />
               )}
             </div>
