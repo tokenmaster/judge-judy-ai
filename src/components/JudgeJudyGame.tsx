@@ -39,6 +39,8 @@ import {
   RoundIndicator,
   TypewriterText
 } from './ui';
+import { ChatThread } from './ChatThread';
+import { ChatInput } from './ChatInput';
 
 export default function JudgeJudyGame({ initialRoomCode }: { initialRoomCode?: string | null }) {
   // Core state
@@ -2228,37 +2230,22 @@ if (isMultiplayer && !isMyTurn && !isLoading) {
                 activeParty={examTarget as 'A' | 'B'}
               />
 
-              <Transcript caseData={caseData} responses={responses} objections={objections} isOpen={transcriptOpen} onToggle={() => setTranscriptOpen(!transcriptOpen)} />
-
-              {currentQuestion && (
-                <div className="tv-card p-4 mb-4 mt-4 border-2 border-yellow-600">
-                  <div className="text-yellow-500 text-sm font-bold mb-1">JUDGE {JUDGE_PERSONALITIES[caseData.judge as keyof typeof JUDGE_PERSONALITIES]?.name?.toUpperCase().replace('JUDGE ', '') || 'JOODY'}:</div>
-                  <div className="text-white"><TypewriterText text={currentQuestion} /></div>
-                </div>
-              )}
-
-              {/* Typing indicator below the question */}
-              <div className="tv-card p-4 mb-4">
-                {isOtherTyping ? (
-                  <div className="flex items-center justify-center gap-2">
-                    <span className="text-lg">✍️</span>
-                    <span className="text-yellow-500 font-bold">{targetName} is typing</span>
-                    <div className="flex gap-1">
-                      <span className="w-1.5 h-1.5 bg-yellow-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
-                      <span className="w-1.5 h-1.5 bg-yellow-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
-                      <span className="w-1.5 h-1.5 bg-yellow-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="flex items-center justify-center gap-2">
-                    <span className="text-lg">⏳</span>
-                    <span className="text-gray-400">Waiting for {targetName} to answer...</span>
-                  </div>
-                )}
+              {/* Chat Thread - watching mode */}
+              <div className="mt-4">
+                <ChatThread
+                  caseData={caseData}
+                  responses={responses}
+                  currentQuestion={currentQuestion}
+                  examTarget={examTarget as 'A' | 'B'}
+                  isOtherTyping={isOtherTyping}
+                  typingPlayerName={targetName}
+                  myRole={myRole}
+                  isWaiting={true}
+                />
               </div>
 
-              <div className="tv-card p-4">
-                <div className="text-gray-400 text-sm text-center">
+              <div className="tv-card p-3 sm:p-4 mt-4">
+                <div className="text-gray-400 text-xs sm:text-sm text-center">
                   You are: <span className={`font-bold ${myRole === 'A' ? 'text-blue-400' : 'text-red-400'}`}>{myRole === 'A' ? caseData.partyA : caseData.partyB}</span>
                   <span className="text-gray-500"> (watching)</span>
                 </div>
@@ -2301,54 +2288,37 @@ if (isMultiplayer && !isMyTurn && !isLoading) {
               <LoadingOverlay emoji={loadingEmoji} message={loadingMessage} />
             ) : currentQuestion ? (
               <div className="space-y-4 mt-4">
-                {/* Transcript above question */}
-                <Transcript caseData={caseData} responses={responses} objections={objections} isOpen={transcriptOpen} onToggle={() => setTranscriptOpen(!transcriptOpen)} />
+                {/* Chat Thread - active responder mode */}
+                <ChatThread
+                  caseData={caseData}
+                  responses={responses}
+                  currentQuestion={currentQuestion}
+                  examTarget={examTarget as 'A' | 'B'}
+                  isOtherTyping={isOtherTyping}
+                  typingPlayerName={targetName}
+                  onObjectionClick={() => {
+                    console.log('[Objection] Button clicked');
+                    setObjectionWindow({ type: 'question', content: currentQuestion });
+                    setShowObjectionModal(true);
+                  }}
+                  canObject={canObjectToQuestion && !objectionsUsed[examTarget as 'A' | 'B']}
+                  myRole={myRole}
+                  isWaiting={false}
+                />
 
-                <div className="tv-card p-4 border-2 border-yellow-600">
-                  <div className="text-yellow-500 text-sm font-bold mb-1 uppercase">
-                    {JUDGE_PERSONALITIES[caseData.judge as keyof typeof JUDGE_PERSONALITIES]?.name || 'Judge Joody'}:
-                  </div>
-                  <div className="text-white"><TypewriterText text={currentQuestion} /></div>
-                </div>
-
-                {canObjectToQuestion && !objectionsUsed[examTarget as 'A' | 'B'] && (
-                  <button
-                    onClick={() => {
-                      console.log('[Objection] Button clicked');
-                      setObjectionWindow({ type: 'question', content: currentQuestion });
-                      setShowObjectionModal(true);
-                    }}
-                    className="tv-button tv-button-red py-1 px-3 text-xs"
-                  >
-                    ⚠️ OBJECT
-                  </button>
-                )}
-
-                <div className={`tv-card p-4 border-2 ${examTarget === 'A' ? 'border-blue-600' : 'border-red-600'}`}>
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className={`font-bold ${examTarget === 'A' ? 'text-blue-400' : 'text-red-400'}`}>{targetName}</span>
-                    <span className="text-gray-400 text-sm">— your response</span>
-                  </div>
-                  <textarea
-                    placeholder="Type your answer..."
-                    value={currentResponse}
-                    onChange={(e) => {
-                      setCurrentResponse(e.target.value);
-                      broadcastTyping();
-                    }}
-                    rows={4}
-                    className="w-full tv-input text-white resize-none"
-                    style={{ color: 'white' }}
-                  />
-                </div>
-
-                <button
-                  onClick={handleResponseSubmit}
-                  disabled={!currentResponse}
-                  className="w-full tv-button text-lg py-4"
-                >
-                  SUBMIT RESPONSE
-                </button>
+                {/* Chat Input */}
+                <ChatInput
+                  value={currentResponse}
+                  onChange={(value) => {
+                    setCurrentResponse(value);
+                    broadcastTyping();
+                  }}
+                  onSubmit={handleResponseSubmit}
+                  placeholder="Type your answer..."
+                  partyColor={examTarget === 'A' ? 'blue' : 'red'}
+                  partyName={targetName}
+                  disabled={!currentQuestion}
+                />
               </div>
             ) : (
               <LoadingOverlay emoji="📝" message="Preparing question..." />
