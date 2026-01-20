@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 
 interface ChatInputProps {
   value: string;
@@ -17,14 +17,22 @@ export function ChatInput({
   value,
   onChange,
   onSubmit,
-  placeholder = 'Type your answer...',
+  placeholder = 'Type your response...',
   partyColor,
-  partyName,
   disabled,
   isLoading
 }: ChatInputProps) {
-  const borderClass = partyColor === 'blue' ? 'border-blue-600' : 'border-red-600';
-  const textClass = partyColor === 'blue' ? 'text-blue-400' : 'text-red-400';
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const accentColor = partyColor === 'blue' ? '#3b82f6' : '#ef4444';
+
+  // Auto-resize textarea
+  useEffect(() => {
+    const textarea = textareaRef.current;
+    if (textarea) {
+      textarea.style.height = 'auto';
+      textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
+    }
+  }, [value]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey && value.trim()) {
@@ -33,37 +41,39 @@ export function ChatInput({
     }
   };
 
-  return (
-    <div className={`tv-card p-1.5 sm:p-2 border-2 ${borderClass}`}>
-      <div className="flex items-center gap-1.5 mb-1">
-        <span className={`font-bold text-[10px] sm:text-xs ${textClass}`}>{partyName}</span>
-        <span className="text-gray-400 text-[8px] sm:text-[10px]">— respond</span>
-      </div>
+  const canSubmit = value.trim() && !disabled && !isLoading;
 
+  return (
+    <div className="flex items-end gap-2 p-2 bg-gray-900 rounded-full border border-gray-700">
       <textarea
+        ref={textareaRef}
         placeholder={placeholder}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         onKeyDown={handleKeyDown}
         rows={1}
         disabled={disabled || isLoading}
-        className={`w-full tv-input text-white resize-none text-[11px] sm:text-xs p-1.5 ${borderClass}`}
+        className="flex-1 bg-transparent text-white text-sm resize-none outline-none px-3 py-1.5 max-h-[120px] placeholder-gray-500"
         style={{ color: 'white' }}
       />
-
-      <div className="flex justify-between items-center mt-1">
-        <div className="text-[7px] sm:text-[8px] text-gray-500">
-          {value.length} chars
-        </div>
-
-        <button
-          onClick={onSubmit}
-          disabled={!value.trim() || disabled || isLoading}
-          className="tv-button py-0.5 px-2 sm:px-3 text-[10px] sm:text-xs"
+      <button
+        onClick={onSubmit}
+        disabled={!canSubmit}
+        className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-all"
+        style={{
+          backgroundColor: canSubmit ? accentColor : '#374151',
+          opacity: canSubmit ? 1 : 0.5
+        }}
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="white"
+          className="w-4 h-4"
         >
-          {isLoading ? '...' : 'SUBMIT'}
-        </button>
-      </div>
+          <path d="M3.478 2.404a.75.75 0 0 0-.926.941l2.432 7.905H13.5a.75.75 0 0 1 0 1.5H4.984l-2.432 7.905a.75.75 0 0 0 .926.94 60.519 60.519 0 0 0 18.445-8.986.75.75 0 0 0 0-1.218A60.517 60.517 0 0 0 3.478 2.404Z" />
+        </svg>
+      </button>
     </div>
   );
 }
