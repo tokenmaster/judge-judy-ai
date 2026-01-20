@@ -693,42 +693,47 @@ useEffect(() => {
       lastQuestionGenTime.current = Date.now();
       setCanObjectToQuestion(true);
       setObjectionWindow({ type: 'question', content: newQuestion, targetParty: newTarget });
-    } else if (newPhase === 'crossExam' && currentRole !== newTarget && !isGeneratingQuestion.current) {
-      // No question yet, it's crossExam, and WE are the EXAMINER (our turn to generate questions)
-      // Only the examiner (non-target) player generates - the target player waits for DB
-      if (questionTargetRef.current !== newQuestionKey) {
-        console.log('[CaseUpdate] Our turn to generate question for', newQuestionKey);
-        // Small delay to let state settle before generating
-        setTimeout(() => {
-          // Double-check all conditions after delay
-          const stillOurTurn = myRoleRef.current !== newTarget;
-          const noQuestionYet = !currentQuestion; // Check current state
+    } else if (newPhase === 'crossExam') {
+      // No question in DB during crossExam - clear local state so watcher doesn't show stale question
+      setCurrentQuestion('');
 
-          console.log('[CaseUpdate] Timeout fired:', {
-            isGenerating: isGeneratingQuestion.current,
-            questionTargetRef: questionTargetRef.current,
-            newQuestionKey,
-            stillOurTurn,
-            noQuestionYet
-          });
+      if (currentRole !== newTarget && !isGeneratingQuestion.current) {
+        // WE are the EXAMINER (our turn to generate questions)
+        // Only the examiner (non-target) player generates - the target player waits for DB
+        if (questionTargetRef.current !== newQuestionKey) {
+          console.log('[CaseUpdate] Our turn to generate question for', newQuestionKey);
+          // Small delay to let state settle before generating
+          setTimeout(() => {
+            // Double-check all conditions after delay
+            const stillOurTurn = myRoleRef.current !== newTarget;
+            const noQuestionYet = !currentQuestion; // Check current state
 
-          if (!isGeneratingQuestion.current &&
-              questionTargetRef.current !== newQuestionKey &&
-              stillOurTurn) {
-            generateNewQuestion(newTarget, newRound);
-          } else {
-            console.log('[CaseUpdate] Skipped generation in timeout - conditions changed');
-          }
-        }, 150); // Slightly longer delay to let DB sync
+            console.log('[CaseUpdate] Timeout fired:', {
+              isGenerating: isGeneratingQuestion.current,
+              questionTargetRef: questionTargetRef.current,
+              newQuestionKey,
+              stillOurTurn,
+              noQuestionYet
+            });
+
+            if (!isGeneratingQuestion.current &&
+                questionTargetRef.current !== newQuestionKey &&
+                stillOurTurn) {
+              generateNewQuestion(newTarget, newRound);
+            } else {
+              console.log('[CaseUpdate] Skipped generation in timeout - conditions changed');
+            }
+          }, 150); // Slightly longer delay to let DB sync
+        } else {
+          console.log('[CaseUpdate] Already generated for this slot');
+        }
+      } else if (currentRole !== newTarget) {
+        // We're the examiner but already generating - just wait
+        console.log('[CaseUpdate] Examiner already generating, waiting');
       } else {
-        console.log('[CaseUpdate] Already generated for this slot');
+        // We're the target (being questioned) - wait for examiner to generate
+        console.log('[CaseUpdate] I am the target, waiting for examiner to generate question');
       }
-    } else if (newPhase === 'crossExam' && currentRole !== newTarget) {
-      // We're the examiner but already generating - just wait
-      console.log('[CaseUpdate] Examiner already generating, waiting');
-    } else if (newPhase === 'crossExam' && currentRole === newTarget) {
-      // We're the target (being questioned) - wait for examiner to generate
-      console.log('[CaseUpdate] I am the target, waiting for examiner to generate question');
     } else {
       console.log('[CaseUpdate] Not crossExam phase or other state');
     }
