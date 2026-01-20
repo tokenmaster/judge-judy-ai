@@ -169,8 +169,9 @@ export function CredibilityBar({
               <span className="text-[9px] font-bold text-white">{credibilityA}%</span>
             </div>
             <div className="h-2 bg-gray-900 rounded-sm overflow-hidden border border-gray-600 relative">
+              {/* Health depletes from center (right) outward (left) */}
               <div
-                className="absolute inset-y-0 right-0 bg-gradient-to-l from-orange-500 via-yellow-400 to-yellow-300 transition-all duration-500"
+                className="absolute inset-y-0 left-0 bg-gradient-to-r from-yellow-300 via-yellow-400 to-orange-500 transition-all duration-500"
                 style={{ width: `${credibilityA}%` }}
               />
             </div>
@@ -191,8 +192,9 @@ export function CredibilityBar({
               </div>
             </div>
             <div className="h-2 bg-gray-900 rounded-sm overflow-hidden border border-gray-600 relative">
+              {/* Health depletes from center (left) outward (right) */}
               <div
-                className="absolute inset-y-0 left-0 bg-gradient-to-r from-orange-500 via-yellow-400 to-yellow-300 transition-all duration-500"
+                className="absolute inset-y-0 right-0 bg-gradient-to-l from-yellow-300 via-yellow-400 to-orange-500 transition-all duration-500"
                 style={{ width: `${credibilityB}%` }}
               />
             </div>
@@ -235,12 +237,12 @@ export function CredibilityBar({
               </div>
             </div>
 
-            {/* Health bar */}
+            {/* Health bar - depletes from center outward */}
             <div className="h-4 bg-gray-900 rounded-sm overflow-hidden border border-gray-600 relative"
                  style={{ boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.5)' }}>
               <div className="absolute inset-0 bg-red-900/50" />
               <div
-                className="absolute inset-y-0 right-0 bg-gradient-to-l from-orange-500 via-yellow-400 to-yellow-200 transition-all duration-500"
+                className="absolute inset-y-0 left-0 bg-gradient-to-r from-yellow-200 via-yellow-400 to-orange-500 transition-all duration-500"
                 style={{ width: `${credibilityA}%` }}
               >
                 <div className="absolute inset-0 bg-gradient-to-b from-white/30 via-transparent to-black/20" />
@@ -288,12 +290,12 @@ export function CredibilityBar({
               <span className="text-[10px] text-gray-500 uppercase tracking-wider">Credibility</span>
             </div>
 
-            {/* Health bar */}
+            {/* Health bar - depletes from center outward */}
             <div className="h-4 bg-gray-900 rounded-sm overflow-hidden border border-gray-600 relative"
                  style={{ boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.5)' }}>
               <div className="absolute inset-0 bg-red-900/50" />
               <div
-                className="absolute inset-y-0 left-0 bg-gradient-to-r from-orange-500 via-yellow-400 to-yellow-200 transition-all duration-500"
+                className="absolute inset-y-0 right-0 bg-gradient-to-l from-yellow-200 via-yellow-400 to-orange-500 transition-all duration-500"
                 style={{ width: `${credibilityB}%` }}
               >
                 <div className="absolute inset-0 bg-gradient-to-b from-white/30 via-transparent to-black/20" />
