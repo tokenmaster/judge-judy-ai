@@ -131,7 +131,7 @@ export function StakesBadge({ stakes, compact = false }: { stakes: string; compa
   );
 }
 
-// Credibility Bar Component - TV Score Display
+// Credibility Bar Component - Tug of War Style
 export function CredibilityBar({
   partyA,
   partyB,
@@ -150,94 +150,95 @@ export function CredibilityBar({
   const lastA = history.filter(h => h.party === 'A').slice(-1)[0];
   const lastB = history.filter(h => h.party === 'B').slice(-1)[0];
 
-  const getBarColor = (score: number) => {
-    if (score >= 70) return 'bg-green-500';
-    if (score >= 40) return 'bg-yellow-500';
-    return 'bg-red-600';
-  };
+  // Calculate tug-of-war position (0-100, where 50 is center)
+  const total = credibilityA + credibilityB;
+  const tugPosition = total > 0 ? (credibilityA / total) * 100 : 50;
 
-  const getLabel = (score: number) => {
-    if (score >= 80) return 'VERY CREDIBLE';
-    if (score >= 60) return 'CREDIBLE';
-    if (score >= 40) return 'QUESTIONABLE';
-    if (score >= 20) return 'LOW';
-    return 'NOT CREDIBLE';
-  };
+  // Determine who's winning
+  const aWinning = credibilityA > credibilityB;
+  const bWinning = credibilityB > credibilityA;
+  const tied = credibilityA === credibilityB;
 
   if (compact) {
-    // Compact inline version - just shows scores side by side
+    // Ultra-compact inline version
     return (
-      <div className="flex items-center justify-center gap-4 mb-2 py-2 px-3 bg-gray-900/50 border border-gray-700 rounded text-xs">
-        <div className="flex items-center gap-2">
-          <span className="text-blue-400 font-bold truncate max-w-[60px]">{partyA}</span>
-          <span className={`font-black ${credibilityA >= 50 ? 'text-green-400' : 'text-red-400'}`}>{credibilityA}%</span>
+      <div className="mb-2 px-2">
+        <div className="flex items-center justify-between text-[10px] mb-1">
+          <span className={`font-bold ${aWinning ? 'text-blue-400' : 'text-gray-500'}`}>{partyA} {credibilityA}%</span>
+          <span className={`font-bold ${bWinning ? 'text-red-400' : 'text-gray-500'}`}>{credibilityB}% {partyB}</span>
         </div>
-        <span className="text-gray-600">|</span>
-        <div className="flex items-center gap-2">
-          <span className="text-red-400 font-bold truncate max-w-[60px]">{partyB}</span>
-          <span className={`font-black ${credibilityB >= 50 ? 'text-green-400' : 'text-red-400'}`}>{credibilityB}%</span>
+        <div className="h-2 bg-gray-800 rounded-full overflow-hidden border border-gray-700 relative">
+          <div className="absolute inset-y-0 left-0 bg-blue-500 transition-all duration-500" style={{ width: `${tugPosition}%` }} />
+          <div className="absolute inset-y-0 right-0 bg-red-500 transition-all duration-500" style={{ width: `${100 - tugPosition}%` }} />
         </div>
       </div>
     );
   }
 
   return (
-    <div className="tv-card p-4 mb-6">
-      <div className="text-center mb-4">
-        <span className="text-xs font-bold tracking-widest text-yellow-500 uppercase">Credibility Meter</span>
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
-        {/* Party A */}
-        <div className="text-center">
-          <div className="lower-third lower-third-blue mb-3 py-2 pl-5">
-            <div className="text-black font-bold text-sm truncate">{partyA}</div>
-          </div>
-          <div className="tv-stat-box">
-            <div className="tv-stat-value">{credibilityA}%</div>
-            <div className="text-xs text-gray-400 font-bold">{getLabel(credibilityA)}</div>
-            {lastA && (
-              <div className={`text-sm font-bold mt-1 ${lastA.change >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                {lastA.change >= 0 ? '+' : ''}{lastA.change}
-              </div>
-            )}
-          </div>
-          <div className="h-3 bg-gray-900 mt-2 border border-gray-700">
-            <div
-              className={`h-full ${getBarColor(credibilityA)} transition-all duration-500`}
-              style={{ width: `${credibilityA}%` }}
-            />
-          </div>
-          {lastA?.flagged && (
-            <div className="text-red-400 text-xs mt-2 font-bold">⚠️ {lastA.flagged}</div>
+    <div className="tv-card p-3 mb-4">
+      {/* Names and scores row */}
+      <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center gap-2">
+          <span className={`text-sm font-black ${aWinning ? 'text-blue-400' : 'text-gray-500'}`}>
+            {credibilityA}%
+          </span>
+          {lastA && (
+            <span className={`text-xs font-bold ${lastA.change >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+              ({lastA.change >= 0 ? '+' : ''}{lastA.change})
+            </span>
           )}
+          <span className={`text-xs font-bold truncate max-w-[70px] ${aWinning ? 'text-blue-300' : 'text-gray-500'}`}>
+            {partyA}
+          </span>
         </div>
 
-        {/* Party B */}
-        <div className="text-center">
-          <div className="lower-third lower-third-red mb-3 py-2 pl-5">
-            <div className="text-black font-bold text-sm truncate">{partyB}</div>
-          </div>
-          <div className="tv-stat-box">
-            <div className="tv-stat-value">{credibilityB}%</div>
-            <div className="text-xs text-gray-400 font-bold">{getLabel(credibilityB)}</div>
-            {lastB && (
-              <div className={`text-sm font-bold mt-1 ${lastB.change >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                {lastB.change >= 0 ? '+' : ''}{lastB.change}
-              </div>
-            )}
-          </div>
-          <div className="h-3 bg-gray-900 mt-2 border border-gray-700">
-            <div
-              className={`h-full ${getBarColor(credibilityB)} transition-all duration-500`}
-              style={{ width: `${credibilityB}%` }}
-            />
-          </div>
-          {lastB?.flagged && (
-            <div className="text-red-400 text-xs mt-2 font-bold">⚠️ {lastB.flagged}</div>
+        <span className="text-yellow-500 text-[10px] font-bold">⚔️ TUG OF WAR</span>
+
+        <div className="flex items-center gap-2">
+          <span className={`text-xs font-bold truncate max-w-[70px] ${bWinning ? 'text-red-300' : 'text-gray-500'}`}>
+            {partyB}
+          </span>
+          {lastB && (
+            <span className={`text-xs font-bold ${lastB.change >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+              ({lastB.change >= 0 ? '+' : ''}{lastB.change})
+            </span>
           )}
+          <span className={`text-sm font-black ${bWinning ? 'text-red-400' : 'text-gray-500'}`}>
+            {credibilityB}%
+          </span>
         </div>
       </div>
+
+      {/* Tug of war bar */}
+      <div className="relative h-5 bg-gray-900 rounded-full overflow-hidden border-2 border-gray-600">
+        {/* Party A side (blue) */}
+        <div
+          className="absolute inset-y-0 left-0 bg-gradient-to-r from-blue-700 to-blue-400 transition-all duration-700"
+          style={{ width: `${tugPosition}%` }}
+        />
+        {/* Party B side (red) */}
+        <div
+          className="absolute inset-y-0 right-0 bg-gradient-to-l from-red-700 to-red-400 transition-all duration-700"
+          style={{ width: `${100 - tugPosition}%` }}
+        />
+        {/* Center marker (the "knot") */}
+        <div
+          className="absolute top-0 bottom-0 w-1.5 bg-yellow-400 rounded transition-all duration-700 shadow-lg"
+          style={{ left: `calc(${tugPosition}% - 3px)` }}
+        />
+        {/* Center reference line */}
+        <div className="absolute top-0 bottom-0 left-1/2 w-px bg-white/20" />
+      </div>
+
+      {/* Winner indicator */}
+      {!tied && (
+        <div className="text-center mt-1">
+          <span className={`text-[10px] font-bold ${aWinning ? 'text-blue-400' : 'text-red-400'}`}>
+            {aWinning ? `← ${partyA} ahead` : `${partyB} ahead →`}
+          </span>
+        </div>
+      )}
     </div>
   );
 }
