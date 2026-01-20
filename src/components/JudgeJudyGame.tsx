@@ -105,6 +105,7 @@ export default function JudgeJudyGame({ initialRoomCode }: { initialRoomCode?: s
   const [homeTab, setHomeTab] = useState<'main' | 'stats'>('main');
   const [stats, setStats] = useState<Stats | null>(null);
   const [statsLoading, setStatsLoading] = useState(false);
+  const [showInviteModal, setShowInviteModal] = useState(false);
 
   // Past verdicts state
   const [pastCases, setPastCases] = useState<Case[]>([]);
@@ -1855,42 +1856,13 @@ Settle YOUR disputes at judgejoody.ai`;
                 <div className="text-yellow-500 text-[10px] sm:text-xs font-bold tracking-widest mb-2">ROOM CODE</div>
                 <div className="tv-stat-value text-3xl sm:text-4xl md:text-5xl tracking-widest mb-3 sm:mb-4" style={{ color: '#d4af37' }}>{roomCode}</div>
 
-                {/* Share options */}
-                <div className="text-yellow-500 text-[10px] sm:text-xs font-bold tracking-widest mb-2">SHARE LINK</div>
-                <div className="grid grid-cols-3 gap-2 mb-3">
-                  <button
-                    onClick={() => {
-                      const shareUrl = `${window.location.origin}?room=${roomCode}`;
-                      const text = `Join my Judge Joody AI case! ${shareUrl}`;
-                      window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
-                    }}
-                    className="tv-button bg-green-700 border-green-500 text-white py-2 sm:py-3 text-xs sm:text-sm flex flex-col items-center gap-1"
-                  >
-                    <span className="text-lg sm:text-xl">💬</span>
-                    <span>WhatsApp</span>
-                  </button>
-                  <button
-                    onClick={() => {
-                      const shareUrl = `${window.location.origin}?room=${roomCode}`;
-                      const text = `Join my Judge Joody AI case! ${shareUrl}`;
-                      window.open(`sms:?body=${encodeURIComponent(text)}`, '_self');
-                    }}
-                    className="tv-button bg-blue-700 border-blue-500 text-white py-2 sm:py-3 text-xs sm:text-sm flex flex-col items-center gap-1"
-                  >
-                    <span className="text-lg sm:text-xl">📱</span>
-                    <span>Text</span>
-                  </button>
-                  <button
-                    onClick={() => {
-                      const shareUrl = `${window.location.origin}?room=${roomCode}`;
-                      navigator.clipboard.writeText(shareUrl);
-                    }}
-                    className="tv-button bg-purple-700 border-purple-500 text-white py-2 sm:py-3 text-xs sm:text-sm flex flex-col items-center gap-1"
-                  >
-                    <span className="text-lg sm:text-xl">🔗</span>
-                    <span>Copy Link</span>
-                  </button>
-                </div>
+                {/* Invite button */}
+                <button
+                  onClick={() => setShowInviteModal(true)}
+                  className="tv-button w-full py-3 sm:py-4 text-sm sm:text-base mb-3"
+                >
+                  📨 INVITE OPPONENT
+                </button>
 
                 {/* Copy code button */}
                 <button
@@ -1903,6 +1875,66 @@ Settle YOUR disputes at judgejoody.ai`;
                 <div className="mt-3 sm:mt-4 text-gray-500 text-[10px] sm:text-xs break-all">
                   {typeof window !== 'undefined' && `${window.location.origin}?room=${roomCode}`}
                 </div>
+
+                {/* Invite Modal */}
+                {showInviteModal && (
+                  <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4" onClick={() => setShowInviteModal(false)}>
+                    <div className="tv-card p-4 sm:p-6 max-w-sm w-full" onClick={e => e.stopPropagation()}>
+                      <div className="text-center mb-4">
+                        <div className="text-2xl mb-2">📨</div>
+                        <h3 className="tv-title text-lg sm:text-xl">INVITE OPPONENT</h3>
+                        <p className="text-gray-400 text-xs mt-1">Choose how to send the invite</p>
+                      </div>
+
+                      <div className="space-y-2">
+                        <button
+                          onClick={() => {
+                            const shareUrl = `${window.location.origin}?room=${roomCode}`;
+                            const text = `Join my Judge Joody AI case! ${shareUrl}`;
+                            window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+                            setShowInviteModal(false);
+                          }}
+                          className="tv-button bg-green-700 border-green-500 text-white w-full py-3 text-sm flex items-center justify-center gap-2"
+                        >
+                          <span className="text-xl">💬</span>
+                          <span>Send via WhatsApp</span>
+                        </button>
+
+                        <button
+                          onClick={() => {
+                            const shareUrl = `${window.location.origin}?room=${roomCode}`;
+                            const text = `Join my Judge Joody AI case! ${shareUrl}`;
+                            window.open(`sms:?body=${encodeURIComponent(text)}`, '_self');
+                            setShowInviteModal(false);
+                          }}
+                          className="tv-button bg-blue-700 border-blue-500 text-white w-full py-3 text-sm flex items-center justify-center gap-2"
+                        >
+                          <span className="text-xl">📱</span>
+                          <span>Send via Text Message</span>
+                        </button>
+
+                        <button
+                          onClick={() => {
+                            const shareUrl = `${window.location.origin}?room=${roomCode}`;
+                            navigator.clipboard.writeText(shareUrl);
+                            setShowInviteModal(false);
+                          }}
+                          className="tv-button bg-purple-700 border-purple-500 text-white w-full py-3 text-sm flex items-center justify-center gap-2"
+                        >
+                          <span className="text-xl">🔗</span>
+                          <span>Copy Link</span>
+                        </button>
+                      </div>
+
+                      <button
+                        onClick={() => setShowInviteModal(false)}
+                        className="w-full mt-4 text-gray-500 hover:text-white text-sm py-2"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Judge waiting GIF */}
