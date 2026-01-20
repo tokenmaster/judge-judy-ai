@@ -2242,7 +2242,10 @@ if (isMultiplayer && !isMyTurn && !isLoading) {
       <div className="min-h-screen p-2 sm:p-4 md:p-6">
         <div className="w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-2xl mx-auto">
           <TVFrame>
-            <ProgressIndicator currentPhase="crossExam" />
+            {/* Compact phase indicator during cross-exam - focus is on the questioning */}
+            <ProgressIndicator currentPhase="crossExam" compact />
+            <StakesBadge stakes={caseData.stakes} compact />
+
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0 mb-3 sm:mb-4">
               <div className="lower-third pl-4 sm:pl-6 flex-1">
                 <div className="text-[10px] sm:text-xs font-bold text-yellow-900 tracking-widest">{isClarifying ? '🔄 FOLLOW-UP' : 'CROSS-EXAMINATION'}</div>
@@ -2268,7 +2271,7 @@ if (isMultiplayer && !isMyTurn && !isLoading) {
               </div>
             </div>
 
-            <StakesBadge stakes={caseData.stakes} />
+            {/* Credibility is prominent during cross-exam - it's actively changing */}
             <CredibilityBar partyA={caseData.partyA} partyB={caseData.partyB} credibilityA={credibilityA} credibilityB={credibilityB} history={credibilityHistory} />
 
             {isLoading ? (
@@ -2372,7 +2375,8 @@ if (isMultiplayer && !isMyTurn && !isLoading) {
       <div className="min-h-screen p-2 sm:p-4 md:p-6">
         <div className="w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-2xl mx-auto">
           <TVFrame>
-            <ProgressIndicator currentPhase="verdict" />
+            {/* Compact progress indicator - verdict is the focus */}
+            <ProgressIndicator currentPhase="verdict" compact />
             <div className="text-center mb-4 sm:mb-6">
               <div className="text-4xl sm:text-5xl md:text-6xl mb-3 sm:mb-4">⚖️</div>
               <h2 className="tv-title text-xl sm:text-2xl md:text-3xl mb-2">THE VERDICT</h2>

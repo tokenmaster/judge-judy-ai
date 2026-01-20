@@ -37,7 +37,7 @@ export function ChannelBug({ text = "COURT TV" }: { text?: string }) {
 }
 
 // Progress Indicator Component - TV Chyron Style
-export function ProgressIndicator({ currentPhase }: { currentPhase: 'statements' | 'crossExam' | 'verdict' }) {
+export function ProgressIndicator({ currentPhase, compact = false }: { currentPhase: 'statements' | 'crossExam' | 'verdict'; compact?: boolean }) {
   const steps = [
     { id: 'statements', label: 'OPENING', icon: '📝' },
     { id: 'crossExam', label: 'CROSS-EXAM', icon: '⚖️' },
@@ -45,6 +45,36 @@ export function ProgressIndicator({ currentPhase }: { currentPhase: 'statements'
   ];
 
   const currentIndex = steps.findIndex(s => s.id === currentPhase);
+
+  if (compact) {
+    // Compact version - just shows current phase as a small badge
+    return (
+      <div className="flex items-center justify-center gap-1 mb-2">
+        {steps.map((step, index) => {
+          const isCompleted = index < currentIndex;
+          const isCurrent = index === currentIndex;
+
+          return (
+            <React.Fragment key={step.id}>
+              <div className={`flex items-center gap-1 px-2 py-1 text-[10px] font-bold uppercase tracking-wider transition-all ${
+                isCurrent
+                  ? 'tv-gradient-gold text-black border border-yellow-300'
+                  : isCompleted
+                    ? 'bg-green-800/50 text-green-300 border border-green-700'
+                    : 'bg-gray-800/50 text-gray-600 border border-gray-700'
+              }`}>
+                <span className="text-xs">{isCompleted ? '✓' : step.icon}</span>
+                {isCurrent && <span>{step.label}</span>}
+              </div>
+              {index < steps.length - 1 && (
+                <div className={`w-3 h-0.5 ${index < currentIndex ? 'bg-green-600' : 'bg-gray-700'}`} />
+              )}
+            </React.Fragment>
+          );
+        })}
+      </div>
+    );
+  }
 
   return (
     <div className="flex items-center justify-center gap-1 mb-6">
@@ -75,8 +105,19 @@ export function ProgressIndicator({ currentPhase }: { currentPhase: 'statements'
 }
 
 // Stakes Badge Component - TV Lower Third Style
-export function StakesBadge({ stakes }: { stakes: string }) {
+export function StakesBadge({ stakes, compact = false }: { stakes: string; compact?: boolean }) {
   if (!stakes) return null;
+
+  if (compact) {
+    // Compact inline version
+    return (
+      <div className="flex items-center justify-center gap-2 mb-2 py-1 px-3 bg-yellow-900/30 border border-yellow-700/50 rounded text-xs">
+        <span>🏆</span>
+        <span className="text-yellow-500 font-bold">{stakes}</span>
+      </div>
+    );
+  }
+
   return (
     <div className="lower-third mb-6 pl-6">
       <div className="flex items-center gap-3">
@@ -96,13 +137,15 @@ export function CredibilityBar({
   partyB,
   credibilityA,
   credibilityB,
-  history = []
+  history = [],
+  compact = false
 }: {
   partyA: string;
   partyB: string;
   credibilityA: number;
   credibilityB: number;
   history?: any[];
+  compact?: boolean;
 }) {
   const lastA = history.filter(h => h.party === 'A').slice(-1)[0];
   const lastB = history.filter(h => h.party === 'B').slice(-1)[0];
@@ -120,6 +163,23 @@ export function CredibilityBar({
     if (score >= 20) return 'LOW';
     return 'NOT CREDIBLE';
   };
+
+  if (compact) {
+    // Compact inline version - just shows scores side by side
+    return (
+      <div className="flex items-center justify-center gap-4 mb-2 py-2 px-3 bg-gray-900/50 border border-gray-700 rounded text-xs">
+        <div className="flex items-center gap-2">
+          <span className="text-blue-400 font-bold truncate max-w-[60px]">{partyA}</span>
+          <span className={`font-black ${credibilityA >= 50 ? 'text-green-400' : 'text-red-400'}`}>{credibilityA}%</span>
+        </div>
+        <span className="text-gray-600">|</span>
+        <div className="flex items-center gap-2">
+          <span className="text-red-400 font-bold truncate max-w-[60px]">{partyB}</span>
+          <span className={`font-black ${credibilityB >= 50 ? 'text-green-400' : 'text-red-400'}`}>{credibilityB}%</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="tv-card p-4 mb-6">
