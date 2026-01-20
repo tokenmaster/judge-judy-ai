@@ -876,10 +876,10 @@ useEffect(() => {
   const generateNewQuestion = async (targetParty: string, round: number) => {
     const now = Date.now();
 
-    // CRITICAL: In multiplayer, only the examTarget player generates
-    // This prevents both players from generating different questions
-    if (isMultiplayer && myRoleRef.current !== targetParty) {
-      console.log('[QuestionGen] Not my turn to generate (myRole:', myRoleRef.current, 'target:', targetParty, ')');
+    // CRITICAL: In multiplayer, only the EXAMINER (non-target) generates questions
+    // The target player waits and receives the question from the database
+    if (isMultiplayer && myRoleRef.current === targetParty) {
+      console.log('[QuestionGen] I am the target, not generating (myRole:', myRoleRef.current, 'target:', targetParty, ')');
       return;
     }
 
