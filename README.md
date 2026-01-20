@@ -1,11 +1,11 @@
-# Judge Judy AI ⚖️
+# Judge Joody AI ⚖️
 
 A multiplayer AI-powered dispute resolution game where two parties present their case and an AI judge delivers the verdict.
 
 ## Features
 
 - **Multiplayer**: Create a case and share a room code with the other party
-- **4 Judge Personalities**: Judge Judy, The Fair Arbiter, Chaotic Neutral, The Bro
+- **4 Judge Personalities**: Judge Joody, The Fair Arbiter, Chaotic Neutral, The Bro
 - **AI Cross-Examination**: The judge asks probing questions based on testimony
 - **Credibility System**: AI evaluates responses for consistency, accountability, and specificity
 - **Objections**: Each party gets one objection during cross-examination
@@ -42,7 +42,7 @@ CREATE TABLE cases (
   room_code TEXT UNIQUE NOT NULL,
   title TEXT NOT NULL,
   category TEXT,
-  judge TEXT DEFAULT 'judy',
+  judge TEXT DEFAULT 'joody',
   stakes TEXT,
   party_a_name TEXT,
   party_b_name TEXT,
@@ -202,7 +202,7 @@ Open [http://localhost:3000](http://localhost:3000)
 
 | Judge | Style |
 |-------|-------|
-| **Judge Judy** | Sharp-tongued, no-nonsense, devastating one-liners |
+| **Judge Joody** | Sharp-tongued, no-nonsense, devastating one-liners |
 | **The Fair Arbiter** | Calm, wise, focused on understanding both sides |
 | **Chaotic Neutral** | Unpredictable, dramatic, reality TV energy |
 | **The Bro** | Chill but insightful, uses "brother" liberally |
