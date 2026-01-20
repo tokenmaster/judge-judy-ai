@@ -2194,7 +2194,14 @@ if (isMultiplayer && !isMyTurn && !isLoading) {
                 <RoundIndicator round={examRound + 1} totalRounds={3} />
               </div>
 
-              <CredibilityBar partyA={caseData.partyA} partyB={caseData.partyB} credibilityA={credibilityA} credibilityB={credibilityB} history={credibilityHistory} />
+              <CredibilityBar
+                partyA={caseData.partyA}
+                partyB={caseData.partyB}
+                credibilityA={credibilityA}
+                credibilityB={credibilityB}
+                history={credibilityHistory}
+                activeParty={examTarget as 'A' | 'B'}
+              />
 
               <Transcript caseData={caseData} responses={responses} objections={objections} isOpen={transcriptOpen} onToggle={() => setTranscriptOpen(!transcriptOpen)} />
 
@@ -2255,24 +2262,15 @@ if (isMultiplayer && !isMyTurn && !isLoading) {
               <RoundIndicator round={examRound + 1} totalRounds={3} />
             </div>
 
-            <div className="mb-4 sm:mb-6">
-              <div className="flex flex-col sm:flex-row gap-2">
-                <PartyNamePlate
-                  name={caseData.partyA}
-                  party="A"
-                  status={examTarget === 'A' ? 'active' : 'waiting'}
-                />
-                <div className="hidden sm:flex items-center text-yellow-500 font-black text-lg sm:text-xl">VS</div>
-                <PartyNamePlate
-                  name={caseData.partyB}
-                  party="B"
-                  status={examTarget === 'B' ? 'active' : 'waiting'}
-                />
-              </div>
-            </div>
-
-            {/* Credibility is prominent during cross-exam - it's actively changing */}
-            <CredibilityBar partyA={caseData.partyA} partyB={caseData.partyB} credibilityA={credibilityA} credibilityB={credibilityB} history={credibilityHistory} />
+            {/* Combined Turn + Credibility display */}
+            <CredibilityBar
+              partyA={caseData.partyA}
+              partyB={caseData.partyB}
+              credibilityA={credibilityA}
+              credibilityB={credibilityB}
+              history={credibilityHistory}
+              activeParty={examTarget as 'A' | 'B'}
+            />
 
             {isLoading ? (
               <LoadingOverlay emoji={loadingEmoji} message={loadingMessage} />

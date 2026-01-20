@@ -131,14 +131,15 @@ export function StakesBadge({ stakes, compact = false }: { stakes: string; compa
   );
 }
 
-// Credibility Bar Component - Tekken Style Health Bars
+// Combined Credibility & Turn Indicator - Tekken Style
 export function CredibilityBar({
   partyA,
   partyB,
   credibilityA,
   credibilityB,
   history = [],
-  compact = false
+  compact = false,
+  activeParty
 }: {
   partyA: string;
   partyB: string;
@@ -146,19 +147,25 @@ export function CredibilityBar({
   credibilityB: number;
   history?: any[];
   compact?: boolean;
+  activeParty?: 'A' | 'B' | null;
 }) {
   const lastA = history.filter(h => h.party === 'A').slice(-1)[0];
   const lastB = history.filter(h => h.party === 'B').slice(-1)[0];
+  const isAActive = activeParty === 'A';
+  const isBActive = activeParty === 'B';
 
   if (compact) {
-    // Compact Tekken-style version
+    // Compact version with turn indicator
     return (
-      <div className="mb-2">
-        <div className="flex items-center gap-1">
+      <div className="mb-2 tv-card p-2">
+        <div className="flex items-center gap-2">
           {/* Party A - Left side */}
-          <div className="flex-1">
+          <div className={`flex-1 p-1.5 rounded ${isAActive ? 'bg-cyan-900/30 border border-cyan-500' : ''}`}>
             <div className="flex items-center justify-between mb-0.5">
-              <span className="text-[9px] font-black text-cyan-400 uppercase tracking-wide truncate">{partyA}</span>
+              <div className="flex items-center gap-1">
+                {isAActive && <span className="text-[8px] bg-red-600 text-white px-1 rounded font-bold animate-pulse">ON AIR</span>}
+                <span className={`text-[9px] font-black uppercase tracking-wide truncate ${isAActive ? 'text-cyan-300' : 'text-gray-500'}`}>{partyA}</span>
+              </div>
               <span className="text-[9px] font-bold text-white">{credibilityA}%</span>
             </div>
             <div className="h-2 bg-gray-900 rounded-sm overflow-hidden border border-gray-600 relative">
@@ -170,15 +177,18 @@ export function CredibilityBar({
           </div>
 
           {/* VS divider */}
-          <div className="px-1">
-            <span className="text-[8px] font-black text-yellow-500">⚔</span>
+          <div className="w-6 h-6 rounded-full bg-gradient-to-b from-yellow-500 to-orange-600 flex items-center justify-center border border-yellow-300 shadow-lg flex-shrink-0">
+            <span className="text-[8px] font-black text-black">VS</span>
           </div>
 
           {/* Party B - Right side */}
-          <div className="flex-1">
+          <div className={`flex-1 p-1.5 rounded ${isBActive ? 'bg-red-900/30 border border-red-500' : ''}`}>
             <div className="flex items-center justify-between mb-0.5">
               <span className="text-[9px] font-bold text-white">{credibilityB}%</span>
-              <span className="text-[9px] font-black text-red-400 uppercase tracking-wide truncate">{partyB}</span>
+              <div className="flex items-center gap-1">
+                <span className={`text-[9px] font-black uppercase tracking-wide truncate ${isBActive ? 'text-red-300' : 'text-gray-500'}`}>{partyB}</span>
+                {isBActive && <span className="text-[8px] bg-red-600 text-white px-1 rounded font-bold animate-pulse">ON AIR</span>}
+              </div>
             </div>
             <div className="h-2 bg-gray-900 rounded-sm overflow-hidden border border-gray-600 relative">
               <div
@@ -193,86 +203,108 @@ export function CredibilityBar({
   }
 
   return (
-    <div className="mb-4 px-2">
-      {/* Tekken-style health bar layout */}
-      <div className="flex items-start gap-2">
-        {/* Party A - Left side (bar depletes from right) */}
-        <div className="flex-1">
-          <div className="flex items-center justify-between mb-1">
-            <span className="text-xs font-black text-cyan-400 uppercase tracking-wider truncate max-w-[80px]">{partyA}</span>
-            <div className="flex items-center gap-1">
-              {lastA && (
-                <span className={`text-[10px] font-bold ${lastA.change >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                  {lastA.change >= 0 ? '+' : ''}{lastA.change}
-                </span>
+    <div className="mb-4">
+      {/* Combined Turn + Credibility Panel */}
+      <div className="tv-card p-3">
+        <div className="flex items-stretch gap-3">
+          {/* Party A - Left side */}
+          <div className={`flex-1 rounded-lg p-2 transition-all ${isAActive ? 'bg-gradient-to-br from-cyan-900/50 to-cyan-950/50 border-2 border-cyan-500 shadow-lg shadow-cyan-500/20' : 'bg-gray-900/50 border border-gray-700'}`}>
+            {/* Name row with ON AIR */}
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <span className={`text-sm font-black uppercase tracking-wider truncate ${isAActive ? 'text-cyan-300' : 'text-gray-500'}`}>{partyA}</span>
+              </div>
+              {isAActive && (
+                <span className="text-[10px] bg-red-600 text-white px-2 py-0.5 rounded font-bold animate-pulse shadow-lg">ON AIR</span>
               )}
-              <span className="text-sm font-black text-white">{credibilityA}%</span>
+              {!isAActive && activeParty && (
+                <span className="text-[10px] text-gray-600 uppercase">Waiting</span>
+              )}
             </div>
-          </div>
-          {/* Health bar - depletes from right to left */}
-          <div className="h-5 bg-gray-900 rounded-sm overflow-hidden border-2 border-gray-600 relative"
-               style={{ boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.5)' }}>
-            {/* Background damage indicator */}
-            <div className="absolute inset-0 bg-red-900/50" />
-            {/* Actual health */}
-            <div
-              className="absolute inset-y-0 right-0 bg-gradient-to-l from-orange-500 via-yellow-400 to-yellow-200 transition-all duration-500"
-              style={{ width: `${credibilityA}%` }}
-            >
-              {/* Shine effect */}
-              <div className="absolute inset-0 bg-gradient-to-b from-white/30 via-transparent to-black/20" />
-              {/* Segment lines */}
-              <div className="absolute inset-0 flex">
-                {[...Array(10)].map((_, i) => (
-                  <div key={i} className="flex-1 border-r border-black/20 last:border-0" />
-                ))}
+
+            {/* Credibility percentage */}
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-[10px] text-gray-500 uppercase tracking-wider">Credibility</span>
+              <div className="flex items-center gap-1">
+                {lastA && (
+                  <span className={`text-[10px] font-bold ${lastA.change >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                    {lastA.change >= 0 ? '+' : ''}{lastA.change}
+                  </span>
+                )}
+                <span className="text-lg font-black text-white">{credibilityA}%</span>
+              </div>
+            </div>
+
+            {/* Health bar */}
+            <div className="h-4 bg-gray-900 rounded-sm overflow-hidden border border-gray-600 relative"
+                 style={{ boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.5)' }}>
+              <div className="absolute inset-0 bg-red-900/50" />
+              <div
+                className="absolute inset-y-0 right-0 bg-gradient-to-l from-orange-500 via-yellow-400 to-yellow-200 transition-all duration-500"
+                style={{ width: `${credibilityA}%` }}
+              >
+                <div className="absolute inset-0 bg-gradient-to-b from-white/30 via-transparent to-black/20" />
+                <div className="absolute inset-0 flex">
+                  {[...Array(10)].map((_, i) => (
+                    <div key={i} className="flex-1 border-r border-black/20 last:border-0" />
+                  ))}
+                </div>
               </div>
             </div>
           </div>
-          <div className="text-[8px] text-gray-500 mt-0.5 uppercase tracking-widest">Credibility</div>
-        </div>
 
-        {/* Center VS badge */}
-        <div className="flex flex-col items-center justify-center pt-4">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-b from-yellow-500 to-orange-600 flex items-center justify-center border-2 border-yellow-300 shadow-lg">
-            <span className="text-xs font-black text-black">VS</span>
-          </div>
-        </div>
-
-        {/* Party B - Right side (bar depletes from left) */}
-        <div className="flex-1">
-          <div className="flex items-center justify-between mb-1">
-            <div className="flex items-center gap-1">
-              <span className="text-sm font-black text-white">{credibilityB}%</span>
-              {lastB && (
-                <span className={`text-[10px] font-bold ${lastB.change >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                  {lastB.change >= 0 ? '+' : ''}{lastB.change}
-                </span>
-              )}
+          {/* Center VS badge */}
+          <div className="flex flex-col items-center justify-center">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-b from-yellow-500 to-orange-600 flex items-center justify-center border-2 border-yellow-300 shadow-lg">
+              <span className="text-sm font-black text-black">VS</span>
             </div>
-            <span className="text-xs font-black text-red-400 uppercase tracking-wider truncate max-w-[80px]">{partyB}</span>
           </div>
-          {/* Health bar - depletes from left to right */}
-          <div className="h-5 bg-gray-900 rounded-sm overflow-hidden border-2 border-gray-600 relative"
-               style={{ boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.5)' }}>
-            {/* Background damage indicator */}
-            <div className="absolute inset-0 bg-red-900/50" />
-            {/* Actual health */}
-            <div
-              className="absolute inset-y-0 left-0 bg-gradient-to-r from-orange-500 via-yellow-400 to-yellow-200 transition-all duration-500"
-              style={{ width: `${credibilityB}%` }}
-            >
-              {/* Shine effect */}
-              <div className="absolute inset-0 bg-gradient-to-b from-white/30 via-transparent to-black/20" />
-              {/* Segment lines */}
-              <div className="absolute inset-0 flex">
-                {[...Array(10)].map((_, i) => (
-                  <div key={i} className="flex-1 border-r border-black/20 last:border-0" />
-                ))}
+
+          {/* Party B - Right side */}
+          <div className={`flex-1 rounded-lg p-2 transition-all ${isBActive ? 'bg-gradient-to-br from-red-900/50 to-red-950/50 border-2 border-red-500 shadow-lg shadow-red-500/20' : 'bg-gray-900/50 border border-gray-700'}`}>
+            {/* Name row with ON AIR */}
+            <div className="flex items-center justify-between mb-2">
+              {!isBActive && activeParty && (
+                <span className="text-[10px] text-gray-600 uppercase">Waiting</span>
+              )}
+              {isBActive && (
+                <span className="text-[10px] bg-red-600 text-white px-2 py-0.5 rounded font-bold animate-pulse shadow-lg">ON AIR</span>
+              )}
+              <div className="flex items-center gap-2">
+                <span className={`text-sm font-black uppercase tracking-wider truncate ${isBActive ? 'text-red-300' : 'text-gray-500'}`}>{partyB}</span>
+              </div>
+            </div>
+
+            {/* Credibility percentage */}
+            <div className="flex items-center justify-between mb-1">
+              <div className="flex items-center gap-1">
+                <span className="text-lg font-black text-white">{credibilityB}%</span>
+                {lastB && (
+                  <span className={`text-[10px] font-bold ${lastB.change >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                    {lastB.change >= 0 ? '+' : ''}{lastB.change}
+                  </span>
+                )}
+              </div>
+              <span className="text-[10px] text-gray-500 uppercase tracking-wider">Credibility</span>
+            </div>
+
+            {/* Health bar */}
+            <div className="h-4 bg-gray-900 rounded-sm overflow-hidden border border-gray-600 relative"
+                 style={{ boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.5)' }}>
+              <div className="absolute inset-0 bg-red-900/50" />
+              <div
+                className="absolute inset-y-0 left-0 bg-gradient-to-r from-orange-500 via-yellow-400 to-yellow-200 transition-all duration-500"
+                style={{ width: `${credibilityB}%` }}
+              >
+                <div className="absolute inset-0 bg-gradient-to-b from-white/30 via-transparent to-black/20" />
+                <div className="absolute inset-0 flex">
+                  {[...Array(10)].map((_, i) => (
+                    <div key={i} className="flex-1 border-r border-black/20 last:border-0" />
+                  ))}
+                </div>
               </div>
             </div>
           </div>
-          <div className="text-[8px] text-gray-500 mt-0.5 uppercase tracking-widest text-right">Credibility</div>
         </div>
       </div>
     </div>
