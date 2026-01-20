@@ -137,28 +137,50 @@ export async function evaluateCredibility(
     .map((r: any) => r.answer)
     .join('\n');
 
-  const prompt = `Evaluate the credibility of this testimony.
+  const prompt = `You are analyzing testimony in a dispute. Think critically and apply real-world logic.
 
-${partyName}'s opening statement: "${statement}"
-Other party claimed: "${otherStatement}"
-${partyName}'s previous answers: "${previousAnswers}"
+DISPUTE CONTEXT:
+${partyName}'s claim: "${statement}"
+Other party's counter-claim: "${otherStatement}"
+${previousAnswers ? `${partyName}'s previous testimony: "${previousAnswers}"` : ''}
 
-Question asked: "${currentQuestion}"
-Their answer: "${currentResponse}"
+CURRENT EXCHANGE:
+Question: "${currentQuestion}"
+${partyName}'s answer: "${currentResponse}"
 
-Score each factor from -10 to +10:
-1. CONSISTENCY: Does this match their previous statements? (not whether it matches the OTHER party)
-2. RESPONSIVENESS: Did they actually answer the question asked?
-3. ACCOUNTABILITY: Are they taking responsibility or deflecting?
-4. SPECIFICITY: Concrete details vs vague/evasive?
+ANALYZE THIS RESPONSE CRITICALLY:
+
+1. LOGICAL CONSISTENCY (-10 to +10):
+   - Does this answer contradict their earlier statements?
+   - Is the internal logic sound, or are there holes?
+   - Would a reasonable person find this believable?
+
+2. DIRECT RESPONSIVENESS (-10 to +10):
+   - Did they actually answer what was asked?
+   - Are they dodging, deflecting, or going off-topic?
+   - Did they address the specific claim/accusation?
+
+3. ACCOUNTABILITY & HONESTY (-10 to +10):
+   - Are they taking fair responsibility or blame-shifting?
+   - Do they acknowledge any fault or nuance?
+   - Does it sound rehearsed/defensive vs genuine?
+
+4. SUBSTANCE & SPECIFICITY (-10 to +10):
+   - Concrete details (names, dates, specifics) vs vague generalities?
+   - Can their claims be verified or are they unfalsifiable?
+   - Is this real engagement or just noise?
+
+5. REAL-WORLD PLAUSIBILITY:
+   - Does this make sense given how people actually behave?
+   - Are there red flags suggesting dishonesty or exaggeration?
 
 Respond in this exact format:
 CONSISTENCY: [score]
 RESPONSIVENESS: [score]
 ACCOUNTABILITY: [score]
 SPECIFICITY: [score]
-ANALYSIS: [one sentence summary]
-FLAG: [major issue if any, or "none"]`;
+ANALYSIS: [2-3 sentences of substantive analysis explaining your assessment]
+FLAG: [specific credibility concern if any, or "none"]`;
 
   const result = await callClaude(prompt, 250);
   
@@ -214,24 +236,42 @@ export async function checkForSnapJudgment(
     return { triggered: false };
   }
 
+  const allTestimony = responses
+    .map((r: any) => `${r.party === 'A' ? caseData.partyA : caseData.partyB}: "${r.answer}"`)
+    .join('\n');
+
   const prompt = `${judge.style}
 
 Case: "${caseData.title}"
-${caseData.partyA} credibility: ${credibilityA}%
-${caseData.partyB} credibility: ${credibilityB}%
+Stakes: ${caseData.stakes}
 
-Recent response from ${lastParty === 'A' ? caseData.partyA : caseData.partyB}: "${lastResponse}"
+${caseData.partyA}'s claim: "${caseData.statementA}"
+${caseData.partyB}'s claim: "${caseData.statementB}"
 
-Should you issue a SNAP JUDGMENT and end the case early? Consider this if:
-- One party is clearly losing credibility
-- Someone made a damaging admission
-- The evidence strongly favors one side
-- A response was evasive, contradictory, or unconvincing
+Testimony so far:
+${allTestimony}
+
+Current credibility:
+${caseData.partyA}: ${credibilityA}%
+${caseData.partyB}: ${credibilityB}%
+
+Most recent response from ${lastParty === 'A' ? caseData.partyA : caseData.partyB}: "${lastResponse}"
+
+Should you issue a SNAP JUDGMENT and end the case early? Consider:
+- Has one party clearly won/lost based on logic and evidence?
+- Did someone make a damaging admission or contradiction?
+- Is this case FRIVOLOUS, FAKE, or NONSENSICAL and should be DISMISSED?
+- Are both parties just wasting the court's time with gibberish?
+
+You can:
+1. Continue the case (SNAP_JUDGMENT: no)
+2. Rule for one party early (SNAP_JUDGMENT: yes, WINNER: [name])
+3. DISMISS the case if it's not a real dispute (SNAP_JUDGMENT: yes, WINNER: NOBODY - CASE DISMISSED)
 
 Respond in this exact format:
 SNAP_JUDGMENT: yes or no
-WINNER: [name if yes, otherwise "none"]
-REASON: [dramatic one-liner if yes, otherwise "Case continues"]`;
+WINNER: [name if ruling early, "NOBODY - CASE DISMISSED" if dismissing, "none" if continuing]
+REASON: [dramatic one-liner explaining your decision]`;
 
   const result = await callClaude(prompt, 150);
 
@@ -309,28 +349,40 @@ export async function generateAIVerdict(
 
   const prompt = `${judge.style}
 
+You are delivering a verdict. While staying in character, you must THINK DEEPLY about the actual substance of this dispute and provide HELPFUL DELIBERATION.
+
 CASE: "${caseData.title}"
 STAKES: ${caseData.stakes}
 
-${caseData.partyA}'s statement: "${caseData.statementA}"
-${caseData.partyB}'s statement: "${caseData.statementB}"
+${caseData.partyA}'s position: "${caseData.statementA}"
+${caseData.partyB}'s position: "${caseData.statementB}"
 
-TESTIMONY:
+TESTIMONY DURING CROSS-EXAMINATION:
 ${allTestimony}
 
-FINAL CREDIBILITY:
+CREDIBILITY SCORES (based on how they answered questions):
 ${caseData.partyA}: ${credibilityA}%
 ${caseData.partyB}: ${credibilityB}%
 
-Deliver your VERDICT. Stay completely in character.
+DELIBERATION PROCESS - Think through these questions:
+1. What is the ACTUAL dispute here? Is it a real problem or just noise/nonsense?
+2. Who has the stronger logical case based on the evidence presented?
+3. Did either party make admissions, contradictions, or compelling points?
+4. What would a fair resolution look like in the real world?
+5. Is there enough substance here to make a ruling, or should the case be DISMISSED?
+
+You have THREE options:
+- Rule for ${caseData.partyA}
+- Rule for ${caseData.partyB}
+- DISMISS the case (if it's frivolous, fake, nonsensical, or both parties are equally at fault/not at fault)
 
 Respond in this exact format:
-WINNER: ${caseData.partyA} or ${caseData.partyB}
-SUMMARY: [One dramatic sentence announcing the winner]
-REASONING: [2-3 sentences explaining why, in character]
-QUOTE1: [A damning or vindicating quote from testimony]
-QUOTE2: [Another key quote]
-CREDIBILITY_IMPACT: [How credibility affected your decision]`;
+WINNER: ${caseData.partyA} or ${caseData.partyB} or NOBODY - CASE DISMISSED
+SUMMARY: [One dramatic sentence - either announcing winner or explaining dismissal]
+REASONING: [3-4 sentences of SUBSTANTIVE reasoning explaining your logic. Reference specific things they said. Explain WHY one side is more convincing or why neither deserves to win. Be helpful - if there's advice for resolving this dispute, include it.]
+QUOTE1: [A key quote from testimony that influenced your decision]
+QUOTE2: [Another revealing quote]
+CREDIBILITY_IMPACT: [How their credibility during questioning affected your ruling]`;
 
   const result = await callClaude(prompt, 500);
   
@@ -340,20 +392,37 @@ CREDIBILITY_IMPACT: [How credibility affected your decision]`;
   const quote1Match = result.match(/QUOTE1:\s*(.+)/i);
   const quote2Match = result.match(/QUOTE2:\s*(.+)/i);
   const credImpactMatch = result.match(/CREDIBILITY_IMPACT:\s*(.+)/i);
-  
-  const winnerName = winnerMatch?.[1]?.trim() || caseData.partyA;
-  const winner = winnerName === caseData.partyA ? 'A' : 'B';
-  const loserName = winner === 'A' ? caseData.partyB : caseData.partyA;
-  
+
+  const winnerRaw = winnerMatch?.[1]?.trim() || caseData.partyA;
+
+  // Check for case dismissal
+  const isDismissed = winnerRaw.toLowerCase().includes('nobody') ||
+                      winnerRaw.toLowerCase().includes('dismissed') ||
+                      winnerRaw.toLowerCase().includes('dismiss');
+
+  let winner: string;
+  let winnerName: string;
+  let loserName: string;
+
+  if (isDismissed) {
+    winner = 'DISMISSED';
+    winnerName = 'Nobody wins when the game is made up';
+    loserName = 'Nobody';
+  } else {
+    winnerName = winnerRaw;
+    winner = winnerName === caseData.partyA ? 'A' : 'B';
+    loserName = winner === 'A' ? caseData.partyB : caseData.partyA;
+  }
+
   const quotes: string[] = [];
   if (quote1Match?.[1]) quotes.push(quote1Match[1]);
   if (quote2Match?.[1]) quotes.push(quote2Match[1]);
-  
+
   return {
     winner,
     winnerName,
     loserName,
-    summary: summaryMatch?.[1]?.trim() || `${winnerName} wins this case!`,
+    summary: summaryMatch?.[1]?.trim() || (isDismissed ? 'Case dismissed!' : `${winnerName} wins this case!`),
     reasoning: reasoningMatch?.[1]?.trim() || 'Based on the evidence presented.',
     quotes,
     credibilityImpact: credImpactMatch?.[1]?.trim() || 'Credibility was a factor.'
