@@ -34,10 +34,10 @@ export function ChatInput({
   };
 
   return (
-    <div className={`tv-card p-2 sm:p-3 border-2 ${borderClass}`}>
-      <div className="flex items-center gap-2 mb-1 sm:mb-2">
-        <span className={`font-bold text-xs sm:text-sm ${textClass}`}>{partyName}</span>
-        <span className="text-gray-400 text-[10px] sm:text-xs">— respond</span>
+    <div className={`tv-card p-1.5 sm:p-2 border-2 ${borderClass}`}>
+      <div className="flex items-center gap-1.5 mb-1">
+        <span className={`font-bold text-[10px] sm:text-xs ${textClass}`}>{partyName}</span>
+        <span className="text-gray-400 text-[8px] sm:text-[10px]">— respond</span>
       </div>
 
       <textarea
@@ -45,23 +45,23 @@ export function ChatInput({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         onKeyDown={handleKeyDown}
-        rows={2}
+        rows={1}
         disabled={disabled || isLoading}
-        className={`w-full tv-input text-white resize-none text-xs sm:text-sm p-2 ${borderClass}`}
+        className={`w-full tv-input text-white resize-none text-[11px] sm:text-xs p-1.5 ${borderClass}`}
         style={{ color: 'white' }}
       />
 
-      <div className="flex justify-between items-center mt-1 sm:mt-2">
-        <div className="text-[8px] sm:text-[10px] text-gray-500">
+      <div className="flex justify-between items-center mt-1">
+        <div className="text-[7px] sm:text-[8px] text-gray-500">
           {value.length} chars
         </div>
 
         <button
           onClick={onSubmit}
           disabled={!value.trim() || disabled || isLoading}
-          className="tv-button py-1 px-3 sm:px-4 text-xs sm:text-sm"
+          className="tv-button py-0.5 px-2 sm:px-3 text-[10px] sm:text-xs"
         >
-          {isLoading ? 'SENDING...' : 'SUBMIT'}
+          {isLoading ? '...' : 'SUBMIT'}
         </button>
       </div>
     </div>
