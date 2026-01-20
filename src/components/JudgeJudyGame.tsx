@@ -2376,50 +2376,74 @@ if (isMultiplayer && !isMyTurn && !isLoading) {
               <p className="text-gray-400 text-xs sm:text-sm">{caseData.title}</p>
             </div>
 
-            {/* Winner announcement with Judge GIF */}
-            <div className="tv-gradient-gold p-3 sm:p-4 md:p-6 mb-4 sm:mb-6 text-center winner-glow">
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                {/* Judge reaction GIF */}
-                <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-lg overflow-hidden border-3 border-yellow-700 flex-shrink-0">
-                  <img
-                    src={judgeGifs.winner}
-                    alt="Judge's reaction"
-                    className="w-full h-full object-contain"
-                  />
-                </div>
-                <div>
-                  <div className="text-yellow-900 text-[10px] sm:text-xs font-bold tracking-widest mb-1 sm:mb-2">WINNER</div>
-                  <div className="text-2xl sm:text-3xl md:text-4xl font-black text-black mb-1 sm:mb-2">{verdict.winnerName} 🏆</div>
-                  <div className="text-yellow-900 italic text-xs sm:text-sm">&quot;{verdict.summary}&quot;</div>
+            {/* Verdict announcement - different for dismissed vs winner */}
+            {verdict.isDismissed ? (
+              /* CASE DISMISSED UI */
+              <div className="tv-gradient-red p-3 sm:p-4 md:p-6 mb-4 sm:mb-6 text-center">
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                  {/* Judge reaction GIF */}
+                  <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-lg overflow-hidden border-3 border-red-700 flex-shrink-0">
+                    <img
+                      src={judgeGifs.winner}
+                      alt="Judge's reaction"
+                      className="w-full h-full object-contain"
+                    />
+                  </div>
+                  <div>
+                    <div className="text-red-200 text-[10px] sm:text-xs font-bold tracking-widest mb-1 sm:mb-2">RULING</div>
+                    <div className="text-2xl sm:text-3xl md:text-4xl font-black text-white mb-1 sm:mb-2">CASE DISMISSED</div>
+                    <div className="text-red-200 italic text-xs sm:text-sm">&quot;{verdict.summary}&quot;</div>
+                  </div>
                 </div>
               </div>
-            </div>
+            ) : (
+              /* WINNER UI */
+              <>
+                <div className="tv-gradient-gold p-3 sm:p-4 md:p-6 mb-4 sm:mb-6 text-center winner-glow">
+                  <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                    {/* Judge reaction GIF */}
+                    <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-lg overflow-hidden border-3 border-yellow-700 flex-shrink-0">
+                      <img
+                        src={judgeGifs.winner}
+                        alt="Judge's reaction"
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                    <div>
+                      <div className="text-yellow-900 text-[10px] sm:text-xs font-bold tracking-widest mb-1 sm:mb-2">WINNER</div>
+                      <div className="text-2xl sm:text-3xl md:text-4xl font-black text-black mb-1 sm:mb-2">{verdict.winnerName} 🏆</div>
+                      <div className="text-yellow-900 italic text-xs sm:text-sm">&quot;{verdict.summary}&quot;</div>
+                    </div>
+                  </div>
+                </div>
 
-            {/* Winner/Loser category-specific GIFs */}
-            <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-6">
-              <div className="tv-card p-2 sm:p-3 text-center">
-                <div className="text-green-400 text-[10px] sm:text-xs font-bold tracking-widest mb-2">🏆 WINNER</div>
-                <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto rounded-lg overflow-hidden border-2 border-green-500 mb-2">
-                  <img
-                    src={getCategoryGif(caseData.category, 'winner')}
-                    alt="Winner reaction"
-                    className="w-full h-full object-contain"
-                  />
+                {/* Winner/Loser category-specific GIFs - only for non-dismissed */}
+                <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-6">
+                  <div className="tv-card p-2 sm:p-3 text-center">
+                    <div className="text-green-400 text-[10px] sm:text-xs font-bold tracking-widest mb-2">🏆 WINNER</div>
+                    <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto rounded-lg overflow-hidden border-2 border-green-500 mb-2">
+                      <img
+                        src={getCategoryGif(caseData.category, 'winner')}
+                        alt="Winner reaction"
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                    <div className="text-white font-bold text-xs sm:text-sm">{verdict.winnerName}</div>
+                  </div>
+                  <div className="tv-card p-2 sm:p-3 text-center">
+                    <div className="text-red-400 text-[10px] sm:text-xs font-bold tracking-widest mb-2">😢 LOSER</div>
+                    <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto rounded-lg overflow-hidden border-2 border-red-500 mb-2">
+                      <img
+                        src={getCategoryGif(caseData.category, 'loser')}
+                        alt="Loser reaction"
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                    <div className="text-white font-bold text-xs sm:text-sm">{verdict.loserName}</div>
+                  </div>
                 </div>
-                <div className="text-white font-bold text-xs sm:text-sm">{verdict.winnerName}</div>
-              </div>
-              <div className="tv-card p-2 sm:p-3 text-center">
-                <div className="text-red-400 text-[10px] sm:text-xs font-bold tracking-widest mb-2">😢 LOSER</div>
-                <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto rounded-lg overflow-hidden border-2 border-red-500 mb-2">
-                  <img
-                    src={getCategoryGif(caseData.category, 'loser')}
-                    alt="Loser reaction"
-                    className="w-full h-full object-contain"
-                  />
-                </div>
-                <div className="text-white font-bold text-xs sm:text-sm">{verdict.loserName}</div>
-              </div>
-            </div>
+              </>
+            )}
 
             <div className="tv-card p-2 sm:p-4 mb-4 sm:mb-6">
               <div className="text-yellow-500 text-[10px] sm:text-xs font-bold tracking-widest mb-1 sm:mb-2">JUDGE&apos;S REASONING</div>

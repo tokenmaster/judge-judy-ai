@@ -404,6 +404,7 @@ export async function generateAIVerdict(
   reasoning: string;
   quotes: string[];
   credibilityImpact: string;
+  isDismissed?: boolean;
 }> {
   const judge = JUDGE_PERSONALITIES[judgeId as keyof typeof JUDGE_PERSONALITIES];
 
@@ -488,8 +489,8 @@ CREDIBILITY_IMPACT: [How their answers during each round affected your ruling]`;
 
   if (isDismissed) {
     winner = 'DISMISSED';
-    winnerName = 'Nobody wins when the game is made up';
-    loserName = 'Nobody';
+    winnerName = 'Case Dismissed';
+    loserName = 'Case Dismissed';
   } else {
     winnerName = winnerRaw;
     winner = winnerName === caseData.partyA ? 'A' : 'B';
@@ -507,7 +508,8 @@ CREDIBILITY_IMPACT: [How their answers during each round affected your ruling]`;
     summary: summaryMatch?.[1]?.trim() || (isDismissed ? 'Case dismissed!' : `${winnerName} wins this case!`),
     reasoning: reasoningMatch?.[1]?.trim() || 'Based on the evidence presented.',
     quotes,
-    credibilityImpact: credImpactMatch?.[1]?.trim() || 'Credibility was a factor.'
+    credibilityImpact: credImpactMatch?.[1]?.trim() || 'Credibility was a factor.',
+    isDismissed
   };
 }
 
