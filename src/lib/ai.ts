@@ -110,41 +110,47 @@ export async function generateMainQuestion(
 
   const prompt = `${judge.style}
 
-You are judging a dispute: "${caseData.title}"
+You are cross-examining ${targetName} in a dispute: "${caseData.title}"
 
-${targetName}'s opening statement: "${targetStatement}"
-${otherName}'s opening statement: "${otherStatement}"
-
-${opponentResponses ? `${otherName}'s testimony so far:\n${opponentResponses}\n` : ''}
-${targetResponses ? `${targetName}'s previous testimony:\n${targetResponses}\n` : ''}
+CONTEXT FOR YOUR QUESTION:
+- ${targetName}'s claim: "${targetStatement}"
+- ${otherName} claims: "${otherStatement}"
+${opponentResponses ? `- ${otherName} previously testified: ${opponentResponses}\n` : ''}
+${targetResponses ? `- ${targetName} already answered: ${targetResponses}\n` : ''}
 
 === ROUND ${examRound + 1}: ${roundPurpose.name.toUpperCase()} ===
 Goal: ${roundPurpose.goal}
-You're questioning ${targetName}.
 
-Generate ONE question focused on: ${roundPurpose.questionFocus}
+You are ONLY questioning ${targetName} right now. Ask them ONE specific question.
 
-GOOD QUESTION EXAMPLES FOR THIS ROUND:
-${roundPurpose.examples.map(ex => `- "${ex}"`).join('\n')}
+QUESTION TYPE FOR THIS ROUND: ${roundPurpose.questionFocus}
 
-YOUR QUESTION MUST:
-- Be specific to something ${targetName} said or claimed
-- ${examRound === 0 ? 'Clarify ambiguous terms, assumptions, or scope of their claim' : ''}
-- ${examRound === 1 ? 'Demand evidence, proof, or logical justification for their assertions' : ''}
-- ${examRound === 2 ? 'Test edge cases, probe weaknesses, or ask about their responsibility/fault' : ''}
-- Stay in character with your judicial style
-- Be directly answerable (not rhetorical)
+CRITICAL RULES:
+1. Address ONLY ${targetName} - do not mention or lecture both parties
+2. Ask a REAL QUESTION that ${targetName} can actually answer (must end with ?)
+3. Reference something specific from ${targetName}'s statement or previous answers
+4. ${examRound === 0 ? 'Ask them to CLARIFY something ambiguous in their claim' : ''}
+5. ${examRound === 1 ? 'Ask them to PROVE or provide EVIDENCE for a specific assertion' : ''}
+6. ${examRound === 2 ? 'Ask about a WEAKNESS or what would make them WRONG' : ''}
 
-BAD QUESTIONS TO AVOID:
-- Generic questions that could apply to anyone
-- Meta-commentary about the trial process
-- Questions about feelings instead of facts
-- Rhetorical questions
+DO NOT:
+- Rant at both parties simultaneously
+- Make statements instead of asking questions
+- Comment on the trial process itself
+- Ask rhetorical questions that don't need answers
 
-Just output ONE direct question, nothing else.`;
+Output ONLY the question itself, addressed to ${targetName}. Example format:
+"${targetName}, [your specific question]?"`;
 
   const question = await callClaude(prompt, 150);
-  return question || `${targetName}, can you explain your side of what happened?`;
+
+  // Ensure it's actually a question
+  let cleanQuestion = question.trim();
+  if (!cleanQuestion.endsWith('?')) {
+    cleanQuestion = `${targetName}, can you explain what you mean by "${targetStatement.slice(0, 50)}..."?`;
+  }
+
+  return cleanQuestion || `${targetName}, can you explain your side of what happened?`;
 }
 
 // Generate follow-up question - DISABLED
