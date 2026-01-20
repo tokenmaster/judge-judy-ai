@@ -691,15 +691,15 @@ useEffect(() => {
       lastQuestionGenTime.current = Date.now();
       setCanObjectToQuestion(true);
       setObjectionWindow({ type: 'question', content: newQuestion, targetParty: newTarget });
-    } else if (newPhase === 'crossExam' && currentRole === newTarget && !isGeneratingQuestion.current) {
-      // No question yet, it's crossExam, and WE are the one being questioned (our turn to generate)
-      // Only the examTarget player generates - the other player waits for DB
+    } else if (newPhase === 'crossExam' && currentRole !== newTarget && !isGeneratingQuestion.current) {
+      // No question yet, it's crossExam, and WE are the EXAMINER (our turn to generate questions)
+      // Only the examiner (non-target) player generates - the target player waits for DB
       if (questionTargetRef.current !== newQuestionKey) {
         console.log('[CaseUpdate] Our turn to generate question for', newQuestionKey);
         // Small delay to let state settle before generating
         setTimeout(() => {
           // Double-check all conditions after delay
-          const stillOurTurn = myRoleRef.current === newTarget;
+          const stillOurTurn = myRoleRef.current !== newTarget;
           const noQuestionYet = !currentQuestion; // Check current state
 
           console.log('[CaseUpdate] Timeout fired:', {
