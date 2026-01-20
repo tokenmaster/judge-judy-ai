@@ -571,12 +571,24 @@ export function PartyNamePlate({
   );
 }
 
-// Round Indicator - Sports Style
+// Round purposes for display
+const ROUND_NAMES: { [key: number]: { name: string; goal: string } } = {
+  1: { name: 'Clarification', goal: 'Defining claims & assumptions' },
+  2: { name: 'Justification', goal: 'Testing evidence & reasoning' },
+  3: { name: 'Stress Test', goal: 'Exposing weaknesses & tradeoffs' }
+};
+
+// Round Indicator - Sports Style with Purpose
 export function RoundIndicator({ round, totalRounds }: { round: number; totalRounds: number }) {
+  const roundInfo = ROUND_NAMES[round] || { name: 'Cross-Exam', goal: '' };
+
   return (
     <div className="tv-stat-box inline-block px-4 py-2">
-      <div className="text-xs text-gray-400 font-bold tracking-widest">ROUND</div>
-      <div className="text-yellow-500 font-black text-2xl">{round} <span className="text-gray-500 text-lg">OF {totalRounds}</span></div>
+      <div className="text-xs text-gray-400 font-bold tracking-widest">ROUND {round} OF {totalRounds}</div>
+      <div className="text-yellow-500 font-black text-lg">{roundInfo.name}</div>
+      {roundInfo.goal && (
+        <div className="text-[10px] text-gray-500 mt-0.5">{roundInfo.goal}</div>
+      )}
     </div>
   );
 }

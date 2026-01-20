@@ -39,6 +39,46 @@ async function callClaude(prompt: string, maxTokens: number = 300): Promise<stri
   }
 }
 
+// Round purposes for structured cross-examination (exported for UI)
+export const ROUND_PURPOSES = {
+  0: {
+    name: 'Clarification & Scope',
+    goal: 'eliminate ambiguity and surface hidden assumptions',
+    questionFocus: 'clarifying core claims or assumptions',
+    examples: [
+      'When you say "[specific term]", what exactly do you mean by that?',
+      'Your statement assumes [assumption]. Is that correct?',
+      'Can you clarify what specifically happened on [date/time]?',
+      'What exactly are you asking for as an outcome here?'
+    ],
+    judgeCheck: 'Are their claims well-defined? Are assumptions explicit or evasive?'
+  },
+  1: {
+    name: 'Justification & Evidence',
+    goal: 'test strength of reasoning and support',
+    questionFocus: 'evidence, proof, and logical basis for claims',
+    examples: [
+      'What evidence do you have that supports this claim?',
+      'Why should I believe your version over theirs?',
+      'Can you prove that [specific claim] actually happened?',
+      'What makes you so certain about [assertion]?'
+    ],
+    judgeCheck: 'Quality of evidence vs. rhetoric? Logical coherence? Data vs. assertion?'
+  },
+  2: {
+    name: 'Stress Test & Tradeoffs',
+    goal: 'expose fragility, risk, and edge cases',
+    questionFocus: 'failure modes, downsides, and conditions where their position breaks',
+    examples: [
+      'Under what circumstances would you admit you were wrong?',
+      'What\'s the weakest part of your argument?',
+      'If [opposing scenario], would your position still hold?',
+      'What responsibility, if any, do you bear in this situation?'
+    ],
+    judgeCheck: 'Risk awareness? Intellectual honesty? Do they acknowledge any fault?'
+  }
+};
+
 // Generate main cross-examination question
 export async function generateMainQuestion(
   judgeId: string,
@@ -53,7 +93,10 @@ export async function generateMainQuestion(
   const otherName = examTarget === 'A' ? caseData.partyB : caseData.partyA;
   const targetStatement = examTarget === 'A' ? caseData.statementA : caseData.statementB;
   const otherStatement = examTarget === 'A' ? caseData.statementB : caseData.statementA;
-  
+
+  // Get round purpose
+  const roundPurpose = ROUND_PURPOSES[examRound as keyof typeof ROUND_PURPOSES] || ROUND_PURPOSES[0];
+
   const targetResponses = responses
     .filter((r: any) => r.party === examTarget)
     .map((r: any) => `Q: ${r.question}\nA: ${r.answer}`)
@@ -75,24 +118,28 @@ ${otherName}'s opening statement: "${otherStatement}"
 ${opponentResponses ? `${otherName}'s testimony so far:\n${opponentResponses}\n` : ''}
 ${targetResponses ? `${targetName}'s previous testimony:\n${targetResponses}\n` : ''}
 
-This is Round ${examRound + 1} of cross-examination. You're questioning ${targetName}.
+=== ROUND ${examRound + 1}: ${roundPurpose.name.toUpperCase()} ===
+Goal: ${roundPurpose.goal}
+You're questioning ${targetName}.
 
-Generate ONE clear, direct question that:
-- Quotes or paraphrases something specific ${otherName} said, then asks ${targetName} to respond
-- Can be answered with a simple yes/no plus explanation, or a clear factual response
-- Focuses on WHO did WHAT, WHEN, and WHY - the actual facts of the dispute
-- Stays in character with your judicial style
+Generate ONE question focused on: ${roundPurpose.questionFocus}
 
-GOOD QUESTION EXAMPLES:
-- "${otherName} says you promised to [specific thing]. Did you make that promise or not?"
-- "${otherName} claims [specific claim]. Is that true?"
-- "According to ${otherName}, you [did something]. What's your side of that?"
+GOOD QUESTION EXAMPLES FOR THIS ROUND:
+${roundPurpose.examples.map(ex => `- "${ex}"`).join('\n')}
+
+YOUR QUESTION MUST:
+- Be specific to something ${targetName} said or claimed
+- ${examRound === 0 ? 'Clarify ambiguous terms, assumptions, or scope of their claim' : ''}
+- ${examRound === 1 ? 'Demand evidence, proof, or logical justification for their assertions' : ''}
+- ${examRound === 2 ? 'Test edge cases, probe weaknesses, or ask about their responsibility/fault' : ''}
+- Stay in character with your judicial style
+- Be directly answerable (not rhetorical)
 
 BAD QUESTIONS TO AVOID:
-- Meta-commentary about the trial ("how am I supposed to ask you about...")
-- Vague questions ("explain yourself")
+- Generic questions that could apply to anyone
+- Meta-commentary about the trial process
 - Questions about feelings instead of facts
-- Rhetorical questions that don't need an answer
+- Rhetorical questions
 
 Just output ONE direct question, nothing else.`;
 
@@ -342,47 +389,65 @@ export async function generateAIVerdict(
   credibilityImpact: string;
 }> {
   const judge = JUDGE_PERSONALITIES[judgeId as keyof typeof JUDGE_PERSONALITIES];
-  
-  const allTestimony = responses
-    .map((r: any) => `${r.party === 'A' ? caseData.partyA : caseData.partyB}: "${r.answer}"`)
-    .join('\n');
+
+  // Organize testimony by round for structured analysis
+  const round1Testimony = responses.slice(0, 2); // Clarification round
+  const round2Testimony = responses.slice(2, 4); // Justification round
+  const round3Testimony = responses.slice(4, 6); // Stress test round
+
+  const formatRoundTestimony = (roundResponses: any[]) => {
+    return roundResponses.map((r: any) =>
+      `${r.party === 'A' ? caseData.partyA : caseData.partyB}: "${r.answer}"`
+    ).join('\n');
+  };
 
   const prompt = `${judge.style}
 
-You are delivering a verdict. While staying in character, you must THINK DEEPLY about the actual substance of this dispute and provide HELPFUL DELIBERATION.
+You are delivering a verdict. While staying in character, you must SYSTEMATICALLY EVALUATE both parties based on the structured cross-examination.
 
 CASE: "${caseData.title}"
 STAKES: ${caseData.stakes}
 
-${caseData.partyA}'s position: "${caseData.statementA}"
-${caseData.partyB}'s position: "${caseData.statementB}"
+=== OPENING POSITIONS ===
+${caseData.partyA}'s claim: "${caseData.statementA}"
+${caseData.partyB}'s claim: "${caseData.statementB}"
 
-TESTIMONY DURING CROSS-EXAMINATION:
-${allTestimony}
+=== ROUND 1: CLARIFICATION & SCOPE ===
+(Goal: Were claims well-defined? Were assumptions explicit or evasive?)
+${formatRoundTestimony(round1Testimony) || 'No testimony'}
 
-CREDIBILITY SCORES (based on how they answered questions):
+=== ROUND 2: JUSTIFICATION & EVIDENCE ===
+(Goal: Quality of evidence? Logical coherence? Assertion vs. proof?)
+${formatRoundTestimony(round2Testimony) || 'No testimony'}
+
+=== ROUND 3: STRESS TEST & TRADEOFFS ===
+(Goal: Risk awareness? Intellectual honesty? Do they acknowledge fault?)
+${formatRoundTestimony(round3Testimony) || 'No testimony'}
+
+=== CREDIBILITY SCORES ===
 ${caseData.partyA}: ${credibilityA}%
 ${caseData.partyB}: ${credibilityB}%
 
-DELIBERATION PROCESS - Think through these questions:
-1. What is the ACTUAL dispute here? Is it a real problem or just noise/nonsense?
-2. Who has the stronger logical case based on the evidence presented?
-3. Did either party make admissions, contradictions, or compelling points?
-4. What would a fair resolution look like in the real world?
-5. Is there enough substance here to make a ruling, or should the case be DISMISSED?
+=== SYNTHESIS PROCESS ===
+Compare both parties across:
+1. CLARITY: Whose claims were better defined and less ambiguous?
+2. JUSTIFICATION: Whose reasoning was stronger, with better evidence?
+3. RISK AWARENESS: Who showed more intellectual honesty about weaknesses?
+4. Which position holds under the widest set of conditions?
+5. Which relies on fewer or weaker assumptions?
 
 You have THREE options:
 - Rule for ${caseData.partyA}
 - Rule for ${caseData.partyB}
-- DISMISS the case (if it's frivolous, fake, nonsensical, or both parties are equally at fault/not at fault)
+- DISMISS the case (if frivolous, fake, or both equally at fault)
 
 Respond in this exact format:
 WINNER: ${caseData.partyA} or ${caseData.partyB} or NOBODY - CASE DISMISSED
-SUMMARY: [One dramatic sentence - either announcing winner or explaining dismissal]
-REASONING: [3-4 sentences of SUBSTANTIVE reasoning explaining your logic. Reference specific things they said. Explain WHY one side is more convincing or why neither deserves to win. Be helpful - if there's advice for resolving this dispute, include it.]
-QUOTE1: [A key quote from testimony that influenced your decision]
-QUOTE2: [Another revealing quote]
-CREDIBILITY_IMPACT: [How their credibility during questioning affected your ruling]`;
+SUMMARY: [One dramatic sentence announcing the verdict]
+REASONING: [3-4 sentences referencing KEY QUESTIONS that determined outcome. What was the critical weakness in the losing position? Include any unresolved uncertainty.]
+QUOTE1: [A revealing quote from testimony]
+QUOTE2: [Another key quote]
+CREDIBILITY_IMPACT: [How their answers during each round affected your ruling]`;
 
   const result = await callClaude(prompt, 500);
   
