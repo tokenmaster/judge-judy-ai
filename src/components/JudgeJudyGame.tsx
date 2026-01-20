@@ -252,8 +252,8 @@ useEffect(() => {
         statementA: caseRecord.statement_a || '',
         statementB: caseRecord.statement_b || ''
       });
-      setCredibilityA(caseRecord.credibility_a || 50);
-      setCredibilityB(caseRecord.credibility_b || 50);
+      setCredibilityA(caseRecord.credibility_a ?? 100);
+      setCredibilityB(caseRecord.credibility_b ?? 100);
       setExamRound(caseRecord.exam_round || 0);
       setExamTarget(caseRecord.exam_target || 'A');
       setCurrentQuestion(caseRecord.current_question || '');
@@ -325,8 +325,8 @@ useEffect(() => {
           statementA: caseRecord.statement_a || '',
           statementB: caseRecord.statement_b || ''
         });
-        setCredibilityA(caseRecord.credibility_a || 50);
-        setCredibilityB(caseRecord.credibility_b || 50);
+        setCredibilityA(caseRecord.credibility_a ?? 100);
+        setCredibilityB(caseRecord.credibility_b ?? 100);
         setVerdict(caseRecord.verdict);
         setVerdictAccepted(true); // Show as already accepted for shared view
         setRoomCode(caseRecord.room_code);
@@ -450,8 +450,8 @@ useEffect(() => {
         party_a_session: sessionId,
         phase: 'waiting',
         current_turn: 'A',
-        credibility_a: 50,
-        credibility_b: 50
+        credibility_a: 100,
+        credibility_b: 100
       })
       .select()
       .single();
@@ -526,8 +526,8 @@ useEffect(() => {
       statementA: caseRecord.statement_a || '',
       statementB: caseRecord.statement_b || ''
     });
-    setCredibilityA(caseRecord.credibility_a || 50);
-    setCredibilityB(caseRecord.credibility_b || 50);
+    setCredibilityA(caseRecord.credibility_a ?? 100);
+    setCredibilityB(caseRecord.credibility_b ?? 100);
     setPhase('statements');
     setCurrentParty('A');
     setIsLoading(false);
