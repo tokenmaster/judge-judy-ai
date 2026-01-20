@@ -1400,6 +1400,118 @@ Settle YOUR disputes at judgejoody.ai`;
     );
   }
 
+  // VIEW PAST VERDICT (must be before HOME check so it can render from stats tab)
+  if (selectedPastCase) {
+    const pastVerdict = selectedPastCase.verdict;
+    const pastJudge = JUDGE_PERSONALITIES[selectedPastCase.judge as keyof typeof JUDGE_PERSONALITIES];
+    const pastJudgeGifs = JUDGE_GIFS[selectedPastCase.judge as keyof typeof JUDGE_GIFS] || JUDGE_GIFS.joody;
+
+    return (
+      <div className="min-h-screen p-2 sm:p-4 md:p-6">
+        <div className="w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-2xl mx-auto">
+          <TVFrame>
+            <button
+              onClick={() => setSelectedPastCase(null)}
+              className="text-yellow-500 hover:text-yellow-300 mb-4 font-bold text-sm"
+            >
+              ← BACK TO STATS
+            </button>
+
+            <div className="text-center mb-4 sm:mb-6">
+              <div className="text-3xl sm:text-4xl md:text-5xl mb-2">📜</div>
+              <h2 className="tv-title text-lg sm:text-xl md:text-2xl mb-1">CASE VERDICT</h2>
+              <p className="text-gray-400 text-xs sm:text-sm">{selectedPastCase.title}</p>
+            </div>
+
+            {/* Case Info */}
+            <div className="tv-card p-3 sm:p-4 mb-4">
+              <div className="flex items-center justify-center gap-2 sm:gap-4 mb-3">
+                <div className="text-center flex-1">
+                  <div className="text-blue-400 font-bold text-sm sm:text-base">{selectedPastCase.party_a_name}</div>
+                  <div className="text-[10px] text-gray-500">Plaintiff</div>
+                </div>
+                <div className="text-yellow-500 font-bold text-lg">VS</div>
+                <div className="text-center flex-1">
+                  <div className="text-red-400 font-bold text-sm sm:text-base">{selectedPastCase.party_b_name}</div>
+                  <div className="text-[10px] text-gray-500">Defendant</div>
+                </div>
+              </div>
+              <div className="text-center text-gray-400 text-xs">
+                ⚖️ Judge: {pastJudge?.name || 'Judge Joody'}
+              </div>
+            </div>
+
+            {/* Winner Announcement */}
+            <div className="tv-gradient-gold p-3 sm:p-4 md:p-6 mb-4 text-center winner-glow">
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
+                <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-lg overflow-hidden border-3 border-yellow-700 flex-shrink-0">
+                  <img
+                    src={pastJudgeGifs.winner}
+                    alt="Judge's reaction"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div>
+                  <div className="text-yellow-900 text-[10px] sm:text-xs font-bold tracking-widest mb-1">WINNER</div>
+                  <div className="text-xl sm:text-2xl md:text-3xl font-black text-black mb-1">{pastVerdict?.winnerName} 🏆</div>
+                  <div className="text-yellow-900 italic text-xs sm:text-sm">&quot;{pastVerdict?.summary}&quot;</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Reasoning */}
+            <div className="tv-card p-3 sm:p-4 mb-4">
+              <div className="text-yellow-500 text-[10px] sm:text-xs font-bold tracking-widest mb-2">JUDGE&apos;S REASONING</div>
+              <div className="text-white text-xs sm:text-sm">{pastVerdict?.reasoning}</div>
+            </div>
+
+            {/* Key Quotes */}
+            {pastVerdict?.quotes?.length > 0 && (
+              <div className="tv-card p-3 sm:p-4 mb-4">
+                <div className="text-yellow-500 text-[10px] sm:text-xs font-bold tracking-widest mb-2">KEY QUOTES</div>
+                {pastVerdict.quotes.map((q: string, i: number) => (
+                  <div key={i} className="text-gray-300 italic text-xs sm:text-sm mb-2 pl-3 border-l-2 border-yellow-600">&quot;{q}&quot;</div>
+                ))}
+              </div>
+            )}
+
+            {/* Credibility Scores */}
+            <div className="tv-card p-3 sm:p-4 mb-4">
+              <div className="text-yellow-500 text-[10px] sm:text-xs font-bold tracking-widest mb-2">FINAL CREDIBILITY</div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="text-center">
+                  <div className="text-blue-400 font-bold text-xs sm:text-sm">{selectedPastCase.party_a_name}</div>
+                  <div className="text-lg sm:text-xl font-black text-white">{selectedPastCase.credibility_a}%</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-red-400 font-bold text-xs sm:text-sm">{selectedPastCase.party_b_name}</div>
+                  <div className="text-lg sm:text-xl font-black text-white">{selectedPastCase.credibility_b}%</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Stakes */}
+            {selectedPastCase.stakes && (
+              <div className="tv-gradient-gold p-2 sm:p-3 mb-4 text-center">
+                <div className="text-yellow-900 text-[10px] sm:text-xs font-bold tracking-widest">🏆 STAKES</div>
+                <div className="text-black font-bold text-sm">{selectedPastCase.stakes}</div>
+              </div>
+            )}
+
+            <button
+              onClick={() => setSelectedPastCase(null)}
+              className="w-full tv-button py-3 text-sm sm:text-base"
+            >
+              ← BACK TO STATS
+            </button>
+
+            <ChannelBug text="COURT TV" />
+          </TVFrame>
+        </div>
+      </div>
+    );
+  }
+
   // HOME
   if (phase === 'home') {
     return (
@@ -1583,118 +1695,6 @@ Settle YOUR disputes at judgejoody.ai`;
                 </div>
               )}
             </div>
-            <ChannelBug text="COURT TV" />
-          </TVFrame>
-        </div>
-      </div>
-    );
-  }
-
-  // VIEW PAST VERDICT
-  if (selectedPastCase) {
-    const pastVerdict = selectedPastCase.verdict;
-    const pastJudge = JUDGE_PERSONALITIES[selectedPastCase.judge as keyof typeof JUDGE_PERSONALITIES];
-    const pastJudgeGifs = JUDGE_GIFS[selectedPastCase.judge as keyof typeof JUDGE_GIFS] || JUDGE_GIFS.joody;
-
-    return (
-      <div className="min-h-screen p-2 sm:p-4 md:p-6">
-        <div className="w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-2xl mx-auto">
-          <TVFrame>
-            <button
-              onClick={() => setSelectedPastCase(null)}
-              className="text-yellow-500 hover:text-yellow-300 mb-4 font-bold text-sm"
-            >
-              ← BACK TO STATS
-            </button>
-
-            <div className="text-center mb-4 sm:mb-6">
-              <div className="text-3xl sm:text-4xl md:text-5xl mb-2">📜</div>
-              <h2 className="tv-title text-lg sm:text-xl md:text-2xl mb-1">CASE VERDICT</h2>
-              <p className="text-gray-400 text-xs sm:text-sm">{selectedPastCase.title}</p>
-            </div>
-
-            {/* Case Info */}
-            <div className="tv-card p-3 sm:p-4 mb-4">
-              <div className="flex items-center justify-center gap-2 sm:gap-4 mb-3">
-                <div className="text-center flex-1">
-                  <div className="text-blue-400 font-bold text-sm sm:text-base">{selectedPastCase.party_a_name}</div>
-                  <div className="text-[10px] text-gray-500">Plaintiff</div>
-                </div>
-                <div className="text-yellow-500 font-bold text-lg">VS</div>
-                <div className="text-center flex-1">
-                  <div className="text-red-400 font-bold text-sm sm:text-base">{selectedPastCase.party_b_name}</div>
-                  <div className="text-[10px] text-gray-500">Defendant</div>
-                </div>
-              </div>
-              <div className="text-center text-gray-400 text-xs">
-                ⚖️ Judge: {pastJudge?.name || 'Judge Joody'}
-              </div>
-            </div>
-
-            {/* Winner Announcement */}
-            <div className="tv-gradient-gold p-3 sm:p-4 md:p-6 mb-4 text-center winner-glow">
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
-                <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-lg overflow-hidden border-3 border-yellow-700 flex-shrink-0">
-                  <img
-                    src={pastJudgeGifs.winner}
-                    alt="Judge's reaction"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div>
-                  <div className="text-yellow-900 text-[10px] sm:text-xs font-bold tracking-widest mb-1">WINNER</div>
-                  <div className="text-xl sm:text-2xl md:text-3xl font-black text-black mb-1">{pastVerdict?.winnerName} 🏆</div>
-                  <div className="text-yellow-900 italic text-xs sm:text-sm">&quot;{pastVerdict?.summary}&quot;</div>
-                </div>
-              </div>
-            </div>
-
-            {/* Reasoning */}
-            <div className="tv-card p-3 sm:p-4 mb-4">
-              <div className="text-yellow-500 text-[10px] sm:text-xs font-bold tracking-widest mb-2">JUDGE&apos;S REASONING</div>
-              <div className="text-white text-xs sm:text-sm">{pastVerdict?.reasoning}</div>
-            </div>
-
-            {/* Key Quotes */}
-            {pastVerdict?.quotes?.length > 0 && (
-              <div className="tv-card p-3 sm:p-4 mb-4">
-                <div className="text-yellow-500 text-[10px] sm:text-xs font-bold tracking-widest mb-2">KEY QUOTES</div>
-                {pastVerdict.quotes.map((q: string, i: number) => (
-                  <div key={i} className="text-gray-300 italic text-xs sm:text-sm mb-2 pl-3 border-l-2 border-yellow-600">&quot;{q}&quot;</div>
-                ))}
-              </div>
-            )}
-
-            {/* Credibility Scores */}
-            <div className="tv-card p-3 sm:p-4 mb-4">
-              <div className="text-yellow-500 text-[10px] sm:text-xs font-bold tracking-widest mb-2">FINAL CREDIBILITY</div>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="text-center">
-                  <div className="text-blue-400 font-bold text-xs sm:text-sm">{selectedPastCase.party_a_name}</div>
-                  <div className="text-lg sm:text-xl font-black text-white">{selectedPastCase.credibility_a}%</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-red-400 font-bold text-xs sm:text-sm">{selectedPastCase.party_b_name}</div>
-                  <div className="text-lg sm:text-xl font-black text-white">{selectedPastCase.credibility_b}%</div>
-                </div>
-              </div>
-            </div>
-
-            {/* Stakes */}
-            {selectedPastCase.stakes && (
-              <div className="tv-gradient-gold p-2 sm:p-3 mb-4 text-center">
-                <div className="text-yellow-900 text-[10px] sm:text-xs font-bold tracking-widest">🏆 STAKES</div>
-                <div className="text-black font-bold text-sm">{selectedPastCase.stakes}</div>
-              </div>
-            )}
-
-            <button
-              onClick={() => setSelectedPastCase(null)}
-              className="w-full tv-button py-3 text-sm sm:text-base"
-            >
-              ← BACK TO STATS
-            </button>
-
             <ChannelBug text="COURT TV" />
           </TVFrame>
         </div>
