@@ -2163,24 +2163,27 @@ Settle YOUR disputes at judgejoody.ai`;
               </div>
             </div>
 
-            {/* Guidance box - hidden on very small screens */}
-            <div className="tv-card p-2 sm:p-4 mb-3 sm:mb-4 hidden xs:block">
-              <div className="text-yellow-500 text-xs sm:text-sm font-bold mb-1 sm:mb-2">💡 WHAT TO WRITE:</div>
-              <ul className="text-gray-400 text-[10px] sm:text-sm space-y-0.5 sm:space-y-1">
-                <li>• <span className="text-gray-300">What happened?</span> Your perspective</li>
-                <li>• <span className="text-gray-300">Why are you right?</span> Explain your case</li>
-                <li>• <span className="text-gray-300">Be specific!</span> Include details</li>
-              </ul>
+            {/* Judge's Opening Question */}
+            <div className="tv-card p-3 sm:p-4 mb-3 sm:mb-4 border-2 border-yellow-600">
+              <div className="text-yellow-500 text-xs sm:text-sm font-bold mb-2">
+                &#9878; {JUDGE_PERSONALITIES[caseData.judge as keyof typeof JUDGE_PERSONALITIES]?.name?.toUpperCase() || 'JUDGE JOODY'}:
+              </div>
+              <div className="text-white text-sm sm:text-base">
+                {isPartyA
+                  ? `So, ${currentName}, you filed a claim about "${caseData.title}". Tell me exactly what happened and why you think you're in the right.`
+                  : `${currentName}, ${caseData.partyA} has made some serious accusations regarding "${caseData.title}". I want to hear your side. What really happened?`
+                }
+              </div>
             </div>
 
+            {/* Response Input */}
             <div className={`tv-card p-2 sm:p-4 mb-3 sm:mb-4 border-2 ${isPartyA ? 'border-blue-600' : 'border-red-600'}`}>
-              <div className="flex items-center gap-1 sm:gap-2 mb-1 sm:mb-2">
+              <div className="flex items-center gap-1 sm:gap-2 mb-2 sm:mb-3">
                 <span className={`font-bold text-sm sm:text-lg ${isPartyA ? 'text-blue-400' : 'text-red-400'}`}>{currentName}</span>
-                <span className="text-gray-400 text-[10px] sm:text-sm">— your statement</span>
+                <span className="text-gray-400 text-[10px] sm:text-sm">— your response</span>
               </div>
-              <div className="text-gray-500 text-[10px] sm:text-xs mb-2 sm:mb-3">The judge will question you about this</div>
               <textarea
-                placeholder="Describe what happened and why you're right..."
+                placeholder={isPartyA ? "Your Honor, here's what happened..." : "Your Honor, let me explain my side..."}
                 value={currentStatement}
                 onChange={(e) => handleStatementChange(e.target.value)}
                 rows={4}
