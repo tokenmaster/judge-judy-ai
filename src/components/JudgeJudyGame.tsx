@@ -2210,7 +2210,7 @@ Settle YOUR disputes at judgejoody.ai`;
   if (phase === 'crossExam') {
     const isMyTurn = isMultiplayer ? (myRole === examTarget) : true;
 
-if (isMultiplayer && !isMyTurn && !isLoading) {
+if (isMultiplayer && !isMyTurn) {
       return (
         <div className="min-h-screen p-2 sm:p-4 md:p-6">
           <div className="w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-2xl mx-auto">
@@ -2243,7 +2243,10 @@ if (isMultiplayer && !isMyTurn && !isLoading) {
                   isOtherTyping={isOtherTyping}
                   typingPlayerName={targetName}
                   myRole={myRole}
-                  isWaiting={true}
+                  isWaiting={!isLoading && !currentQuestion}
+                  isLoading={isLoading}
+                  loadingMessage={loadingMessage}
+                  loadingEmoji={loadingEmoji}
                 />
               </div>
 
