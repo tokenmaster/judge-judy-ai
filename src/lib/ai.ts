@@ -108,41 +108,52 @@ export async function generateMainQuestion(
     .map((r: any) => `Q: ${r.question}\nA: ${r.answer}`)
     .join('\n\n');
 
+  // Build round-specific instruction
+  let roundInstruction = '';
+  if (examRound === 0) {
+    roundInstruction = `FOCUS: ${targetName} and ${otherName} have made conflicting claims. Find a specific point where they contradict each other and ask ${targetName} to clarify or explain the discrepancy.`;
+  } else if (examRound === 1) {
+    roundInstruction = `FOCUS: ${otherName} made specific claims or provided details that challenge ${targetName}'s position. Ask ${targetName} to justify their position in light of what ${otherName} said.`;
+  } else {
+    roundInstruction = `FOCUS: Find the weakest part of ${targetName}'s argument OR something ${otherName} said that ${targetName} hasn't addressed. Press ${targetName} on this specific vulnerability.`;
+  }
+
   const prompt = `${judge.style}
 
 You are cross-examining ${targetName} in a dispute: "${caseData.title}"
 
-CONTEXT FOR YOUR QUESTION:
-- ${targetName}'s claim: "${targetStatement}"
-- ${otherName} claims: "${otherStatement}"
-${opponentResponses ? `- ${otherName} previously testified: ${opponentResponses}\n` : ''}
-${targetResponses ? `- ${targetName} already answered: ${targetResponses}\n` : ''}
+=== CASE FOUNDATION ===
+${targetName}'s opening claim: "${targetStatement}"
+${otherName}'s counter-claim: "${otherStatement}"
+
+=== ${otherName.toUpperCase()}'S TESTIMONY ===
+${opponentResponses ? opponentResponses : `${otherName} has not testified yet.`}
+
+=== ${targetName.toUpperCase()}'S PREVIOUS ANSWERS ===
+${targetResponses ? targetResponses : `${targetName} has not answered any questions yet.`}
+
+=== YOUR ANALYSIS (think through this carefully) ===
+Before asking your question, analyze:
+1. CORE CONFLICT: What is the fundamental disagreement between ${targetName} and ${otherName}?
+2. OPPONENT'S KEY POINTS: What specific things did ${otherName} claim that ${targetName} should have to address?
+3. GAPS OR CONTRADICTIONS: Are there inconsistencies between what ${targetName} says and what ${otherName} says?
+4. UNPROVEN CLAIMS: What has ${targetName} asserted without evidence or explanation?
 
 === ROUND ${examRound + 1}: ${roundPurpose.name.toUpperCase()} ===
 Goal: ${roundPurpose.goal}
+${roundInstruction}
 
-You are ONLY questioning ${targetName} right now. Ask them ONE specific question.
+Based on your analysis, ask ${targetName} ONE specific question that:
+- Directly addresses something ${otherName} claimed or revealed
+- Tests a weakness, gap, or unproven assertion in ${targetName}'s position
+- Requires a concrete, specific answer (not just "yes" or "no")
+- References specific details from the statements or testimony
 
-QUESTION TYPE FOR THIS ROUND: ${roundPurpose.questionFocus}
+CRITICAL: Your question MUST reference the actual dispute content. Do NOT ask generic questions.
 
-CRITICAL RULES:
-1. Address ONLY ${targetName} - do not mention or lecture both parties
-2. Ask a REAL QUESTION that ${targetName} can actually answer (must end with ?)
-3. Reference something specific from ${targetName}'s statement or previous answers
-4. ${examRound === 0 ? 'Ask them to CLARIFY something ambiguous in their claim' : ''}
-5. ${examRound === 1 ? 'Ask them to PROVE or provide EVIDENCE for a specific assertion' : ''}
-6. ${examRound === 2 ? 'Ask about a WEAKNESS or what would make them WRONG' : ''}
+Output ONLY the question itself, addressed directly to ${targetName}. Must end with a question mark.`;
 
-DO NOT:
-- Rant at both parties simultaneously
-- Make statements instead of asking questions
-- Comment on the trial process itself
-- Ask rhetorical questions that don't need answers
-
-Output ONLY the question itself, addressed to ${targetName}. Example format:
-"${targetName}, [your specific question]?"`;
-
-  const question = await callClaude(prompt, 150);
+  const question = await callClaude(prompt, 200);
 
   // Ensure it's actually a question
   let cleanQuestion = question.trim();
