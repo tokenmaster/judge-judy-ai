@@ -669,51 +669,63 @@ useEffect(() => {
     setExamRound(newRound);
     setExamTarget(newTarget);
 
-    // Handle question updates
+    // Handle question updates - use myRoleRef to avoid stale closure
+    const currentRole = myRoleRef.current;
+
     console.log('[CaseUpdate] Question check:', {
       isGenerating: isGeneratingQuestion.current,
       newQuestion: !!newQuestion,
       newPhase,
-      myRole,
+      currentRole,
       newTarget,
-      myRoleMatchesTarget: myRole === newTarget,
+      roleMatchesTarget: currentRole === newTarget,
       questionTargetRef: questionTargetRef.current,
       newQuestionKey
     });
 
-    if (isGeneratingQuestion.current) {
-      console.log('[CaseUpdate] Skip - currently generating');
-    } else if (newQuestion) {
-      // We received a question from the database
-      console.log('[CaseUpdate] Received question from DB');
+    if (newQuestion) {
+      // We received a question from the database - ALWAYS use DB question
+      console.log('[CaseUpdate] Received question from DB, using it');
       setCurrentQuestion(newQuestion);
       questionTargetRef.current = newQuestionKey;
       lastQuestionGenTime.current = Date.now();
       setCanObjectToQuestion(true);
       setObjectionWindow({ type: 'question', content: newQuestion, targetParty: newTarget });
-    } else if (newPhase === 'crossExam' && myRole === newTarget) {
-      // No question, it's crossExam, and it's OUR turn to generate
-      // Check if we already generated for this slot
-      if (questionTargetRef.current !== newQuestionKey && !isGeneratingQuestion.current) {
+    } else if (newPhase === 'crossExam' && currentRole === newTarget && !isGeneratingQuestion.current) {
+      // No question yet, it's crossExam, and WE are the one being questioned (our turn to generate)
+      // Only the examTarget player generates - the other player waits for DB
+      if (questionTargetRef.current !== newQuestionKey) {
         console.log('[CaseUpdate] Our turn to generate question for', newQuestionKey);
         // Small delay to let state settle before generating
         setTimeout(() => {
-          console.log('[CaseUpdate] Timeout fired, checking again:', {
+          // Double-check all conditions after delay
+          const stillOurTurn = myRoleRef.current === newTarget;
+          const noQuestionYet = !currentQuestion; // Check current state
+
+          console.log('[CaseUpdate] Timeout fired:', {
             isGenerating: isGeneratingQuestion.current,
             questionTargetRef: questionTargetRef.current,
-            newQuestionKey
+            newQuestionKey,
+            stillOurTurn,
+            noQuestionYet
           });
-          if (!isGeneratingQuestion.current && questionTargetRef.current !== newQuestionKey) {
+
+          if (!isGeneratingQuestion.current &&
+              questionTargetRef.current !== newQuestionKey &&
+              stillOurTurn) {
             generateNewQuestion(newTarget, newRound);
           } else {
-            console.log('[CaseUpdate] Skipped generation in timeout');
+            console.log('[CaseUpdate] Skipped generation in timeout - conditions changed');
           }
-        }, 100);
+        }, 150); // Slightly longer delay to let DB sync
       } else {
-        console.log('[CaseUpdate] Already generated for this slot or currently generating');
+        console.log('[CaseUpdate] Already generated for this slot');
       }
+    } else if (newPhase === 'crossExam' && currentRole !== newTarget) {
+      // We're the spectator - we should wait for the question from DB
+      console.log('[CaseUpdate] Spectator waiting for question from DB');
     } else {
-      console.log('[CaseUpdate] Not our turn or not crossExam phase');
+      console.log('[CaseUpdate] Not crossExam phase or not ready');
     }
 
     setObjectionsUsed({
@@ -864,6 +876,13 @@ useEffect(() => {
   const generateNewQuestion = async (targetParty: string, round: number) => {
     const now = Date.now();
 
+    // CRITICAL: In multiplayer, only the examTarget player generates
+    // This prevents both players from generating different questions
+    if (isMultiplayer && myRoleRef.current !== targetParty) {
+      console.log('[QuestionGen] Not my turn to generate (myRole:', myRoleRef.current, 'target:', targetParty, ')');
+      return;
+    }
+
     // Skip if already generating
     if (isGeneratingQuestion.current) {
       console.log('[QuestionGen] Already generating, skipping');
@@ -884,7 +903,7 @@ useEffect(() => {
       return;
     }
 
-    console.log('[QuestionGen] Starting generation for', questionKey);
+    console.log('[QuestionGen] Starting generation for', questionKey, '(I am', myRoleRef.current, ')');
 
     // Set all locks BEFORE any async operation
     isGeneratingQuestion.current = true;
