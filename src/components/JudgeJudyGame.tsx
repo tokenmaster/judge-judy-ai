@@ -2220,13 +2220,11 @@ if (isMultiplayer && !isMyTurn) {
         <div className="min-h-screen p-2 sm:p-4 md:p-6">
           <div className="w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-2xl mx-auto">
             <TVFrame>
-              <ProgressIndicator currentPhase="crossExam" />
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0 mb-3 sm:mb-4">
-                <div className="lower-third pl-4 sm:pl-6 flex-1">
-                  <div className="text-[10px] sm:text-xs font-bold text-yellow-900 tracking-widest">{isClarifying ? '🔄 FOLLOW-UP' : 'CROSS-EXAMINATION'}</div>
-                  <div className="text-black font-bold text-sm sm:text-base">{caseData.title}</div>
+              <div className="flex items-center justify-between mb-3">
+                <ProgressIndicator currentPhase="crossExam" />
+                <div className="pixel-badge pixel-badge-gold text-[8px] sm:text-[10px]">
+                  ROUND {examRound + 1}/3
                 </div>
-                <RoundIndicator round={examRound + 1} totalRounds={3} />
               </div>
 
               <CredibilityBar
@@ -2272,20 +2270,13 @@ if (isMultiplayer && !isMyTurn) {
       <div className="min-h-screen p-2 sm:p-4 md:p-6">
         <div className="w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-2xl mx-auto">
           <TVFrame>
-            {/* Compact phase indicator during cross-exam - focus is on the questioning */}
-            <ProgressIndicator currentPhase="crossExam" compact />
-            <StakesBadge stakes={caseData.stakes} compact />
-
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0 mb-3 sm:mb-4">
-              <div className="lower-third pl-4 sm:pl-6 flex-1">
-                <div className="text-[10px] sm:text-xs font-bold text-yellow-900 tracking-widest">{isClarifying ? '🔄 FOLLOW-UP' : 'CROSS-EXAMINATION'}</div>
-                <div className="text-black font-bold text-sm sm:text-base">{caseData.title}</div>
-                {isMultiplayer && <div className="text-[10px] sm:text-xs text-yellow-900">Room: {roomCode}</div>}
+            <div className="flex items-center justify-between mb-3">
+              <ProgressIndicator currentPhase="crossExam" compact />
+              <div className="pixel-badge pixel-badge-gold text-[8px] sm:text-[10px]">
+                ROUND {examRound + 1}/3
               </div>
-              <RoundIndicator round={examRound + 1} totalRounds={3} />
             </div>
 
-            {/* Combined Turn + Credibility display */}
             <CredibilityBar
               partyA={caseData.partyA}
               partyB={caseData.partyB}
