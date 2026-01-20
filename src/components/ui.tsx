@@ -3,27 +3,29 @@
 import React from 'react';
 import { getCredibilityLabel, getCredibilityColor, OBJECTION_TYPES, JUDGE_GIFS, SITUATION_GIFS, getSituationGif } from '@/lib/constants';
 
-// TV Frame Wrapper Component
+// TV Frame Wrapper Component - Pixel Art Style
 export function TVFrame({ children, showLive = true }: { children: React.ReactNode; showLive?: boolean }) {
   return (
     <div className="relative">
-      {/* TV Antennas */}
+      {/* Pixel TV Antennas */}
       <div className="flex justify-center gap-8 -mb-1">
-        <div className="w-1 h-10 bg-gray-600 rounded-full transform -rotate-12 origin-bottom" />
-        <div className="w-1 h-10 bg-gray-600 rounded-full transform rotate-12 origin-bottom" />
+        <div className="w-2 h-10 bg-[#4a4a4a] transform -rotate-12 origin-bottom" />
+        <div className="w-2 h-10 bg-[#4a4a4a] transform rotate-12 origin-bottom" />
       </div>
-      <div className="tv-screen p-6 relative z-0">
-        {/* Channel Bug - Top Left */}
-        <div className="absolute top-3 left-3 channel-bug z-20 text-xs">
-          COURT TV
-        </div>
-        {showLive && (
-          <div className="absolute top-3 right-3 z-20">
-            <span className="live-badge">LIVE</span>
+      <div className="pixel-tv-frame p-2">
+        <div className="pixel-screen p-4 md:p-6 relative">
+          {/* Channel Bug - Top Left - Pixel Style */}
+          <div className="absolute top-2 left-2 pixel-badge pixel-badge-gold z-20">
+            COURT TV
           </div>
-        )}
-        <div className="relative z-0 pt-4">
-          {children}
+          {showLive && (
+            <div className="absolute top-2 right-2 z-20">
+              <span className="pixel-badge pixel-badge-live">LIVE</span>
+            </div>
+          )}
+          <div className="relative z-0 pt-6">
+            {children}
+          </div>
         </div>
       </div>
     </div>
@@ -36,7 +38,7 @@ export function ChannelBug({ text = "COURT TV" }: { text?: string }) {
   return null;
 }
 
-// Progress Indicator Component - TV Chyron Style
+// Progress Indicator Component - Pixel Art Style
 export function ProgressIndicator({ currentPhase, compact = false }: { currentPhase: 'statements' | 'crossExam' | 'verdict'; compact?: boolean }) {
   const steps = [
     { id: 'statements', label: 'OPENING', icon: '📝' },
@@ -47,7 +49,7 @@ export function ProgressIndicator({ currentPhase, compact = false }: { currentPh
   const currentIndex = steps.findIndex(s => s.id === currentPhase);
 
   if (compact) {
-    // Compact version - just shows current phase as a small badge
+    // Compact pixel version
     return (
       <div className="flex items-center justify-center gap-1 mb-2">
         {steps.map((step, index) => {
@@ -56,18 +58,18 @@ export function ProgressIndicator({ currentPhase, compact = false }: { currentPh
 
           return (
             <React.Fragment key={step.id}>
-              <div className={`flex items-center gap-1 px-2 py-1 text-[10px] font-bold uppercase tracking-wider transition-all ${
+              <div className={`flex items-center gap-1 px-2 py-1 transition-all ${
                 isCurrent
-                  ? 'tv-gradient-gold text-black border border-yellow-300'
+                  ? 'pixel-badge pixel-badge-gold'
                   : isCompleted
-                    ? 'bg-green-800/50 text-green-300 border border-green-700'
-                    : 'bg-gray-800/50 text-gray-600 border border-gray-700'
+                    ? 'pixel-badge bg-[#228b22] border-[#165016] text-white'
+                    : 'pixel-badge bg-[#2a2a2a] border-[#4a4a4a] text-gray-600'
               }`}>
                 <span className="text-xs">{isCompleted ? '✓' : step.icon}</span>
                 {isCurrent && <span>{step.label}</span>}
               </div>
               {index < steps.length - 1 && (
-                <div className={`w-3 h-0.5 ${index < currentIndex ? 'bg-green-600' : 'bg-gray-700'}`} />
+                <div className={`w-3 h-1 ${index < currentIndex ? 'bg-[#228b22]' : 'bg-[#4a4a4a]'}`} />
               )}
             </React.Fragment>
           );
@@ -84,18 +86,18 @@ export function ProgressIndicator({ currentPhase, compact = false }: { currentPh
 
         return (
           <React.Fragment key={step.id}>
-            <div className={`flex items-center gap-2 px-4 py-2 text-sm font-bold uppercase tracking-wider transition-all ${
+            <div className={`flex items-center gap-2 px-3 py-2 border-4 transition-all ${
               isCurrent
-                ? 'tv-gradient-gold text-black border-2 border-yellow-300'
+                ? 'bg-[#daa520] border-[#8b6914] text-[#3d2314] pixel-text text-[10px]'
                 : isCompleted
-                  ? 'bg-green-800 text-green-200 border-2 border-green-600'
-                  : 'bg-gray-800 text-gray-500 border-2 border-gray-700'
+                  ? 'bg-[#228b22] border-[#165016] text-white pixel-text text-[10px]'
+                  : 'bg-[#2a2a2a] border-[#4a4a4a] text-gray-500 pixel-text text-[10px]'
             }`}>
-              <span className="text-lg">{isCompleted ? '✓' : step.icon}</span>
+              <span className="text-sm">{isCompleted ? '✓' : step.icon}</span>
               <span>{step.label}</span>
             </div>
             {index < steps.length - 1 && (
-              <div className={`w-6 h-1 ${index < currentIndex ? 'bg-green-500' : 'bg-gray-700'}`} />
+              <div className={`w-4 h-1 ${index < currentIndex ? 'bg-[#228b22]' : 'bg-[#4a4a4a]'}`} />
             )}
           </React.Fragment>
         );
@@ -104,34 +106,34 @@ export function ProgressIndicator({ currentPhase, compact = false }: { currentPh
   );
 }
 
-// Stakes Badge Component - TV Lower Third Style
+// Stakes Badge Component - Pixel Art Style
 export function StakesBadge({ stakes, compact = false }: { stakes: string; compact?: boolean }) {
   if (!stakes) return null;
 
   if (compact) {
-    // Compact inline version
+    // Compact pixel version
     return (
-      <div className="flex items-center justify-center gap-2 mb-2 py-1 px-3 bg-yellow-900/30 border border-yellow-700/50 rounded text-xs">
+      <div className="flex items-center justify-center gap-2 mb-2 py-1 px-3 bg-[#8b6914]/30 border-2 border-[#daa520] text-xs">
         <span>🏆</span>
-        <span className="text-yellow-500 font-bold">{stakes}</span>
+        <span className="pixel-text-sm text-[#daa520]">{stakes}</span>
       </div>
     );
   }
 
   return (
-    <div className="lower-third mb-6 pl-6">
+    <div className="pixel-card mb-4 p-3 border-l-8 border-l-[#daa520]">
       <div className="flex items-center gap-3">
         <span className="text-2xl">🏆</span>
         <div>
-          <div className="text-xs font-bold text-yellow-900 uppercase tracking-wider">What&apos;s At Stake</div>
-          <div className="text-black font-bold text-lg">{stakes}</div>
+          <div className="pixel-text-sm text-[#daa520]">STAKES</div>
+          <div className="pixel-text text-sm text-white mt-1">{stakes}</div>
         </div>
       </div>
     </div>
   );
 }
 
-// Combined Credibility & Turn Indicator - Tekken Style
+// Combined Credibility & Turn Indicator - Pixel Art Style
 export function CredibilityBar({
   partyA,
   partyB,
@@ -154,49 +156,62 @@ export function CredibilityBar({
   const isAActive = activeParty === 'A';
   const isBActive = activeParty === 'B';
 
+  // Calculate filled segments (10 segments = 100%)
+  const segmentsA = Math.ceil(credibilityA / 10);
+  const segmentsB = Math.ceil(credibilityB / 10);
+
+  // Pixel Health Bar Segments Component
+  const PixelHealthBar = ({ segments, party, reverse = false }: { segments: number; party: 'A' | 'B'; reverse?: boolean }) => {
+    const segmentArray = [...Array(10)].map((_, i) => {
+      const segmentIndex = reverse ? 9 - i : i;
+      const isFilled = segmentIndex < segments;
+      return (
+        <div
+          key={i}
+          className={`flex-1 h-full border-r-2 border-[#1a1a1a] last:border-0 transition-colors ${
+            isFilled
+              ? party === 'A' ? 'bg-[#4a7ab0]' : 'bg-[#b22222]'
+              : 'bg-[#2a2a2a]'
+          }`}
+        />
+      );
+    });
+    return <>{segmentArray}</>;
+  };
+
   if (compact) {
-    // Compact version with turn indicator
+    // Compact pixel version
     return (
-      <div className="mb-2 tv-card p-2">
+      <div className="mb-2 pixel-card p-2">
         <div className="flex items-center gap-2">
           {/* Party A - Left side */}
-          <div className={`flex-1 p-1.5 rounded ${isAActive ? 'bg-cyan-900/30 border border-cyan-500' : ''}`}>
-            <div className="flex items-center justify-between mb-0.5">
+          <div className={`flex-1 p-1.5 ${isAActive ? 'bg-[#1e3a5f]/50 border-2 border-[#4a7ab0]' : ''}`}>
+            <div className="flex items-center justify-between mb-1">
               <div className="flex items-center gap-1">
-                {isAActive && <span className="text-[8px] bg-red-600 text-white px-1 rounded font-bold animate-pulse">ON AIR</span>}
-                <span className={`text-[9px] font-black uppercase tracking-wide truncate ${isAActive ? 'text-cyan-300' : 'text-gray-500'}`}>{partyA}</span>
+                {isAActive && <span className="pixel-badge pixel-badge-live text-[6px]">ON AIR</span>}
+                <span className={`pixel-text-sm truncate ${isAActive ? 'text-[#4a7ab0]' : 'text-gray-500'}`}>{partyA}</span>
               </div>
-              <span className="text-[9px] font-bold text-white">{credibilityA}%</span>
+              <span className="pixel-text-sm text-white">{credibilityA}%</span>
             </div>
-            <div className="h-2 bg-gray-900 rounded-sm overflow-hidden border border-gray-600 relative">
-              {/* Health depletes from center (right) outward (left) */}
-              <div
-                className="absolute inset-y-0 left-0 bg-gradient-to-r from-yellow-300 via-yellow-400 to-orange-500 transition-all duration-500"
-                style={{ width: `${credibilityA}%` }}
-              />
+            <div className="pixel-health-bar h-3">
+              <PixelHealthBar segments={segmentsA} party="A" />
             </div>
           </div>
 
-          {/* VS divider */}
-          <div className="w-6 h-6 rounded-full bg-gradient-to-b from-yellow-500 to-orange-600 flex items-center justify-center border border-yellow-300 shadow-lg flex-shrink-0">
-            <span className="text-[8px] font-black text-black">VS</span>
-          </div>
+          {/* VS divider - Pixel style */}
+          <div className="pixel-vs text-[8px] px-2 py-1 flex-shrink-0">VS</div>
 
           {/* Party B - Right side */}
-          <div className={`flex-1 p-1.5 rounded ${isBActive ? 'bg-red-900/30 border border-red-500' : ''}`}>
-            <div className="flex items-center justify-between mb-0.5">
-              <span className="text-[9px] font-bold text-white">{credibilityB}%</span>
+          <div className={`flex-1 p-1.5 ${isBActive ? 'bg-[#8b0000]/30 border-2 border-[#b22222]' : ''}`}>
+            <div className="flex items-center justify-between mb-1">
+              <span className="pixel-text-sm text-white">{credibilityB}%</span>
               <div className="flex items-center gap-1">
-                <span className={`text-[9px] font-black uppercase tracking-wide truncate ${isBActive ? 'text-red-300' : 'text-gray-500'}`}>{partyB}</span>
-                {isBActive && <span className="text-[8px] bg-red-600 text-white px-1 rounded font-bold animate-pulse">ON AIR</span>}
+                <span className={`pixel-text-sm truncate ${isBActive ? 'text-[#b22222]' : 'text-gray-500'}`}>{partyB}</span>
+                {isBActive && <span className="pixel-badge pixel-badge-live text-[6px]">ON AIR</span>}
               </div>
             </div>
-            <div className="h-2 bg-gray-900 rounded-sm overflow-hidden border border-gray-600 relative">
-              {/* Health depletes from center (left) outward (right) */}
-              <div
-                className="absolute inset-y-0 right-0 bg-gradient-to-l from-yellow-300 via-yellow-400 to-orange-500 transition-all duration-500"
-                style={{ width: `${credibilityB}%` }}
-              />
+            <div className="pixel-health-bar h-3">
+              <PixelHealthBar segments={segmentsB} party="B" reverse />
             </div>
           </div>
         </div>
@@ -206,105 +221,75 @@ export function CredibilityBar({
 
   return (
     <div className="mb-4">
-      {/* Combined Turn + Credibility Panel */}
-      <div className="tv-card p-3">
+      {/* Combined Turn + Credibility Panel - Pixel Style */}
+      <div className="pixel-card p-3">
         <div className="flex items-stretch gap-3">
           {/* Party A - Left side */}
-          <div className={`flex-1 rounded-lg p-2 transition-all ${isAActive ? 'bg-gradient-to-br from-cyan-900/50 to-cyan-950/50 border-2 border-cyan-500 shadow-lg shadow-cyan-500/20' : 'bg-gray-900/50 border border-gray-700'}`}>
+          <div className={`flex-1 p-2 transition-all ${isAActive ? 'bg-[#1e3a5f]/50 border-4 border-[#4a7ab0]' : 'bg-[#2a2a2a] border-2 border-[#4a4a4a]'}`}>
             {/* Name row with ON AIR */}
             <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-2">
-                <span className={`text-sm font-black uppercase tracking-wider truncate ${isAActive ? 'text-cyan-300' : 'text-gray-500'}`}>{partyA}</span>
-              </div>
+              <span className={`pixel-text text-xs truncate ${isAActive ? 'text-[#4a7ab0]' : 'text-gray-500'}`}>{partyA}</span>
               {isAActive && (
-                <span className="text-[10px] bg-red-600 text-white px-2 py-0.5 rounded font-bold animate-pulse shadow-lg">ON AIR</span>
+                <span className="pixel-badge pixel-badge-live">ON AIR</span>
               )}
               {!isAActive && activeParty && (
-                <span className="text-[10px] text-gray-600 uppercase">Waiting</span>
+                <span className="pixel-text-sm text-gray-600">WAIT</span>
               )}
             </div>
 
             {/* Credibility percentage */}
-            <div className="flex items-center justify-between mb-1">
-              <span className="text-[10px] text-gray-500 uppercase tracking-wider">Credibility</span>
-              <div className="flex items-center gap-1">
+            <div className="flex items-center justify-between mb-2">
+              <span className="pixel-text-sm text-gray-500">HP</span>
+              <div className="flex items-center gap-2">
                 {lastA && (
-                  <span className={`text-[10px] font-bold ${lastA.change >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                  <span className={`pixel-text-sm ${lastA.change >= 0 ? 'text-[#228b22]' : 'text-[#b22222]'}`}>
                     {lastA.change >= 0 ? '+' : ''}{lastA.change}
                   </span>
                 )}
-                <span className="text-lg font-black text-white">{credibilityA}%</span>
+                <span className="pixel-text text-sm text-white">{credibilityA}%</span>
               </div>
             </div>
 
-            {/* Health bar - depletes from center outward */}
-            <div className="h-4 bg-gray-900 rounded-sm overflow-hidden border border-gray-600 relative"
-                 style={{ boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.5)' }}>
-              <div className="absolute inset-0 bg-red-900/50" />
-              <div
-                className="absolute inset-y-0 left-0 bg-gradient-to-r from-yellow-200 via-yellow-400 to-orange-500 transition-all duration-500"
-                style={{ width: `${credibilityA}%` }}
-              >
-                <div className="absolute inset-0 bg-gradient-to-b from-white/30 via-transparent to-black/20" />
-                <div className="absolute inset-0 flex">
-                  {[...Array(10)].map((_, i) => (
-                    <div key={i} className="flex-1 border-r border-black/20 last:border-0" />
-                  ))}
-                </div>
-              </div>
+            {/* Pixel Health bar - segmented */}
+            <div className="pixel-health-bar">
+              <PixelHealthBar segments={segmentsA} party="A" />
             </div>
           </div>
 
-          {/* Center VS badge */}
+          {/* Center VS badge - Pixel style */}
           <div className="flex flex-col items-center justify-center">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-b from-yellow-500 to-orange-600 flex items-center justify-center border-2 border-yellow-300 shadow-lg">
-              <span className="text-sm font-black text-black">VS</span>
-            </div>
+            <div className="pixel-vs">VS</div>
           </div>
 
           {/* Party B - Right side */}
-          <div className={`flex-1 rounded-lg p-2 transition-all ${isBActive ? 'bg-gradient-to-br from-red-900/50 to-red-950/50 border-2 border-red-500 shadow-lg shadow-red-500/20' : 'bg-gray-900/50 border border-gray-700'}`}>
+          <div className={`flex-1 p-2 transition-all ${isBActive ? 'bg-[#8b0000]/30 border-4 border-[#b22222]' : 'bg-[#2a2a2a] border-2 border-[#4a4a4a]'}`}>
             {/* Name row with ON AIR */}
             <div className="flex items-center justify-between mb-2">
               {!isBActive && activeParty && (
-                <span className="text-[10px] text-gray-600 uppercase">Waiting</span>
+                <span className="pixel-text-sm text-gray-600">WAIT</span>
               )}
               {isBActive && (
-                <span className="text-[10px] bg-red-600 text-white px-2 py-0.5 rounded font-bold animate-pulse shadow-lg">ON AIR</span>
+                <span className="pixel-badge pixel-badge-live">ON AIR</span>
               )}
-              <div className="flex items-center gap-2">
-                <span className={`text-sm font-black uppercase tracking-wider truncate ${isBActive ? 'text-red-300' : 'text-gray-500'}`}>{partyB}</span>
-              </div>
+              <span className={`pixel-text text-xs truncate ${isBActive ? 'text-[#b22222]' : 'text-gray-500'}`}>{partyB}</span>
             </div>
 
             {/* Credibility percentage */}
-            <div className="flex items-center justify-between mb-1">
-              <div className="flex items-center gap-1">
-                <span className="text-lg font-black text-white">{credibilityB}%</span>
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <span className="pixel-text text-sm text-white">{credibilityB}%</span>
                 {lastB && (
-                  <span className={`text-[10px] font-bold ${lastB.change >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                  <span className={`pixel-text-sm ${lastB.change >= 0 ? 'text-[#228b22]' : 'text-[#b22222]'}`}>
                     {lastB.change >= 0 ? '+' : ''}{lastB.change}
                   </span>
                 )}
               </div>
-              <span className="text-[10px] text-gray-500 uppercase tracking-wider">Credibility</span>
+              <span className="pixel-text-sm text-gray-500">HP</span>
             </div>
 
-            {/* Health bar - depletes from center outward */}
-            <div className="h-4 bg-gray-900 rounded-sm overflow-hidden border border-gray-600 relative"
-                 style={{ boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.5)' }}>
-              <div className="absolute inset-0 bg-red-900/50" />
-              <div
-                className="absolute inset-y-0 right-0 bg-gradient-to-l from-yellow-200 via-yellow-400 to-orange-500 transition-all duration-500"
-                style={{ width: `${credibilityB}%` }}
-              >
-                <div className="absolute inset-0 bg-gradient-to-b from-white/30 via-transparent to-black/20" />
-                <div className="absolute inset-0 flex">
-                  {[...Array(10)].map((_, i) => (
-                    <div key={i} className="flex-1 border-r border-black/20 last:border-0" />
-                  ))}
-                </div>
-              </div>
+            {/* Pixel Health bar - segmented, depletes from right */}
+            <div className="pixel-health-bar">
+              <PixelHealthBar segments={segmentsB} party="B" reverse />
             </div>
           </div>
         </div>
@@ -582,7 +567,7 @@ export function SnapJudgmentDisplay({
   );
 }
 
-// Loading Overlay - TV Please Stand By
+// Loading Overlay - Pixel Art Style
 export function LoadingOverlay({
   emoji,
   message
@@ -591,13 +576,13 @@ export function LoadingOverlay({
   message: string;
 }) {
   return (
-    <div className="tv-card p-8 text-center">
+    <div className="pixel-card p-8 text-center">
       <ThinkingEmoji emoji={emoji} />
-      <div className="text-yellow-500 mt-4 font-bold uppercase tracking-wider">{message}</div>
-      <div className="flex justify-center gap-1 mt-3">
-        <span className="w-2 h-2 bg-yellow-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
-        <span className="w-2 h-2 bg-yellow-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
-        <span className="w-2 h-2 bg-yellow-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+      <div className="pixel-text text-xs text-[#daa520] mt-4">{message}</div>
+      <div className="flex justify-center gap-2 mt-3">
+        <span className="w-3 h-3 bg-[#daa520] animate-bounce" style={{ animationDelay: '0ms' }}></span>
+        <span className="w-3 h-3 bg-[#daa520] animate-bounce" style={{ animationDelay: '150ms' }}></span>
+        <span className="w-3 h-3 bg-[#daa520] animate-bounce" style={{ animationDelay: '300ms' }}></span>
       </div>
     </div>
   );
@@ -639,16 +624,16 @@ const ROUND_NAMES: { [key: number]: { name: string; goal: string } } = {
   3: { name: 'Stress Test', goal: 'Exposing weaknesses & tradeoffs' }
 };
 
-// Round Indicator - Sports Style with Purpose
+// Round Indicator - Pixel Art Style
 export function RoundIndicator({ round, totalRounds }: { round: number; totalRounds: number }) {
   const roundInfo = ROUND_NAMES[round] || { name: 'Cross-Exam', goal: '' };
 
   return (
-    <div className="tv-stat-box inline-block px-4 py-2">
-      <div className="text-xs text-gray-400 font-bold tracking-widest">ROUND {round} OF {totalRounds}</div>
-      <div className="text-yellow-500 font-black text-lg">{roundInfo.name}</div>
+    <div className="pixel-card inline-block px-4 py-2 border-2 border-[#daa520]">
+      <div className="pixel-text-sm text-gray-400">ROUND {round}/{totalRounds}</div>
+      <div className="pixel-text text-sm text-[#daa520] mt-1">{roundInfo.name}</div>
       {roundInfo.goal && (
-        <div className="text-[10px] text-gray-500 mt-0.5">{roundInfo.goal}</div>
+        <div className="pixel-text-sm text-gray-500 mt-1">{roundInfo.goal}</div>
       )}
     </div>
   );

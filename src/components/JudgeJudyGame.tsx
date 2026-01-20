@@ -1538,24 +1538,24 @@ Settle YOUR disputes at judgejoody.ai`;
         <div className="w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl">
           <TVFrame>
             <div className="p-1 sm:p-2 md:p-4 lg:p-6">
-              {/* Tab Navigation */}
-              <div className="flex mb-4 sm:mb-6 border-b-2 border-yellow-600">
+              {/* Tab Navigation - Pixel Style */}
+              <div className="flex mb-4 sm:mb-6 gap-2">
                 <button
                   onClick={() => setHomeTab('main')}
-                  className={`flex-1 py-2 sm:py-3 text-xs sm:text-sm md:text-base font-bold tracking-wider transition-colors ${
+                  className={`flex-1 py-2 sm:py-3 pixel-text text-[8px] sm:text-[10px] transition-colors ${
                     homeTab === 'main'
-                      ? 'text-yellow-500 border-b-2 border-yellow-500 -mb-[2px]'
-                      : 'text-gray-500 hover:text-gray-300'
+                      ? 'pixel-button pixel-button-gold'
+                      : 'pixel-button'
                   }`}
                 >
                   ⚖️ PLAY
                 </button>
                 <button
                   onClick={() => setHomeTab('stats')}
-                  className={`flex-1 py-2 sm:py-3 text-xs sm:text-sm md:text-base font-bold tracking-wider transition-colors ${
+                  className={`flex-1 py-2 sm:py-3 pixel-text text-[8px] sm:text-[10px] transition-colors ${
                     homeTab === 'stats'
-                      ? 'text-yellow-500 border-b-2 border-yellow-500 -mb-[2px]'
-                      : 'text-gray-500 hover:text-gray-300'
+                      ? 'pixel-button pixel-button-gold'
+                      : 'pixel-button'
                   }`}
                 >
                   📊 STATS
@@ -1565,107 +1565,110 @@ Settle YOUR disputes at judgejoody.ai`;
               {homeTab === 'main' ? (
                 <div className="text-center">
                   <div className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl mb-3 md:mb-6">⚖️</div>
-                  <h1 className="tv-title text-xl sm:text-2xl md:text-4xl lg:text-5xl mb-2 md:mb-4">Judge Joody AI</h1>
-                  <p className="tv-subtitle text-xs sm:text-sm md:text-lg lg:text-xl mb-4 sm:mb-6 md:mb-8">Settle disputes. Real stakes. No lawyers.</p>
+                  <h1 className="pixel-title text-base sm:text-lg md:text-2xl lg:text-3xl mb-2 md:mb-4">JUDGE JOODY AI</h1>
+                  <p className="pixel-text-sm text-gray-300 mb-4 sm:mb-6 md:mb-8">SETTLE DISPUTES. REAL STAKES.</p>
 
                   <div className="space-y-2 sm:space-y-3 mb-4 sm:mb-6 md:mb-8">
                     <button
                       onClick={() => setPhase('create')}
-                      className="w-full tv-button text-sm sm:text-base md:text-lg py-3 sm:py-4 md:py-5"
+                      className="w-full pixel-button pixel-button-gold pixel-button-lg"
                     >
-                      🆕 CREATE NEW CASE
+                      🆕 CREATE CASE
                     </button>
                     <button
                       onClick={() => setPhase('join')}
-                      className="w-full tv-button bg-gray-700 border-gray-600 text-white text-sm sm:text-base md:text-lg py-2 sm:py-3"
+                      className="w-full pixel-button"
                     >
-                      🔗 JOIN EXISTING CASE
+                      🔗 JOIN CASE
                     </button>
                   </div>
 
-                  <div className="tv-card p-2 sm:p-3 md:p-4 mb-4 sm:mb-6 md:mb-8">
-                    <div className="text-gray-300 text-xs sm:text-sm">
-                      <span className="text-yellow-500 font-bold">✨ MULTIPLAYER:</span> Create a case and share the room code!
+                  <div className="pixel-card p-2 sm:p-3 md:p-4 mb-4 sm:mb-6 md:mb-8">
+                    <div className="pixel-text-sm text-gray-300">
+                      <span className="text-[#daa520]">✨ MULTIPLAYER:</span> Share your room code!
                     </div>
                   </div>
 
                   <div className="grid grid-cols-4 gap-1 sm:gap-2 md:gap-3">
-                    <div className="tv-card p-1.5 sm:p-2 md:p-4 text-center"><div className="text-lg sm:text-xl md:text-3xl mb-1">📝</div><div className="text-yellow-500 text-[8px] sm:text-[10px] md:text-xs font-bold">PRESENT</div></div>
-                    <div className="tv-card p-1.5 sm:p-2 md:p-4 text-center"><div className="text-lg sm:text-xl md:text-3xl mb-1">🔥</div><div className="text-yellow-500 text-[8px] sm:text-[10px] md:text-xs font-bold">GRILLED</div></div>
-                    <div className="tv-card p-1.5 sm:p-2 md:p-4 text-center"><div className="text-lg sm:text-xl md:text-3xl mb-1">⚠️</div><div className="text-yellow-500 text-[8px] sm:text-[10px] md:text-xs font-bold">OBJECT</div></div>
-                    <div className="tv-card p-1.5 sm:p-2 md:p-4 text-center"><div className="text-lg sm:text-xl md:text-3xl mb-1">🏆</div><div className="text-yellow-500 text-[8px] sm:text-[10px] md:text-xs font-bold">WIN</div></div>
+                    <div className="pixel-card p-1.5 sm:p-2 md:p-4 text-center"><div className="text-lg sm:text-xl md:text-3xl mb-1">📝</div><div className="pixel-text-sm text-[#daa520]">PRESENT</div></div>
+                    <div className="pixel-card p-1.5 sm:p-2 md:p-4 text-center"><div className="text-lg sm:text-xl md:text-3xl mb-1">🔥</div><div className="pixel-text-sm text-[#daa520]">GRILLED</div></div>
+                    <div className="pixel-card p-1.5 sm:p-2 md:p-4 text-center"><div className="text-lg sm:text-xl md:text-3xl mb-1">⚠️</div><div className="pixel-text-sm text-[#daa520]">OBJECT</div></div>
+                    <div className="pixel-card p-1.5 sm:p-2 md:p-4 text-center"><div className="text-lg sm:text-xl md:text-3xl mb-1">🏆</div><div className="pixel-text-sm text-[#daa520]">WIN</div></div>
                   </div>
                 </div>
               ) : (
                 <div className="text-center">
                   <div className="text-4xl sm:text-5xl md:text-6xl mb-3 md:mb-4">📊</div>
-                  <h2 className="tv-title text-lg sm:text-xl md:text-2xl mb-2 md:mb-4">Court Statistics</h2>
-                  <p className="text-gray-400 text-xs sm:text-sm mb-4 sm:mb-6">All-time stats from Judge Joody AI</p>
+                  <h2 className="pixel-title text-sm sm:text-base md:text-lg mb-2 md:mb-4">COURT STATS</h2>
+                  <p className="pixel-text-sm text-gray-400 mb-4 sm:mb-6">ALL-TIME RECORDS</p>
 
                   {statsLoading ? (
-                    <div className="tv-card p-4 sm:p-6">
-                      <div className="animate-pulse text-yellow-500 text-sm">Loading stats...</div>
+                    <div className="pixel-card p-4 sm:p-6">
+                      <div className="pixel-text-sm text-[#daa520]">LOADING...</div>
                     </div>
                   ) : stats ? (
                     <div className="space-y-3 sm:space-y-4">
-                      <div className="tv-card p-3 sm:p-4 md:p-6">
-                        <div className="text-yellow-500 text-[10px] sm:text-xs font-bold tracking-widest mb-2">CASES FILED</div>
-                        <div className="tv-stat-value text-3xl sm:text-4xl md:text-5xl" style={{ color: '#d4af37' }}>
+                      <div className="pixel-card p-3 sm:p-4 md:p-6 border-2 border-[#daa520]">
+                        <div className="pixel-text-sm text-[#daa520] mb-2">CASES FILED</div>
+                        <div className="pixel-text text-2xl sm:text-3xl md:text-4xl text-[#daa520]">
                           {stats.cases_filed.toLocaleString()}
                         </div>
-                        <div className="text-gray-500 text-[10px] sm:text-xs mt-1">Total disputes brought to court</div>
+                        <div className="pixel-text-sm text-gray-500 mt-1">TOTAL DISPUTES</div>
                       </div>
 
                       <div className="grid grid-cols-2 gap-2 sm:gap-3">
-                        <div className="tv-card p-3 sm:p-4">
-                          <div className="text-green-500 text-[10px] sm:text-xs font-bold tracking-widest mb-1">VERDICTS ACCEPTED</div>
-                          <div className="text-2xl sm:text-3xl font-black text-green-400">
+                        <div className="pixel-card p-3 sm:p-4 border-2 border-[#228b22]">
+                          <div className="pixel-text-sm text-[#228b22] mb-1">ACCEPTED</div>
+                          <div className="pixel-text text-lg sm:text-xl text-[#228b22]">
                             {stats.verdicts_accepted.toLocaleString()}
                           </div>
-                          <div className="text-gray-500 text-[8px] sm:text-[10px] mt-1">Justice served</div>
+                          <div className="pixel-text-sm text-gray-500 mt-1">JUSTICE</div>
                         </div>
 
-                        <div className="tv-card p-3 sm:p-4">
-                          <div className="text-red-500 text-[10px] sm:text-xs font-bold tracking-widest mb-1">VERDICTS REJECTED</div>
-                          <div className="text-2xl sm:text-3xl font-black text-red-400">
+                        <div className="pixel-card p-3 sm:p-4 border-2 border-[#b22222]">
+                          <div className="pixel-text-sm text-[#b22222] mb-1">REJECTED</div>
+                          <div className="pixel-text text-lg sm:text-xl text-[#b22222]">
                             {stats.verdicts_rejected.toLocaleString()}
                           </div>
-                          <div className="text-gray-500 text-[8px] sm:text-[10px] mt-1">Contested rulings</div>
+                          <div className="pixel-text-sm text-gray-500 mt-1">CONTESTED</div>
                         </div>
                       </div>
 
                       {stats.cases_filed > 0 && (
-                        <div className="tv-card p-3 sm:p-4">
-                          <div className="text-yellow-500 text-[10px] sm:text-xs font-bold tracking-widest mb-2">ACCEPTANCE RATE</div>
-                          <div className="w-full bg-gray-700 rounded-full h-3 sm:h-4 overflow-hidden">
-                            <div
-                              className="h-full bg-gradient-to-r from-green-600 to-green-400 transition-all duration-500"
-                              style={{ width: `${((stats.verdicts_accepted / (stats.verdicts_accepted + stats.verdicts_rejected)) * 100) || 0}%` }}
-                            />
+                        <div className="pixel-card p-3 sm:p-4">
+                          <div className="pixel-text-sm text-[#daa520] mb-2">ACCEPT RATE</div>
+                          <div className="pixel-health-bar h-4">
+                            {[...Array(10)].map((_, i) => {
+                              const rate = (stats.verdicts_accepted / (stats.verdicts_accepted + stats.verdicts_rejected)) * 100 || 0;
+                              const filled = i < Math.round(rate / 10);
+                              return (
+                                <div key={i} className={`flex-1 h-full border-r-2 border-[#1a1a1a] last:border-0 ${filled ? 'bg-[#228b22]' : 'bg-[#2a2a2a]'}`} />
+                              );
+                            })}
                           </div>
-                          <div className="text-gray-400 text-xs sm:text-sm mt-2">
-                            {((stats.verdicts_accepted / (stats.verdicts_accepted + stats.verdicts_rejected)) * 100 || 0).toFixed(1)}% of verdicts accepted
+                          <div className="pixel-text-sm text-gray-400 mt-2">
+                            {((stats.verdicts_accepted / (stats.verdicts_accepted + stats.verdicts_rejected)) * 100 || 0).toFixed(0)}% ACCEPTED
                           </div>
                         </div>
                       )}
                     </div>
                   ) : statsError ? (
-                    <div className="tv-card p-4 sm:p-6">
-                      <div className="text-yellow-500 text-sm mb-2">📊 Stats table not configured</div>
-                      <div className="text-gray-500 text-xs">
-                        Run the SQL setup in your Supabase dashboard to enable stats tracking.
+                    <div className="pixel-card p-4 sm:p-6">
+                      <div className="pixel-text-sm text-[#daa520] mb-2">NO DATABASE</div>
+                      <div className="pixel-text-sm text-gray-500">
+                        RUN SQL SETUP
                       </div>
                       <button
                         onClick={() => { setStatsError(false); setStatsLoading(false); }}
-                        className="mt-3 text-yellow-500 hover:text-yellow-300 text-xs font-bold"
+                        className="mt-3 pixel-button text-[8px]"
                       >
                         🔄 RETRY
                       </button>
                     </div>
                   ) : (
-                    <div className="tv-card p-4 sm:p-6">
-                      <div className="text-gray-500 text-sm">No stats available yet</div>
-                      <div className="text-gray-600 text-xs mt-2">Be the first to file a case!</div>
+                    <div className="pixel-card p-4 sm:p-6">
+                      <div className="pixel-text-sm text-gray-500">NO STATS YET</div>
+                      <div className="pixel-text-sm text-gray-600 mt-2">BE THE FIRST!</div>
                     </div>
                   )}
 
