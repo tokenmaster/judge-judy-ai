@@ -1448,7 +1448,7 @@ Settle YOUR disputes at judgejoody.ai`;
                   <img
                     src={pastJudgeGifs.winner}
                     alt="Judge's reaction"
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-contain"
                   />
                 </div>
                 <div>
@@ -1944,7 +1944,7 @@ Settle YOUR disputes at judgejoody.ai`;
                     <img
                       src={JUDGE_GIFS[caseData.judge as keyof typeof JUDGE_GIFS]?.waiting || JUDGE_GIFS.joody.waiting}
                       alt="Judge waiting"
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-contain"
                     />
                   </div>
                   <div className="text-yellow-500 font-bold text-xs sm:text-sm md:text-base">
@@ -2002,7 +2002,7 @@ Settle YOUR disputes at judgejoody.ai`;
                       <img
                         src={getCategoryGif(caseData.category, 'dispute')}
                         alt="Case dispute"
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-contain"
                       />
                     </div>
                   </div>
@@ -2029,7 +2029,7 @@ Settle YOUR disputes at judgejoody.ai`;
                       <img
                         src={JUDGE_GIFS[caseData.judge as keyof typeof JUDGE_GIFS]?.intro || JUDGE_GIFS.joody.intro}
                         alt={`${judge?.name || 'Judge'} reaction`}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-contain"
                       />
                     </div>
                     {/* Judge Info */}
@@ -2292,9 +2292,9 @@ if (isMultiplayer && !isMyTurn && !isLoading) {
                       setObjectionWindow({ type: 'question', content: currentQuestion });
                       setShowObjectionModal(true);
                     }}
-                    className="w-full tv-button tv-button-red py-2 text-sm"
+                    className="tv-button tv-button-red py-1 px-3 text-xs"
                   >
-                    ⚠️ {targetName}: OBJECT TO THIS QUESTION
+                    ⚠️ OBJECT
                   </button>
                 )}
 
@@ -2350,7 +2350,7 @@ if (isMultiplayer && !isMyTurn && !isLoading) {
                   <img
                     src={judgeGifs.thinking}
                     alt="Judge deliberating"
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-contain"
                   />
                 </div>
                 <div className="tv-title text-base sm:text-lg md:text-xl mb-2">The judge is deliberating...</div>
@@ -2387,7 +2387,7 @@ if (isMultiplayer && !isMyTurn && !isLoading) {
                   <img
                     src={judgeGifs.winner}
                     alt="Judge's reaction"
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-contain"
                   />
                 </div>
                 <div>
@@ -2406,7 +2406,7 @@ if (isMultiplayer && !isMyTurn && !isLoading) {
                   <img
                     src={getCategoryGif(caseData.category, 'winner')}
                     alt="Winner reaction"
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-contain"
                   />
                 </div>
                 <div className="text-white font-bold text-xs sm:text-sm">{verdict.winnerName}</div>
@@ -2417,7 +2417,7 @@ if (isMultiplayer && !isMyTurn && !isLoading) {
                   <img
                     src={getCategoryGif(caseData.category, 'loser')}
                     alt="Loser reaction"
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-contain"
                   />
                 </div>
                 <div className="text-white font-bold text-xs sm:text-sm">{verdict.loserName}</div>
@@ -2489,7 +2489,7 @@ if (isMultiplayer && !isMyTurn && !isLoading) {
                     <img
                       src={appealResult.upheld ? getSituationGif('appealDenied') : getSituationGif('appealGranted')}
                       alt={appealResult.upheld ? 'Appeal denied' : 'Appeal granted'}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-contain"
                     />
                   </div>
                 </div>

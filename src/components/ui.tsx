@@ -6,26 +6,34 @@ import { getCredibilityLabel, getCredibilityColor, OBJECTION_TYPES, JUDGE_GIFS, 
 // TV Frame Wrapper Component
 export function TVFrame({ children, showLive = true }: { children: React.ReactNode; showLive?: boolean }) {
   return (
-    <div className="tv-screen p-6 relative z-0">
-      {showLive && (
-        <div className="absolute top-3 right-3 z-20">
-          <span className="live-badge">LIVE</span>
+    <div className="relative">
+      {/* TV Antennas */}
+      <div className="flex justify-center gap-8 -mb-1">
+        <div className="w-1 h-10 bg-gray-600 rounded-full transform -rotate-12 origin-bottom" />
+        <div className="w-1 h-10 bg-gray-600 rounded-full transform rotate-12 origin-bottom" />
+      </div>
+      <div className="tv-screen p-6 relative z-0">
+        {/* Channel Bug - Top Left */}
+        <div className="absolute top-3 left-3 channel-bug z-20 text-xs">
+          COURT TV
         </div>
-      )}
-      <div className="relative z-0">
-        {children}
+        {showLive && (
+          <div className="absolute top-3 right-3 z-20">
+            <span className="live-badge">LIVE</span>
+          </div>
+        )}
+        <div className="relative z-0 pt-4">
+          {children}
+        </div>
       </div>
     </div>
   );
 }
 
-// Channel Bug Component
+// Channel Bug Component (legacy - now built into TVFrame)
 export function ChannelBug({ text = "COURT TV" }: { text?: string }) {
-  return (
-    <div className="absolute bottom-3 right-3 channel-bug z-20">
-      {text}
-    </div>
-  );
+  // Now integrated into TVFrame, this is a no-op for backwards compatibility
+  return null;
 }
 
 // Progress Indicator Component - TV Chyron Style
@@ -368,7 +376,7 @@ export function ObjectionRuling({
           <img
             src={gifUrl}
             alt="Judge's reaction"
-            className="w-full h-full object-cover"
+            className="w-full h-full object-contain"
           />
         </div>
         <div className={`text-4xl font-black mb-4 tracking-wider ${ruling.sustained ? 'text-green-400' : 'text-red-500'}`}
@@ -418,7 +426,7 @@ export function SnapJudgmentDisplay({
           <img
             src={judgeGifs.snapJudgment}
             alt="Judge's snap judgment"
-            className="w-full h-full object-cover"
+            className="w-full h-full object-contain"
           />
         </div>
         <div className="text-red-500 text-3xl font-black mb-2 tracking-wider"
