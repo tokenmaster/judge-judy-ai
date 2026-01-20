@@ -131,7 +131,7 @@ export function StakesBadge({ stakes, compact = false }: { stakes: string; compa
   );
 }
 
-// Credibility Bar Component - Health Bar Style
+// Credibility Bar Component - Tekken Style Health Bars
 export function CredibilityBar({
   partyA,
   partyB,
@@ -150,61 +150,57 @@ export function CredibilityBar({
   const lastA = history.filter(h => h.party === 'A').slice(-1)[0];
   const lastB = history.filter(h => h.party === 'B').slice(-1)[0];
 
-  // Get health bar color based on percentage
-  const getHealthColor = (health: number) => {
-    if (health >= 70) return 'bg-green-500';
-    if (health >= 40) return 'bg-yellow-500';
-    return 'bg-red-500';
-  };
-
-  const getHealthGradient = (health: number) => {
-    if (health >= 70) return 'from-green-600 to-green-400';
-    if (health >= 40) return 'from-yellow-600 to-yellow-400';
-    return 'from-red-600 to-red-400';
-  };
-
   if (compact) {
-    // Compact stacked version
+    // Compact Tekken-style version
     return (
-      <div className="mb-2 px-2 space-y-1">
-        {/* Party A health bar */}
-        <div className="flex items-center gap-2">
-          <span className="text-[10px] font-bold text-blue-400 w-12 truncate">{partyA}</span>
-          <div className="flex-1 h-2 bg-gray-800 rounded-full overflow-hidden border border-gray-700">
-            <div
-              className={`h-full ${getHealthColor(credibilityA)} transition-all duration-500`}
-              style={{ width: `${credibilityA}%` }}
-            />
+      <div className="mb-2">
+        <div className="flex items-center gap-1">
+          {/* Party A - Left side */}
+          <div className="flex-1">
+            <div className="flex items-center justify-between mb-0.5">
+              <span className="text-[9px] font-black text-cyan-400 uppercase tracking-wide truncate">{partyA}</span>
+              <span className="text-[9px] font-bold text-white">{credibilityA}%</span>
+            </div>
+            <div className="h-2 bg-gray-900 rounded-sm overflow-hidden border border-gray-600 relative">
+              <div
+                className="absolute inset-y-0 right-0 bg-gradient-to-l from-orange-500 via-yellow-400 to-yellow-300 transition-all duration-500"
+                style={{ width: `${credibilityA}%` }}
+              />
+            </div>
           </div>
-          <span className="text-[10px] font-bold text-gray-400 w-8">{credibilityA}%</span>
-        </div>
-        {/* Party B health bar */}
-        <div className="flex items-center gap-2">
-          <span className="text-[10px] font-bold text-red-400 w-12 truncate">{partyB}</span>
-          <div className="flex-1 h-2 bg-gray-800 rounded-full overflow-hidden border border-gray-700">
-            <div
-              className={`h-full ${getHealthColor(credibilityB)} transition-all duration-500`}
-              style={{ width: `${credibilityB}%` }}
-            />
+
+          {/* VS divider */}
+          <div className="px-1">
+            <span className="text-[8px] font-black text-yellow-500">⚔</span>
           </div>
-          <span className="text-[10px] font-bold text-gray-400 w-8">{credibilityB}%</span>
+
+          {/* Party B - Right side */}
+          <div className="flex-1">
+            <div className="flex items-center justify-between mb-0.5">
+              <span className="text-[9px] font-bold text-white">{credibilityB}%</span>
+              <span className="text-[9px] font-black text-red-400 uppercase tracking-wide truncate">{partyB}</span>
+            </div>
+            <div className="h-2 bg-gray-900 rounded-sm overflow-hidden border border-gray-600 relative">
+              <div
+                className="absolute inset-y-0 left-0 bg-gradient-to-r from-orange-500 via-yellow-400 to-yellow-300 transition-all duration-500"
+                style={{ width: `${credibilityB}%` }}
+              />
+            </div>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="tv-card p-3 mb-4">
-      <div className="text-center mb-2">
-        <span className="text-[10px] font-bold tracking-widest text-yellow-500 uppercase">Credibility</span>
-      </div>
-
-      <div className="space-y-3">
-        {/* Party A health bar */}
-        <div>
+    <div className="mb-4 px-2">
+      {/* Tekken-style health bar layout */}
+      <div className="flex items-start gap-2">
+        {/* Party A - Left side (bar depletes from right) */}
+        <div className="flex-1">
           <div className="flex items-center justify-between mb-1">
-            <span className="text-xs font-bold text-blue-400 truncate max-w-[100px]">{partyA}</span>
-            <div className="flex items-center gap-2">
+            <span className="text-xs font-black text-cyan-400 uppercase tracking-wider truncate max-w-[80px]">{partyA}</span>
+            <div className="flex items-center gap-1">
               {lastA && (
                 <span className={`text-[10px] font-bold ${lastA.change >= 0 ? 'text-green-400' : 'text-red-400'}`}>
                   {lastA.change >= 0 ? '+' : ''}{lastA.change}
@@ -213,39 +209,70 @@ export function CredibilityBar({
               <span className="text-sm font-black text-white">{credibilityA}%</span>
             </div>
           </div>
-          <div className="h-4 bg-gray-900 rounded overflow-hidden border border-gray-700">
+          {/* Health bar - depletes from right to left */}
+          <div className="h-5 bg-gray-900 rounded-sm overflow-hidden border-2 border-gray-600 relative"
+               style={{ boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.5)' }}>
+            {/* Background damage indicator */}
+            <div className="absolute inset-0 bg-red-900/50" />
+            {/* Actual health */}
             <div
-              className={`h-full bg-gradient-to-r ${getHealthGradient(credibilityA)} transition-all duration-500 relative`}
+              className="absolute inset-y-0 right-0 bg-gradient-to-l from-orange-500 via-yellow-400 to-yellow-200 transition-all duration-500"
               style={{ width: `${credibilityA}%` }}
             >
               {/* Shine effect */}
-              <div className="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-b from-white/30 via-transparent to-black/20" />
+              {/* Segment lines */}
+              <div className="absolute inset-0 flex">
+                {[...Array(10)].map((_, i) => (
+                  <div key={i} className="flex-1 border-r border-black/20 last:border-0" />
+                ))}
+              </div>
             </div>
+          </div>
+          <div className="text-[8px] text-gray-500 mt-0.5 uppercase tracking-widest">Credibility</div>
+        </div>
+
+        {/* Center VS badge */}
+        <div className="flex flex-col items-center justify-center pt-4">
+          <div className="w-8 h-8 rounded-full bg-gradient-to-b from-yellow-500 to-orange-600 flex items-center justify-center border-2 border-yellow-300 shadow-lg">
+            <span className="text-xs font-black text-black">VS</span>
           </div>
         </div>
 
-        {/* Party B health bar */}
-        <div>
+        {/* Party B - Right side (bar depletes from left) */}
+        <div className="flex-1">
           <div className="flex items-center justify-between mb-1">
-            <span className="text-xs font-bold text-red-400 truncate max-w-[100px]">{partyB}</span>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1">
+              <span className="text-sm font-black text-white">{credibilityB}%</span>
               {lastB && (
                 <span className={`text-[10px] font-bold ${lastB.change >= 0 ? 'text-green-400' : 'text-red-400'}`}>
                   {lastB.change >= 0 ? '+' : ''}{lastB.change}
                 </span>
               )}
-              <span className="text-sm font-black text-white">{credibilityB}%</span>
             </div>
+            <span className="text-xs font-black text-red-400 uppercase tracking-wider truncate max-w-[80px]">{partyB}</span>
           </div>
-          <div className="h-4 bg-gray-900 rounded overflow-hidden border border-gray-700">
+          {/* Health bar - depletes from left to right */}
+          <div className="h-5 bg-gray-900 rounded-sm overflow-hidden border-2 border-gray-600 relative"
+               style={{ boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.5)' }}>
+            {/* Background damage indicator */}
+            <div className="absolute inset-0 bg-red-900/50" />
+            {/* Actual health */}
             <div
-              className={`h-full bg-gradient-to-r ${getHealthGradient(credibilityB)} transition-all duration-500 relative`}
+              className="absolute inset-y-0 left-0 bg-gradient-to-r from-orange-500 via-yellow-400 to-yellow-200 transition-all duration-500"
               style={{ width: `${credibilityB}%` }}
             >
               {/* Shine effect */}
-              <div className="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-b from-white/30 via-transparent to-black/20" />
+              {/* Segment lines */}
+              <div className="absolute inset-0 flex">
+                {[...Array(10)].map((_, i) => (
+                  <div key={i} className="flex-1 border-r border-black/20 last:border-0" />
+                ))}
+              </div>
             </div>
           </div>
+          <div className="text-[8px] text-gray-500 mt-0.5 uppercase tracking-widest text-right">Credibility</div>
         </div>
       </div>
     </div>
