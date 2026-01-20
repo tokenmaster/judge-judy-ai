@@ -2150,13 +2150,6 @@ Settle YOUR disputes at judgejoody.ai`;
         <div className="w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-2xl mx-auto">
           <TVFrame>
             <ProgressIndicator currentPhase="statements" />
-            <div className="lower-third mb-4 sm:mb-6 pl-4 sm:pl-6">
-              <div className="text-[10px] sm:text-xs font-bold text-yellow-900 tracking-widest">OPENING STATEMENTS</div>
-              <div className="text-black font-bold text-sm sm:text-lg">{caseData.title}</div>
-              {isMultiplayer && <div className="text-[10px] sm:text-xs text-yellow-900 mt-1">Room: {roomCode}</div>}
-            </div>
-
-            <StakesBadge stakes={caseData.stakes} />
 
             <div className="mb-4 sm:mb-6">
               <div className="flex flex-col sm:flex-row gap-2">
