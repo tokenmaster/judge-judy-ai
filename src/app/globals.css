@@ -1094,6 +1094,10 @@ body {
   border: 3px solid var(--pixel-gray);
 }
 
+.chat-typing-indicator.chat-typing-right {
+  align-self: flex-end;
+}
+
 .chat-typing-dots {
   display: flex;
   gap: 4px;

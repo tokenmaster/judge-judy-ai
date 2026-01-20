@@ -195,9 +195,9 @@ export function ChatThread({
         </div>
       )}
 
-      {/* Typing indicator */}
+      {/* Typing indicator - right aligned for party typing */}
       {isOtherTyping && !isLoading && (
-        <div className="chat-typing-indicator">
+        <div className="chat-typing-indicator chat-typing-right">
           <div className="flex items-center gap-2">
             <span className="text-yellow-500 text-xs">{typingPlayerName}</span>
             <div className="chat-typing-dots">
