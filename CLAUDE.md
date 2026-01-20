@@ -27,7 +27,7 @@ Judge Joody AI is a multiplayer AI-powered dispute resolution game using Next.js
 1. **Explicit generation calls** - Removed the reactive useEffect. Questions are now generated explicitly at specific moments:
    - `handleStatementSubmit`: When entering crossExam phase (single player)
    - `handleResponseSubmit`: After transitioning to next party (single player)
-   - `handleCaseUpdate`: When becoming examTarget via subscription (multiplayer)
+   - `handleCaseUpdate`: When becoming the EXAMINER (NOT the examTarget) via subscription (multiplayer)
 
 2. **Refs for subscription callbacks** - Use refs to ensure subscription callbacks always call the latest handler versions:
    - `handleCaseUpdateRef` - Always points to latest `handleCaseUpdate`
@@ -49,9 +49,11 @@ Judge Joody AI is a multiplayer AI-powered dispute resolution game using Next.js
 1. Party A creates case, gets room code
 2. Party B joins with room code
 3. Both submit statements
-4. Cross-examination: examTarget player generates questions, other player waits
-5. After each response, target switches and other player generates next question
+4. Cross-examination: The EXAMINER (player who is NOT the examTarget) generates questions, examTarget waits to answer
+5. After each response, target switches and the NEW examiner generates the next question
 6. After 2 rounds (4 questions total), verdict is generated
+
+**Key insight:** `examTarget` is the party being QUESTIONED (they answer). The OTHER party (examiner) generates the questions.
 
 ### Disabled Features
 

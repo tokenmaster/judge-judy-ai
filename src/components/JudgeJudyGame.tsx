@@ -722,10 +722,13 @@ useEffect(() => {
         console.log('[CaseUpdate] Already generated for this slot');
       }
     } else if (newPhase === 'crossExam' && currentRole !== newTarget) {
-      // We're the spectator - we should wait for the question from DB
-      console.log('[CaseUpdate] Spectator waiting for question from DB');
+      // We're the examiner but already generating - just wait
+      console.log('[CaseUpdate] Examiner already generating, waiting');
+    } else if (newPhase === 'crossExam' && currentRole === newTarget) {
+      // We're the target (being questioned) - wait for examiner to generate
+      console.log('[CaseUpdate] I am the target, waiting for examiner to generate question');
     } else {
-      console.log('[CaseUpdate] Not crossExam phase or not ready');
+      console.log('[CaseUpdate] Not crossExam phase or other state');
     }
 
     setObjectionsUsed({
@@ -1136,9 +1139,9 @@ const handleResponseSubmit = async () => {
     } else {
       // Generate next question
       if (isMultiplayer) {
-        // In multiplayer, the new examTarget player generates via subscription
-        // We just need to clear our state - they will generate
-        console.log('[ResponseSubmit] Multiplayer - other player will generate');
+        // In multiplayer, the EXAMINER (non-target) player generates via subscription
+        // We just need to clear our state - the examiner will generate
+        console.log('[ResponseSubmit] Multiplayer - examiner will generate via subscription');
       } else {
         // In single player, we generate the next question immediately
         console.log('[ResponseSubmit] Single player - generating next question');
@@ -1201,8 +1204,8 @@ const handleResponseSubmit = async () => {
     setAppealResult(null);
     setIsAppealing(false);
     setAppealAcknowledged(false);
-    setCredibilityA(50);
-    setCredibilityB(50);
+    setCredibilityA(100);
+    setCredibilityB(100);
     setClarificationCount(0);
     setIsClarifying(false);
     setObjections([]);
