@@ -83,8 +83,8 @@ export default function JudgeJudyGame({ initialRoomCode }: { initialRoomCode?: s
   const [appealResult, setAppealResult] = useState<any>(null);
   const [isAppealing, setIsAppealing] = useState(false);
   const [appealAcknowledged, setAppealAcknowledged] = useState(false);
-  const [credibilityA, setCredibilityA] = useState(50);
-  const [credibilityB, setCredibilityB] = useState(50);
+  const [credibilityA, setCredibilityA] = useState(100);
+  const [credibilityB, setCredibilityB] = useState(100);
   const [credibilityHistory, setCredibilityHistory] = useState<any[]>([]);
   const [clarificationCount, setClarificationCount] = useState(0);
   const [isClarifying, setIsClarifying] = useState(false);

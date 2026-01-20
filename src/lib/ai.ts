@@ -245,7 +245,7 @@ FLAG: [specific credibility concern if any, or "none"]`;
     (parseInt(accountabilityMatch?.[1] || '0')) +
     (parseInt(specificityMatch?.[1] || '0'));
   
-  const newCredibility = Math.max(5, Math.min(95, currentCredibility + totalChange));
+  const newCredibility = Math.max(5, Math.min(100, currentCredibility + totalChange));
   const flaggedText = flagMatch?.[1];
   const flagged = (flaggedText && flaggedText.toLowerCase() !== 'none') ? flaggedText : null;
   
