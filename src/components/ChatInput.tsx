@@ -32,10 +32,11 @@ export function ChatInput({
   partyColor,
   disabled,
   isLoading,
-  showScaffolding = true
+  showScaffolding = false
 }: ChatInputProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [selectedType, setSelectedType] = useState<AnswerType | null>(null);
+  const [showHelp, setShowHelp] = useState(false);
   const accentColor = partyColor === 'blue' ? '#3b82f6' : '#ef4444';
 
   // Auto-resize textarea
@@ -62,28 +63,46 @@ export function ChatInput({
 
   return (
     <div className="space-y-2">
-      {/* Answer Type Chips */}
-      {showScaffolding && (
-        <div className="flex flex-wrap gap-1">
-          {ANSWER_TYPES.map((type) => (
-            <button
-              key={type.id}
-              onClick={() => setSelectedType(selectedType === type.id ? null : type.id)}
-              className={`px-2 py-1 text-[8px] sm:text-[10px] border transition-all
-                ${selectedType === type.id
-                  ? type.warning
-                    ? 'bg-orange-900/50 border-orange-500 text-orange-300'
-                    : 'bg-[#2a4a70] border-[#4a7ab0] text-white'
-                  : 'bg-gray-800 border-gray-600 text-gray-400 hover:border-gray-500'
-                }
-                ${type.warning ? 'opacity-70' : ''}
-              `}
-            >
-              <span className="mr-1">{type.icon}</span>
-              {type.label}
-              {type.warning && <span className="ml-1 text-orange-400">⚠</span>}
-            </button>
-          ))}
+      {/* "Need help?" toggle - hidden chips by default */}
+      {showScaffolding && !showHelp && (
+        <button
+          onClick={() => setShowHelp(true)}
+          className="text-[10px] text-gray-500 hover:text-gray-400 transition-colors"
+        >
+          💡 Need help answering?
+        </button>
+      )}
+
+      {/* Answer Type Chips - only shown when help is toggled */}
+      {showScaffolding && showHelp && (
+        <div className="space-y-1">
+          <div className="flex flex-wrap gap-1">
+            {ANSWER_TYPES.map((type) => (
+              <button
+                key={type.id}
+                onClick={() => setSelectedType(selectedType === type.id ? null : type.id)}
+                className={`px-2 py-1 text-[8px] sm:text-[10px] border transition-all
+                  ${selectedType === type.id
+                    ? type.warning
+                      ? 'bg-orange-900/50 border-orange-500 text-orange-300'
+                      : 'bg-[#2a4a70] border-[#4a7ab0] text-white'
+                    : 'bg-gray-800 border-gray-600 text-gray-400 hover:border-gray-500'
+                  }
+                  ${type.warning ? 'opacity-70' : ''}
+                `}
+              >
+                <span className="mr-1">{type.icon}</span>
+                {type.label}
+                {type.warning && <span className="ml-1 text-orange-400">⚠</span>}
+              </button>
+            ))}
+          </div>
+          <button
+            onClick={() => { setShowHelp(false); setSelectedType(null); }}
+            className="text-[9px] text-gray-600 hover:text-gray-500"
+          >
+            ✕ Hide tips
+          </button>
         </div>
       )}
 

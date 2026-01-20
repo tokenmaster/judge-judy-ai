@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useEffect, useMemo } from 'react';
+import React, { useRef, useEffect, useMemo, useState } from 'react';
 import { ChatMessage, ChatMessageData } from './ChatMessage';
 import { JUDGE_PERSONALITIES } from '@/lib/constants';
 
@@ -146,6 +146,7 @@ export function ChatThread({
   loadingEmoji
 }: ChatThreadProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [showHistory, setShowHistory] = useState(false);
 
   // Build messages array
   const messages = useMemo(
@@ -153,32 +154,60 @@ export function ChatThread({
     [caseData, responses, currentQuestion, examTarget]
   );
 
+  // Separate history from current active question
+  const { historyMessages, activeMessage } = useMemo(() => {
+    const active = messages.find(m => m.isActive);
+    const history = messages.filter(m => !m.isActive);
+    return { historyMessages: history, activeMessage: active };
+  }, [messages]);
+
   // Auto-scroll to bottom when messages change
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [messages, isOtherTyping]);
+  }, [messages, isOtherTyping, showHistory]);
+
+  const historyCount = historyMessages.length;
 
   return (
-    <div className="chat-thread" ref={scrollRef}>
-      {/* Section header */}
-      <div className="text-center mb-4">
-        <div className="pixel-badge pixel-badge-gold inline-block text-[8px] sm:text-[10px]">
-          CASE PROCEEDINGS
-        </div>
-      </div>
+    <div className="chat-thread chat-thread-simplified" ref={scrollRef}>
+      {/* Collapsed history toggle - only show if there's history */}
+      {historyCount > 0 && (
+        <button
+          onClick={() => setShowHistory(!showHistory)}
+          className="chat-history-toggle"
+        >
+          {showHistory ? '▲ Hide' : '▼ Show'} {historyCount} previous exchange{historyCount !== 1 ? 's' : ''}
+        </button>
+      )}
 
-      {/* Message list */}
-      {messages.map((message) => (
+      {/* Collapsed history - shown only when expanded */}
+      {showHistory && historyMessages.map((message) => (
         <ChatMessage
           key={message.id}
           message={message}
           showCredibilityChange={message.type === 'party_response'}
+        />
+      ))}
+
+      {/* Divider when history is shown */}
+      {showHistory && historyCount > 0 && activeMessage && (
+        <div className="chat-history-divider">
+          <span>CURRENT QUESTION</span>
+        </div>
+      )}
+
+      {/* Active question - always prominent */}
+      {activeMessage && (
+        <ChatMessage
+          key={activeMessage.id}
+          message={activeMessage}
+          showCredibilityChange={false}
           onObjectionClick={onObjectionClick}
           canObject={canObject}
         />
-      ))}
+      )}
 
       {/* Loading indicator - inside chat thread */}
       {isLoading && (

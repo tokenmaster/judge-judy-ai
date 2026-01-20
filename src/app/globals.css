@@ -1086,26 +1086,94 @@ body {
   background: rgba(178, 34, 34, 0.2);
 }
 
-/* Question Card - Focal Element */
+/* Question Card - Focal Element (ENLARGED for prominence) */
 .chat-question-wrapper {
   align-self: flex-start;
-  max-width: 95%;
+  max-width: 100%;
+  width: 100%;
 }
 
 .chat-question-card {
   background: linear-gradient(180deg, #3d2f10 0%, #2a2010 100%);
   border: 4px solid var(--pixel-gold);
-  padding: 16px;
-  margin-top: 4px;
+  padding: 20px 24px;
+  margin: 8px 0;
+  min-height: 80px;
   box-shadow:
     4px 4px 0 var(--pixel-black),
-    0 0 20px rgba(218, 165, 32, 0.3);
+    0 0 30px rgba(218, 165, 32, 0.4);
 }
 
 .chat-question-card .chat-content {
-  font-size: 14px;
-  line-height: 1.6;
+  font-size: 16px;
+  line-height: 1.7;
   color: var(--pixel-gold);
+}
+
+/* Simplified chat thread with collapsed history */
+.chat-thread-simplified {
+  max-height: 400px;
+}
+
+/* History toggle button */
+.chat-history-toggle {
+  width: 100%;
+  padding: 8px 12px;
+  margin-bottom: 12px;
+  background: var(--pixel-gray-dark);
+  border: 2px solid var(--pixel-gray);
+  color: var(--pixel-cream);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  text-align: center;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.chat-history-toggle:hover {
+  opacity: 1;
+  background: var(--pixel-gray);
+}
+
+/* History divider */
+.chat-history-divider {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 16px 0;
+  color: var(--pixel-gold);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  opacity: 0.6;
+}
+
+.chat-history-divider::before,
+.chat-history-divider::after {
+  content: '';
+  flex: 1;
+  height: 2px;
+  background: var(--pixel-gold);
+  opacity: 0.3;
+  margin: 0 12px;
+}
+
+/* Action header for responding */
+.chat-action-header {
+  text-align: center;
+  padding: 8px 0;
+  color: var(--pixel-cream);
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  opacity: 0.8;
+  animation: action-pulse 2s ease-in-out infinite;
+}
+
+@keyframes action-pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
 }
 
 /* Judge Flavor - Collapsible Commentary */
@@ -1186,6 +1254,10 @@ body {
     border-width: 3px;
   }
 
+  .chat-thread-simplified {
+    max-height: 320px;
+  }
+
   .chat-bubble {
     max-width: 90%;
     padding: 10px 12px;
@@ -1228,5 +1300,33 @@ body {
   .chat-typing-dots span {
     width: 6px;
     height: 6px;
+  }
+
+  /* Mobile question card - still prominent */
+  .chat-question-card {
+    padding: 16px 18px;
+    min-height: 60px;
+  }
+
+  .chat-question-card .chat-content {
+    font-size: 14px;
+  }
+
+  /* Mobile history toggle */
+  .chat-history-toggle {
+    font-size: 6px;
+    padding: 6px 10px;
+  }
+
+  /* Mobile history divider */
+  .chat-history-divider {
+    font-size: 6px;
+    margin: 12px 0;
+  }
+
+  /* Mobile action header */
+  .chat-action-header {
+    font-size: 8px;
+    letter-spacing: 1px;
   }
 }

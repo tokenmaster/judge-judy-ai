@@ -28,6 +28,7 @@ import {
   StakesBadge,
   CredibilityBar,
   TiltBar,
+  MiniStatusBar,
   CollapsibleOpeningStatements,
   CollapsibleStakes,
   Transcript,
@@ -2225,51 +2226,29 @@ if (isMultiplayer && !isMyTurn) {
         <div className="min-h-screen p-2 sm:p-4 md:p-6">
           <div className="w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-2xl mx-auto">
             <TVFrame>
-              <div className="flex items-center justify-between mb-3">
-                <ProgressIndicator currentPhase="crossExam" />
-                <RoundIndicator round={examRound + 1} totalRounds={3} />
-              </div>
-
-              {/* Collapsible panels */}
-              <CollapsibleOpeningStatements
+              {/* Simplified: MiniStatusBar replaces multiple components */}
+              <MiniStatusBar
+                round={examRound + 1}
+                totalRounds={3}
                 partyA={caseData.partyA}
                 partyB={caseData.partyB}
-                statementA={caseData.statementA}
-                statementB={caseData.statementB}
-                isExpanded={openingStatementsExpanded}
-                onToggle={() => setOpeningStatementsExpanded(!openingStatementsExpanded)}
-              />
-              <CollapsibleStakes
-                stakes={caseData.stakes}
-                isExpanded={stakesExpanded}
-                onToggle={() => setStakesExpanded(!stakesExpanded)}
-              />
-
-              {/* TiltBar - no percentages */}
-              <TiltBar
-                partyA={caseData.partyA}
-                partyB={caseData.partyB}
-                credibilityA={credibilityA}
-                credibilityB={credibilityB}
                 activeParty={examTarget as 'A' | 'B'}
               />
 
               {/* Chat Thread - watching mode */}
-              <div className="mt-2">
-                <ChatThread
-                  caseData={caseData}
-                  responses={responses}
-                  currentQuestion={currentQuestion}
-                  examTarget={examTarget as 'A' | 'B'}
-                  isOtherTyping={isOtherTyping}
-                  typingPlayerName={targetName}
-                  myRole={myRole}
-                  isWaiting={!isLoading && !currentQuestion}
-                  isLoading={isLoading}
-                  loadingMessage={loadingMessage}
-                  loadingEmoji={loadingEmoji}
-                />
-              </div>
+              <ChatThread
+                caseData={caseData}
+                responses={responses}
+                currentQuestion={currentQuestion}
+                examTarget={examTarget as 'A' | 'B'}
+                isOtherTyping={isOtherTyping}
+                typingPlayerName={targetName}
+                myRole={myRole}
+                isWaiting={!isLoading && !currentQuestion}
+                isLoading={isLoading}
+                loadingMessage={loadingMessage}
+                loadingEmoji={loadingEmoji}
+              />
 
               <div className="tv-card p-2 mt-3">
                 <div className="text-gray-400 text-[10px] sm:text-xs text-center">
@@ -2288,36 +2267,16 @@ if (isMultiplayer && !isMyTurn) {
       <div className="min-h-screen p-2 sm:p-4 md:p-6">
         <div className="w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-2xl mx-auto">
           <TVFrame>
-            <div className="flex items-center justify-between mb-3">
-              <ProgressIndicator currentPhase="crossExam" compact />
-              <RoundIndicator round={examRound + 1} totalRounds={3} />
-            </div>
-
-            {/* Collapsible panels */}
-            <CollapsibleOpeningStatements
+            {/* Simplified: MiniStatusBar replaces multiple components */}
+            <MiniStatusBar
+              round={examRound + 1}
+              totalRounds={3}
               partyA={caseData.partyA}
               partyB={caseData.partyB}
-              statementA={caseData.statementA}
-              statementB={caseData.statementB}
-              isExpanded={openingStatementsExpanded}
-              onToggle={() => setOpeningStatementsExpanded(!openingStatementsExpanded)}
-            />
-            <CollapsibleStakes
-              stakes={caseData.stakes}
-              isExpanded={stakesExpanded}
-              onToggle={() => setStakesExpanded(!stakesExpanded)}
-            />
-
-            {/* TiltBar - no percentages */}
-            <TiltBar
-              partyA={caseData.partyA}
-              partyB={caseData.partyB}
-              credibilityA={credibilityA}
-              credibilityB={credibilityB}
               activeParty={examTarget as 'A' | 'B'}
             />
 
-            <div className="space-y-3 mt-2">
+            <div className="space-y-3">
               {/* Chat Thread - active responder mode with loading inside */}
               <ChatThread
                 caseData={caseData}
@@ -2339,21 +2298,26 @@ if (isMultiplayer && !isMyTurn) {
                 loadingEmoji={loadingEmoji || '📝'}
               />
 
-              {/* Chat Input with answer scaffolding - only show when question is ready */}
+              {/* Chat Input - only show when question is ready */}
               {currentQuestion && !isLoading && (
-                <ChatInput
-                  value={currentResponse}
-                  onChange={(value) => {
-                    setCurrentResponse(value);
-                    broadcastTyping();
-                  }}
-                  onSubmit={handleResponseSubmit}
-                  placeholder="Type your answer..."
-                  partyColor={examTarget === 'A' ? 'blue' : 'red'}
-                  partyName={targetName}
-                  disabled={!currentQuestion}
-                  showScaffolding={true}
-                />
+                <div className="space-y-2">
+                  <div className="text-center text-[10px] sm:text-xs text-gray-400 uppercase tracking-wider">
+                    ↓ Respond to the Judge ↓
+                  </div>
+                  <ChatInput
+                    value={currentResponse}
+                    onChange={(value) => {
+                      setCurrentResponse(value);
+                      broadcastTyping();
+                    }}
+                    onSubmit={handleResponseSubmit}
+                    placeholder="Type your answer..."
+                    partyColor={examTarget === 'A' ? 'blue' : 'red'}
+                    partyName={targetName}
+                    disabled={!currentQuestion}
+                    showScaffolding={false}
+                  />
+                </div>
               )}
             </div>
             <ChannelBug text="COURT TV" />

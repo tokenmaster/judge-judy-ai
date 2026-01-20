@@ -298,6 +298,41 @@ export function CredibilityBar({
   );
 }
 
+// Mini Status Bar - Compact single-row status for simplified cross-exam
+export function MiniStatusBar({
+  round,
+  totalRounds,
+  partyA,
+  partyB,
+  activeParty
+}: {
+  round: number;
+  totalRounds: number;
+  partyA: string;
+  partyB: string;
+  activeParty: 'A' | 'B';
+}) {
+  const activeName = activeParty === 'A' ? partyA : partyB;
+
+  return (
+    <div className="flex items-center justify-between px-3 py-2 bg-[#1a1a1a] border-b-2 border-[#333] mb-3">
+      <span className="pixel-text-sm text-gray-500">R{round}/{totalRounds}</span>
+      <div className="flex items-center gap-2 text-xs">
+        <span className={`truncate max-w-[60px] ${activeParty === 'A' ? 'text-[#4a7ab0] font-bold' : 'text-gray-500'}`}>
+          {partyA}
+        </span>
+        <span className="text-gray-600">vs</span>
+        <span className={`truncate max-w-[60px] ${activeParty === 'B' ? 'text-[#b22222] font-bold' : 'text-gray-500'}`}>
+          {partyB}
+        </span>
+      </div>
+      <span className="pixel-badge pixel-badge-live text-[6px]">
+        {activeName.split(' ')[0]} ON AIR
+      </span>
+    </div>
+  );
+}
+
 // Tilt Bar - Visual credibility indicator without numbers
 function getTiltLabel(credA: number, credB: number): string {
   const diff = Math.abs(credA - credB);
